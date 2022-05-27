@@ -1,0 +1,103 @@
+@font-face {
+    font-family: comfortaa;
+    src: url(../fonts/comfortaa.ttf) format("ttf");
+}
+
+@font-face {
+    font-family: robotoMono;
+    src: url(../fonts/robotoMono.ttf);
+}
+
+*{
+    font-family: comfortaa;
+    user-select: none;
+}
+
+body{
+    margin: 0;
+    padding: 0;
+}
+
+/*--Navbar--*/
+.navbar{
+    background-color: white;
+    min-height: 75px;
+    height: 10vh;
+    max-height: 100px;
+    display: flex;
+    align-items: center;
+    position: fixed;
+    top: 0px;
+    width: 100%;
+    z-index: 99;
+}
+
+.navbar_image{
+    height: 100%;
+    overflow: hidden;
+}
+
+.navbar_image img{
+    margin: 5%;
+    max-height: 90%;
+    max-width: 90%;
+}
+
+.navbar_list{
+    height: 100%;
+    display: flex;
+    flex-grow: 1;
+    justify-content: right;
+    align-items: center;
+}
+
+.navbar_item{
+    height: 100%;
+    list-style-type: none;
+    margin-right: 4vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navbar_item:last-child{
+    margin-right: 5vw;
+}
+
+.navbar_link{
+    height: 100%;
+    padding: 0 10px;
+    line-height: calc(min(max(10vh, 75px), 100px));
+    text-align: center;
+    color: #161616;
+    font-weight: bold;
+    text-decoration: none;
+    font-size: 1.75rem;
+}
+
+@media screen and (max-width: 800px){
+    .navbar_item:last-child{
+        margin-right: 1vw;
+    }
+
+    .navbar_link{
+        font-size: 2.9vw;
+    }
+}
+
+/*--Display--*/
+.display{
+    background-color: #161616;
+    padding-top: 20vh;
+    height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.camera{
+    margin-top: 5vh;
+    height: 300px;
+    width: 600px;
+    overflow: hidden;
+}
