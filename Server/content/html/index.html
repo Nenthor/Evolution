@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google" content="notranslate">
+    <script src="/content/JS/external/jquery.js"></script>
+    <link rel="icon" href="/content/images/icon.png">
+    <link rel="stylesheet" href="/content/CSS/index.css">
+    <title>E-Volution</title>
+</head>
+<body>
+    <!--Navbar-->
+    <nav class="navbar">
+        <div class="navbar_image">
+            <img src="/content/images/logo.png" alt="Logo">
+        </div>
+        <ul class="navbar_list">
+            <li class="navbar_item">
+                <a href="/content/html/music.html" class="navbar_link">Musik</a>
+            </li>
+            <li class="navbar_item">
+                <a href="/content/html/camera.html" class="navbar_link">Kamera</a>
+            </li>
+            <li class="navbar_item">
+                <a href="/" class="navbar_link">Neu laden</a>
+            </li>
+        </ul>
+    </nav>
+    <!--Display-->
+    <div class="display">
+        <div class="display_settings">
+            <ul class="display_settingsList">
+                <li class="display_settingsItem">
+                    <img class="display_settingsImage" src="" alt="Sound">
+                </li>
+                <li class="display_settingsItem">
+                    <img class="display_settingsImage" src="" alt="Light">
+                </li>
+                <li class="display_settingsItem">
+                    <img class="display_settingsImage" src="" alt="Remote control">
+                </li>
+                <li class="display_settingsItem">
+                    <img class="display_settingsImage" src="/content/images/shutdown.png" alt="Power off">
+                </li>
+            </ul>
+        </div>
+        <div class="display_speedometer">
+            <canvas id="display_SpeedCanvas"></canvas>
+        </div>
+        <div class="display_batteryContainer">
+                <p class="display_batteryText">Akkustand:</p>
+            <div class="display_batteryBar" id="display_battery">
+                <div class="display_innerCircle">
+                    <p class="display_batteryIndex" id="display_batteryIndex">0%</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Footer-->
+    <div class="footer">
+        <ul class="footer_list">
+            <li class="footer_item">
+                <p class="footer_text">{Coords}</p>
+            </li>
+            <li class="footer_item">
+                <p class="footer_text">{Clock}</p>
+            </li>
+            <li class="footer_item">
+                <p class="footer_text">{Date}</p>
+            </li>
+        </ul>
+    </div>
+    <!--Remotecontroll-->
+    <div class="remotecontrollbox" id="remotecontrollbox">
+        <div class="remotecontrollbox_content">
+            <p class="remotecontrollbox_message" id="confirmMessage">Das System wird ferngesteuert.</p>
+            <div class="remotecontrollbox_input">
+                <input class="remotecontrollbox_button" id="remote_off" type="button" value="Fernsteuerung ausschalten" />
+            </div>
+        </div>
+    </div>
+    <!--ConfirmBox (for shutdownButton)-->
+    <div class="confirmbox">
+        <div class="confirmbox_content">
+            <p class="confirmbox_message" id="confirmMessage">Soll das System heruntergefahren werden?</p>
+            <div class="confirmbox_input">
+                <input class="confirmbox_button" id="confirm_true" type="button" value="Ja" />
+                <input class="confirmbox_button" id="confirm_false" type="button" value="Abbrechen" />
+            </div>
+        </div>
+    </div>
+</body>
+<footer>
+    <script src="/content/JS/index.js"></script>
+</footer>
+</html>
