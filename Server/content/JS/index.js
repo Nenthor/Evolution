@@ -1,11 +1,11 @@
 //Server data
-const socket = new WebSocket(`ws://${location.host}:80`);
+const socket = new WebSocket(`ws://${location.host}`);
 var coords = 'Lokalisieren...';
 var settings = '000';
 var speed = '0';
 var battery = 0;
 
-socket.addEventListener('open', event => {
+socket.addEventListener('open', () => {
     send('get_coords');
     send('get_settings');
     send('get_speed');

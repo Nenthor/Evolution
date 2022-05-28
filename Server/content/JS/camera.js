@@ -4,11 +4,11 @@ var emptyColor = "#777";
 var occupiedColor = "#cd3232";
 
 //Server data
-const socket = new WebSocket(`ws://${location.host}:80`);
+const socket = new WebSocket(`ws://${location.host}`);
 var camera = '000';
 var firstLoad = true;
 
-socket.addEventListener('open', event => {
+socket.addEventListener('open', () => {
     socket.send('get_camera');
 });
 

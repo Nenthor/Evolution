@@ -2,10 +2,10 @@ const playButton = document.getElementById("navbar_playButton");
 const musicItems = document.getElementsByClassName("display_musicItem");
 
 //Server data
-const socket = new WebSocket(`ws://${location.host}:80`);
+const socket = new WebSocket(`ws://${location.host}`);
 var music = 0;
 
-socket.addEventListener('open', event => {
+socket.addEventListener('open', () => {
     socket.send('get_music');
 });
 

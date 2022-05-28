@@ -1,7 +1,7 @@
 //Server data
-const socket = new WebSocket(`ws://${location.host}:80`);
+const socket = new WebSocket(`ws://${location.host}`);
 
-socket.addEventListener('open', event => {
+socket.addEventListener('open', () => {
     send('get_speed');
     send('get_battery');
     send('controll_request');

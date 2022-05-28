@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const WebSocket = require('ws');
 const fs = require('fs');
+const os = require('os');
 
 global.path = String(__dirname);
 global.data = {
@@ -13,7 +14,7 @@ global.data = {
     speed : '0'
 };
 
-const port = 80;
+var port = 80;
 const app = express();
 const server = require('http').createServer(app);
 
@@ -99,6 +100,10 @@ app.get('/content/html/*', function (req, res) {
 app.get('*', (req, res) => { res.status(404); res.end(); });
 
 //Open port
-server.listen(port, function(){
-    console.log(`Server is listening to port ${port}`);
-});
+if(os.platform() == 'linux'){
+	server.listen(port, () => console.log(`Server is listening to port ${port}`));
+}else{
+	port = 8080;
+	server.listen(port, () => console.log(`Server is listening to port ${port}`))
+}
+

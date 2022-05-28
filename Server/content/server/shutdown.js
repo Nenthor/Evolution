@@ -1,4 +1,6 @@
 const shell = require('shelljs');
+const os = require('os');
 
 //Shutdown command
-shell.exec('sudo shutdown now');
+if(os.platform == 'linux')
+    shell.exec('sudo shutdown now');
