@@ -1,3 +1,3 @@
 @ECHO OFF
-node boot.js
+npm install && node boot.js
 PAUSE
