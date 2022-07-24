@@ -5,7 +5,7 @@ socket.addEventListener('open', () => {
     send('get_speed');
     send('get_battery');
     send('controll_request');
-}, {passive: true});
+}, { passive: true });
 
 socket.addEventListener('message', event => {
     const data = String(event.data).split(':');
@@ -17,9 +17,9 @@ socket.addEventListener('message', event => {
             updateBatterytext(data[1]);
             break;
         case 'controll_request':
-            if(data[1] == 'accepted'){
+            if (data[1] == 'accepted') {
                 controllRequest(true, null);
-            }else{
+            } else {
                 controllRequest(false, data[1]);
             }
             break;
@@ -30,10 +30,10 @@ socket.addEventListener('message', event => {
         default:
             break;
     }
-}, {passive: true});
+}, { passive: true });
 
-function send(message){
-    if(socket.readyState == WebSocket.OPEN){
+function send(message) {
+    if (socket.readyState == WebSocket.OPEN) {
         socket.send(message);
     }
 }
@@ -41,23 +41,23 @@ function send(message){
 //BackButton
 const backbutton = document.getElementById('back_button');
 const mobilbackbutton = document.getElementById('mobil_back_button');
-backbutton.addEventListener('click', logout, {passive: true});
-mobilbackbutton.addEventListener('click', logout, {passive: true});
+backbutton.addEventListener('click', logout, { passive: true });
+mobilbackbutton.addEventListener('click', logout, { passive: true });
 
-function logout(){
+function logout() {
     open('/content/html/index_remote.html', '_self');
 }
 
 window.addEventListener('beforeunload', event => {
     send('remote_devicelogout');
-}, {passive: true});
+}, { passive: true });
 
 //Waiting-Animation
 const waitingtitle = document.getElementById('waitingtitle');
 const waitingdefaulttext = waitingtitle.textContent;
 var currentdotanimation = 0;
 setInterval(() => {
-    
+
     switch (currentdotanimation) {
         case 0:
             waitingtitle.textContent = `${waitingdefaulttext}`
@@ -88,17 +88,17 @@ const waitingcause = document.getElementById('waitingcause');
 var connectionCheck = null;
 waitingdiv.style.display = 'flex';
 
-function controllRequest(accepted, cause){
-    if(accepted){
+function controllRequest(accepted, cause) {
+    if (accepted) {
         waitingdiv.style.display = 'none';
         waitingcause.textContent = 'Warte auf Serverantwort';
 
         checkRemoteConnection();
-    }else{
+    } else {
         waitingdiv.style.display = 'flex';
         waitingcause.textContent = cause;
 
-        if(connectionCheck != null){
+        if (connectionCheck != null) {
             clearInterval(connectionCheck);
             connectionCheck = null;
         }
@@ -108,30 +108,30 @@ function controllRequest(accepted, cause){
 //Check remote Connection
 var checkreceived = false;
 
-function checkRemoteConnection(){
+function checkRemoteConnection() {
     checkReceived();
     connectionCheck = setInterval(() => {
-        if(checkreceived){
+        if (checkreceived) {
             checkreceived = false;
-        }else{
+        } else {
             send('remote_devicelogout');
             controllRequest(false, 'Reaktionszeit ist zu groß. Webseite muss neu geladen werden.');
         }
     }, 4000); //Ask if check was received every 2s
 }
 
-function checkReceived(){
+function checkReceived() {
     checkreceived = true;
 }
 
-window.addEventListener('focus', onTurnOnScreen, {passive: true});
-window.addEventListener('blur', onTurnOffScreen, {passive: true});
+window.addEventListener('focus', onTurnOnScreen, { passive: true });
+window.addEventListener('blur', onTurnOffScreen, { passive: true });
 
-function onTurnOnScreen(){
+function onTurnOnScreen() {
     send('controll_request');
 }
 
-function onTurnOffScreen(){
+function onTurnOffScreen() {
     send('remote_devicelogout');
     controllRequest(false, 'Webseite ist nicht im Vordergrund.');
 }
@@ -140,11 +140,11 @@ function onTurnOffScreen(){
 const speedtext = document.getElementById('speedtext');
 const batterytext = document.getElementById('batterytext');
 
-function updateSpeedtext(speed){
+function updateSpeedtext(speed) {
     speedtext.textContent = `Geschwindigkeit: ${speed} km/h`;
 }
 
-function updateBatterytext(battery){
+function updateBatterytext(battery) {
     batterytext.textContent = `Akku: ${battery}%`;
 }
 
@@ -156,19 +156,19 @@ for (let index = 0; index < controller.length; index++) {
     ["mousedown", "touchstart"].forEach(event => {
         element.addEventListener(event, () => {
             onControllerStart(index);
-        }, {passive: true})
+        }, { passive: true })
     });
     ["mouseup", "mouseleave", "touchend", "touchcancel"].forEach(event => {
         element.addEventListener(event, () => {
             onControllerEnd(index);
-        }, {passive: true})
+        }, { passive: true })
     });
 }
 
 var currentdirection = 'STANDBY';
-function onControllerStart(index){
+function onControllerStart(index) {
     // 0: FORWARD ; 1: LEFT ; 2: RIGHT ; 3: BACKWARD
-    if(currentdirection != 'STANDBY') return;
+    if (currentdirection != 'STANDBY') return;
 
     switch (index) {
         case 0:
@@ -184,24 +184,24 @@ function onControllerStart(index){
             currentdirection = 'BACKWARD';
             break;
     }
-    
+
     controller[index].style.backgroundColor = '#3268cd';
     sendCurrentdirection();
 }
 
-function onControllerEnd(index){
+function onControllerEnd(index) {
     switch (index) {
         case 0:
-            if(currentdirection != 'FORWARD') return;
+            if (currentdirection != 'FORWARD') return;
             break;
         case 1:
-            if(currentdirection != 'LEFT') return;
+            if (currentdirection != 'LEFT') return;
             break;
         case 2:
-            if(currentdirection != 'RIGHT') return;
+            if (currentdirection != 'RIGHT') return;
             break;
         case 3:
-            if(currentdirection != 'BACKWARD') return;
+            if (currentdirection != 'BACKWARD') return;
             break;
     }
     currentdirection = 'STANDBY';
@@ -209,7 +209,7 @@ function onControllerEnd(index){
     sendCurrentdirection();
 }
 
-function sendCurrentdirection(){
+function sendCurrentdirection() {
     send(`set_remotedirection:${currentdirection}`);
 }
 
@@ -217,4 +217,4 @@ function sendCurrentdirection(){
 var slider = document.getElementById('slider');
 slider.addEventListener('change', event => {
     send(`set_remotespeed:${slider.value}`);
-}, {passive: true});
+}, { passive: true });

@@ -14,7 +14,7 @@ module.exports = class ArrayQueue {
     }
 
     getElement() {
-        if(this.isEmpty()) return null;
+        if (this.isEmpty()) return null;
 
         const element = this.elements[0];
         for (let index = 0; index < this.length; index++) {
@@ -26,17 +26,17 @@ module.exports = class ArrayQueue {
         return element;
     }
 
-    removeElement(element){
-        if(this.isEmpty()) return null;
+    removeElement(element) {
+        if (this.isEmpty()) return null;
 
         var foundElement = false;
         for (let index = 0; index < this.length; index++) {
-            if(this.elements[index] == element) foundElement = true;
-            if(!foundElement) continue;
+            if (this.elements[index] == element) foundElement = true;
+            if (!foundElement) continue;
             this.elements[index] = this.elements[index + 1];
         }
 
-        if(foundElement){
+        if (foundElement) {
             this.elements.pop();
             this.length--;
         }

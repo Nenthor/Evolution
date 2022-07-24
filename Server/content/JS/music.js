@@ -7,7 +7,7 @@ var music = 0;
 
 socket.addEventListener('open', () => {
     socket.send('get_music');
-}, {passive: true});
+}, { passive: true });
 
 socket.addEventListener('message', event => {
     const data = String(event.data).split(':');
@@ -19,34 +19,33 @@ socket.addEventListener('message', event => {
         default:
             break;
     }
-}, {passive: true});
+}, { passive: true });
 
 //Setup
-playButton.addEventListener("click", function(){ onPlayClick(); }, {passive: true});
+playButton.addEventListener("click", function () { onPlayClick(); }, { passive: true });
 
 for (let item = 0; item < musicItems.length; item++) {
-    musicItems[item].addEventListener("click", function(){ onClick(item); }, {passive: true});
+    musicItems[item].addEventListener("click", function () { onClick(item); }, { passive: true });
 }
 
-function updateMusic()
-{
-    if(music == 0) playButton.textContent = "Starten";
+function updateMusic() {
+    if (music == 0) playButton.textContent = "Starten";
     else playButton.textContent = "Stoppen";
 
     musicColorReset();
-    if(music != 0) musicSetColor(music - 1);
+    if (music != 0) musicSetColor(music - 1);
 }
 
 //Buttons
-function onPlayClick(){
-    if(music == 0){
+function onPlayClick() {
+    if (music == 0) {
         playButton.textContent = "Stoppen";
         var random = Math.floor(Math.random() * 4);
 
         musicColorReset();
         musicSetColor(random);
         saveData(random + 1);
-    }else{
+    } else {
         playButton.textContent = "Starten";
 
         musicColorReset();
@@ -54,28 +53,26 @@ function onPlayClick(){
     }
 }
 
-function onClick(index){
-    if(index == music - 1) return;
-    if(music == 0) playButton.textContent = "Stoppen";
+function onClick(index) {
+    if (index == music - 1) return;
+    if (music == 0) playButton.textContent = "Stoppen";
     musicColorReset();
     musicSetColor(index);
 
     saveData(index + 1);
 }
 
-function musicColorReset()
-{
+function musicColorReset() {
     for (let item = 0; item < musicItems.length; item++) {
         musicItems[item].style.backgroundColor = "#646464";
     }
 }
 
-function musicSetColor(index){
+function musicSetColor(index) {
     musicItems[index].style.backgroundColor = "#16AA16";
 }
 
-function saveData(index)
-{
+function saveData(index) {
     socket.send(`set_music:${index}`);
     music = index;
 }

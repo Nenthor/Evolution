@@ -5,37 +5,36 @@ var occupiedColor = "#cd3232";
 
 //Server data
 const socket = new WebSocket(`ws://${location.host}`);
-var camera = '000';
 var firstLoad = true;
 
 socket.addEventListener('open', () => {
     socket.send('get_camera');
-}, {passive: true});
+}, { passive: true });
 
 socket.addEventListener('message', event => {
     const data = String(event.data).split(':');
     switch (data[0]) {
         case 'camera':
-            camera = data[1];
-            if(firstLoad){
+            obstacles = data[1];
+            if (firstLoad) {
                 updateCamera();
                 firstLoad = false;
-            }  
+            }
             else location.reload(true);
             break;
         default:
             break;
     }
-}, {passive: true});
+}, { passive: true });
 
-function getColor(index, level){    
-    if(obstacles[index] >= level)
+function getColor(index, level) {
+    if (obstacles[index] >= level)
         return occupiedColor;
     else
         return emptyColor;
 }
 
-function updateCamera(){
+function updateCamera() {
     $("#camera").zinoChart({
         type: "pie",
         variation: "multi-level",

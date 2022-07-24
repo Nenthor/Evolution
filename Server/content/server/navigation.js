@@ -7,7 +7,6 @@ var lat = Infinity, long = Infinity; //Unreachable default values
 var pixelX = 0, pixelY = 0;
 var currentTile = null;
 
-
 module.exports = {
     extractFileData: readNavigationFile,    //Input: filepath
     getNavigation: getLocation,             //Output: String

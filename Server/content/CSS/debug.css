@@ -1,172 +1,172 @@
 /*--Debug-Information--*/
-.osStats{
-    height: 60px;
-    width: 100%;
-    background-color: #323232;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
+.osStats {
+  height: 60px;
+  width: 100%;
+  background-color: #323232;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
 }
 
-.osStats_item{
-    background-color: #646464;
-    width: 25vw;
-    height: 75%;
-    padding: 0 2.5vw;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 15px;
+.osStats_item {
+  background-color: #646464;
+  width: 25vw;
+  height: 75%;
+  padding: 0 2.5vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 15px;
 }
 
-.osStats_text{
-    color: white;
-    font-size: min(1rem, 3vw);
-    font-family: robotoMono;
-    text-align: center;
+.osStats_text {
+  color: white;
+  font-size: min(1rem, 3vw);
+  font-family: robotoMono;
+  text-align: center;
 }
 
-.log{
-    height: calc(100vh - max(10vh, 75px) - 60px);
-    width: 100%;
-    background-color: #161616;
-    display: inline-block;
+.log {
+  height: calc(100vh - max(10vh, 75px) - 60px);
+  width: 100%;
+  background-color: #161616;
+  display: inline-block;
 }
 
-.log_formBox{
-    background-color: #161616;
-    width: 100%;
-    height: 40px;
-    margin: 10px 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.log_formBox {
+  background-color: #161616;
+  width: 100%;
+  height: 40px;
+  margin: 10px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.log_form{
-    background-color: #fff;
-    width: 50%;
-    height: 100%;
-    border-radius: 30px;
-    display: flex;
-    justify-content: space-evenly;
-    align-items: center;
-    box-shadow: 0 0 10px 1px #161616;
-    transition: width ease-in-out 1s;
-    position: relative;
+.log_form {
+  background-color: #fff;
+  width: 50%;
+  height: 100%;
+  border-radius: 30px;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  box-shadow: 0 0 10px 1px #161616;
+  transition: width ease-in-out 1s;
+  position: relative;
 }
 
-.log_formSelected{
-    display: none;
-    position: absolute;
-    content: '';
-    width: 33.75%;
-    height: 100%;
-    border-radius: 30px;
-    background-color: #0d85d4;
-    left: auto;
-    transition: left ease-in-out 0.5s;
+.log_formSelected {
+  display: none;
+  position: absolute;
+  content: "";
+  width: 33.75%;
+  height: 100%;
+  border-radius: 30px;
+  background-color: #0d85d4;
+  left: auto;
+  transition: left ease-in-out 0.5s;
 }
 
-.log_fromButton{
-    display: inline-block;
-    width: 100%;
-    height: 100%;
-    border-color: transparent;
-    background-color: transparent;
-    cursor: pointer;
-    text-align: center;
-    line-height: 40px;
-    color: #161616;
-    z-index: 50;
-    transition: color ease-in-out 0.5s;
+.log_fromButton {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  border-color: transparent;
+  background-color: transparent;
+  cursor: pointer;
+  text-align: center;
+  line-height: 40px;
+  color: #161616;
+  z-index: 50;
+  transition: color ease-in-out 0.5s;
 }
 
-.log_output{
-    height: calc(100% - 60px);
-    width: 100%;
-    display: inline-block;
-    flex-flow: column;
+.log_output {
+  height: calc(100% - 60px);
+  width: 100%;
+  display: inline-block;
+  flex-flow: column;
 }
 
-.log_list{
-    width: calc(100% - 10px);
-    height: calc(100% - 60px);
-    border: 5px solid #0d85d4;
-    background-color: #323232;
-    overflow-y: scroll;
-    display: flex;
-    flex-direction: column-reverse;
+.log_list {
+  width: calc(100% - 10px);
+  height: calc(100% - 60px);
+  border: 5px solid #0d85d4;
+  background-color: #323232;
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column-reverse;
 }
 
-.log_list::-webkit-scrollbar{
-    display: none;
+.log_list::-webkit-scrollbar {
+  display: none;
 }
 
-.log_item{
-    background-color: #646464;
-    width: 100%;
-    height: max(max-content, 30px);
-    margin: 2px 0;
+.log_item {
+  background-color: #646464;
+  width: 100%;
+  height: max(max-content, 30px);
+  margin: 2px 0;
 }
 
-.log_item:first-child{
-    margin-bottom: 0;
+.log_item:first-child {
+  margin-bottom: 0;
 }
 
-.log_item:last-child{
-    margin-top: 0;
+.log_item:last-child {
+  margin-top: 0;
 }
 
-.log_text{
-    display: inline-block;
-    width: calc(100% - 2px);
-    height: max(max-content, 30px);
-    padding: 0 1px;
-    color: white;
-    text-align: left;
-    font-family: robotoMono;
-    font-size: 0.9rem;
-    line-height: 30px;
-    white-space: initial;
-    word-break: break-all;
-    overflow: hidden;
+.log_text {
+  display: inline-block;
+  width: calc(100% - 2px);
+  height: max(max-content, 30px);
+  padding: 0 1px;
+  color: white;
+  text-align: left;
+  font-family: robotoMono;
+  font-size: 0.9rem;
+  line-height: 30px;
+  white-space: initial;
+  word-break: break-all;
+  overflow: hidden;
 }
 
-.log_console{
-    width: 100%;
-    height: 50px;
-    background-color: #646464;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.log_console {
+  width: 100%;
+  height: 50px;
+  background-color: #646464;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.log_clearLog{
-    width: 30%;
-    height: 80%;
-    background-color: #e42727;
-    border-radius: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
+.log_clearLog {
+  width: 30%;
+  height: 80%;
+  background-color: #e42727;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all ease-in-out 1s;
+}
+
+.log_clearLogText {
+  color: white;
+  font-weight: bold;
+  text-align: center;
+}
+
+@media screen and (max-width: 900px) {
+  .log_clearLog {
+    width: 65%;
     transition: all ease-in-out 1s;
-}
-
-.log_clearLogText{
-    color: white;
-    font-weight: bold;
-    text-align: center;
-}
-
-@media screen and (max-width: 900px){
-    .log_clearLog{
-        width: 65%;
-        transition: all ease-in-out 1s;
-    }
-    .log_form{
-        width: 85%;
-        transition: all ease-in-out 1s;
-    }
+  }
+  .log_form {
+    width: 85%;
+    transition: all ease-in-out 1s;
+  }
 }

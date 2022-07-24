@@ -10,7 +10,9 @@ socket.addEventListener('open', () => {
     send('get_settings');
     send('get_speed');
     send('get_battery');
-}, {passive: true});
+    send('get_battery');
+    send('get_remotecontrollstate');
+}, { passive: true });
 
 socket.addEventListener('message', event => {
     const data = String(event.data).split(':');
@@ -32,15 +34,15 @@ socket.addEventListener('message', event => {
             updateBattery();
             break;
         case 'remote_controll':
-            if(data[1] == 'on') remoteControllEnabled();
-            else if(data[1] == 'off') remoteControllDisabled();
+            if (data[1] == 'on') remoteControllEnabled();
+            else if (data[1] == 'off') remoteControllDisabled();
             break;
         default:
             break;
     }
-}, {passive: true});
+}, { passive: true });
 
-function send(message){
+function send(message) {
     socket.send(message);
 }
 
@@ -51,16 +53,16 @@ const logo = document.getElementById('logo');
 var tapCount = 0;
 logo.addEventListener('click', () => {
     addTapcount();
-    if(tapCount >= 3){
+    if (tapCount >= 3) {
         tapCount = 0;
         open('/content/html/debug.html', '_self');
     }
-}, {passive: true});
+}, { passive: true });
 
-function addTapcount(){
+function addTapcount() {
     tapCount++;
     setTimeout(() => {
-        if(tapCount >= 1) tapCount--;
+        if (tapCount >= 1) tapCount--;
     }, 500); //Delay for 0.5s
 }
 
@@ -69,7 +71,7 @@ const footerItems = document.getElementsByClassName("footer_item");
 const months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
 const weeks = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
 
-function getDate(){
+function setDate() {
     var date = new Date();
     var minutes = date.getMinutes();
     var hours = date.getHours();
@@ -77,69 +79,60 @@ function getDate(){
     var week = weeks[date.getDay()];
     var month = months[date.getMonth()];
     var year = date.getFullYear();
-    
-    if(minutes < 10) minutes = "0" + minutes.toString();
-    if(hours < 10) hours = "0" + hours.toString();
-    if(day < 10) day = "0" + day.toString();
+
+    if (minutes < 10) minutes = "0" + minutes.toString();
+    if (hours < 10) hours = "0" + hours.toString();
+    if (day < 10) day = "0" + day.toString();
 
     //Set Footer Items
     footerItems[1].textContent = `${hours}:${minutes} Uhr`;
-    return `${week}, ${day}. ${month} ${year}`;
+    footerItems[2].textContent = `${week}, ${day}. ${month} ${year}`;
 }
 
-function setEqualSpace(date, coords){
-    footerItems[0].textContent = coords.padStart(date.length, "\u00A0");
-    footerItems[2].textContent = date.padEnd(coords.length, "\u00A0");
-}
+setDate();
+setTimeout(() => {
+    setDate();
+    setInterval(() => {
+        setDate();
+    }, 60000);
+}, (60 - new Date().getSeconds()) * 1000);
 
-document.addEventListener('DOMContentLoaded', function() {
-    var date = getDate();
-    setEqualSpace(date, coords);
-
-    interval = setInterval(function()
-    {
-        var date = getDate();
-        setEqualSpace(date, coords);
-    }, 20000);
-}, {passive: true});
-
-function updateCoords(){
-    var date = getDate();
-    setEqualSpace(date, coords);
+function updateCoords() {
+    footerItems[0].textContent = coords;
 }
 
 //Settings-Buttons
 const settingsItems = document.getElementsByClassName("display_settingsImage");
 
 for (let item = 0; item < settingsItems.length; item++) {
-    settingsItems[item].addEventListener("click", () => onClick(item), {passive: true});
+    settingsItems[item].addEventListener("click", () => onClick(item), { passive: true });
 }
 
-function replaceAt(text, index, replacement){
+function replaceAt(text, index, replacement) {
     return text.substring(0, index) + replacement + text.substring(index + 1, replacement.length);
 }
 
 updateSettings();
-function updateSettings(){
+function updateSettings() {
     for (let index = 0; index < settings.length; index++) {
         settingsItems[index].src = getSettingsURL(index, settings[index]);
     }
 }
 
-function getSettingsURL(index, state){
+function getSettingsURL(index, state) {
     switch (index) {
         case 0:
-            if(state == 1)
+            if (state == 1)
                 return "/content/images/sound_on.webp";
             else
                 return "/content/images/sound_off.webp";
         case 1:
-            if(state == 1)
+            if (state == 1)
                 return "/content/images/light_on.webp";
             else
                 return "/content/images/light_off.webp";
         case 2:
-            if(state == 1)
+            if (state == 1)
                 return "/content/images/remote_on.webp";
             else
                 return "/content/images/remote_off.webp";
@@ -155,25 +148,25 @@ confirmBox.style.display = 'none';
 confirmTrue.addEventListener('click', () => {
     send('shutdown');
     confirmBox.style.display = 'none';
-}, {passive: true});
+}, { passive: true });
 
 confirmFalse.addEventListener('click', () => {
     confirmBox.style.display = 'none';
-}, {passive: true});
+}, { passive: true });
 
 //onClick
-function onClick(index){
-    if(index == 3){
+function onClick(index) {
+    if (index == 3) {
         confirmBox.style.display = 'flex';
         return;
     }
 
     var state = parseInt(settings[index]) == 0 ? 1 : 0;
     var url = getSettingsURL(index, state);
-    
+
     settings = replaceAt(settings, index, state);
     settingsItems[index].src = url;
-    
+
     send(`set_settings:${settings}`);
 }
 
@@ -185,13 +178,13 @@ remotecontrollbox.style.display = 'none';
 turnOffRemoteControll.addEventListener('click', () => {
     onClick(2);
     remoteControllDisabled();
-}, {passive: true});
+}, { passive: true });
 
-function remoteControllEnabled(){
+function remoteControllEnabled() {
     remotecontrollbox.style.display = 'flex';
 }
 
-function remoteControllDisabled(){
+function remoteControllDisabled() {
     remotecontrollbox.style.display = 'none';
 }
 
@@ -249,12 +242,12 @@ function drawSpeedo(speed, topSpeed) {
     if (speed == undefined || topSpeed == undefined) return false;
 
     speed = Math.round(speed);
-    
+
     //Set Reverse Gear
-    if(speed < 0){
+    if (speed < 0) {
         reverseGear = true;
         speed *= -1;
-    }else reverseGear = false;
+    } else reverseGear = false;
 
     //Clear
     context.clearRect(0, 0, canvas.width, canvas.height);
@@ -283,7 +276,7 @@ function drawSpeedo(speed, topSpeed) {
     if (!reverseGear) {
         context.fillStyle = "#333";
         context.fillText('R', 250, 460);
-    }else{
+    } else {
         context.fillStyle = "#CD3232";
         context.fillText('R', 250, 460);
     }
@@ -304,7 +297,7 @@ function drawSpeedo(speed, topSpeed) {
     context.stroke();
 
     //Speed Limiter
-    if(speed > topSpeed){
+    if (speed > topSpeed) {
         speed = topSpeed;
     }
 
@@ -313,7 +306,7 @@ function drawSpeedo(speed, topSpeed) {
     context.strokeStyle = speedGradient;
     context.arc(250, 250, 228, .782 * Math.PI, calculateSpeedAngle(speed / topSpeed, 127, 45) * Math.PI);
     context.stroke();
-    
+
     //SpeedNeedle
     speedNeedle(calculateSpeedAngle(speed / topSpeed, 127, 45) * Math.PI);
     context.shadowBlur = 0;
@@ -327,7 +320,7 @@ function drawSpeedo(speed, topSpeed) {
 }
 
 updateSpeed();
-function updateSpeed(){
+function updateSpeed() {
     drawSpeedo(speed, 40);
 }
 
@@ -336,7 +329,7 @@ const bar = document.getElementById("display_battery");
 const index = document.getElementById("display_batteryIndex");
 
 updateBattery();
-function updateBattery(){
+function updateBattery() {
     index.textContent = `${battery}%`
     bar.style.background = `conic-gradient(
         #5694f1 ${battery * 3.6}deg,
