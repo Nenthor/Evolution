@@ -1,7 +1,8 @@
 const WebSocket = require('ws');
 const fs = require('fs');
 const os = require('os');
-const sound = require('play-sound')(opts = {});
+const path = require('path');
+const sound = require('play-sound')(opts = { });
 const ArrayQueue = require('./arrayqueue');
 const navigation = require('./navigation');
 const gpio = require('./gpio');
@@ -107,6 +108,7 @@ global.wss.on('connection', ws => {
             case incoming.set_settings:
                 receiveMessages(`Änderung der "Einstellungs"-Datei zu "${message[1]}" erhalten.`, importance.MEDIUM);
                 writeFile(message[1], 'settings');
+                checkForMute(String(message[1]));
                 global.data.settings = String(message[1]);
                 remoteControllUpdate();
                 sendAllClients(`${outgoing.settings}:${global.data.settings}`, `Änderung der "Einstellungs"-Datei zu "${message[1]}" wird an alle Klienten gesendet.`, ws, importance.LOW);
@@ -158,7 +160,10 @@ global.data.speed = getData('speed', '0');
 navigation.setNavigation(global.data.coords); //Send data to navigation script
 setDebugInterval(global.data.coords); //Check stats every 5s
 
-playMusic(parseInt(global.data.music));
+setTimeout(() => {
+    checkForMute('100');
+    playMusic(parseInt(global.data.music));
+}, 3000); //Play music after 3s
 
 function getData(file) {
     return fs.readFileSync(`${global.path}/content/data/${file}.txt`, 'utf8');
@@ -220,38 +225,52 @@ function setNavigation(coords) {
 }
 
 //Music Section
-var currentMusic = undefined;
+var currentMusic = null;
+var isMuted = false;
 
 function playMusic(index){
-    if(index == 0){
-        //Stop music
-        if(currentMusic != null) currentMusic.kill();
+    if(currentMusic != null){
+        //Stop current music
+        currentMusic.kill();
         currentMusic = null;
-        return;
     }
-
-    if(currentMusic != null) currentMusic.kill(); //Stop current music
+    
+    if(index == 0 || isMuted) return;
 
     switch(index){
         case 1:
-            playMusicFile('rickroll.mp3');
+            currentMusic = playMusicFile('rickroll.mp3');
             break;
         case 2:
-            playMusicFile('mario.mp3');
+            currentMusic = playMusicFile('mario.mp3');
             break;
         case 3:
-            playMusicFile('salsa.mp3');
+            currentMusic = playMusicFile('salsa.mp3');
             break;
         case 4:
-            playMusicFile('podcast.mp3');
+            currentMusic = playMusicFile('podcast.mp3');
             break;
     }
 }
 
 function playMusicFile(file){
-    currentMusic = sound.play(`${global.path}/content/sound/${file}`, { mplayer: ['-loop 0'] }, (err) => {
+    return sound.play(path.join(global.path, `content/sound/${file}`), { mplayer: ['-loop', 0] }, (err) => {
         if(err && err != 1) console.log(`Error while trying to play ${file}.`);
     });
+}
+
+function checkForMute(settings){
+    if(settings[0] == global.data.settings[0]) return;
+
+    if(settings[0] == '0'){
+        //Mute sound
+        isMuted = true;
+        playMusic(0);
+    }else{
+        //Play sound
+        isMuted = false;
+        playMusic(parseInt(global.data.music));
+    }
 }
 
 //Debug Section
