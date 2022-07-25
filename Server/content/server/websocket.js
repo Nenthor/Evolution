@@ -1,6 +1,7 @@
 const WebSocket = require('ws');
 const fs = require('fs');
 const os = require('os');
+const sound = require('play-sound')(opts = {});
 const ArrayQueue = require('./arrayqueue');
 const navigation = require('./navigation');
 const gpio = require('./gpio');
@@ -92,6 +93,7 @@ global.wss.on('connection', ws => {
                 receiveMessages(`Änderung der "Musik"-Datei zu "${message[1]}" erhalten.`, importance.MEDIUM);
                 writeFile(message[1], 'music');
                 global.data.music = String(message[1]);
+                playMusic(parseInt(message[1]));
                 sendAllClients(`${outgoing.music}:${global.data.music}`, `Änderung der "Musik"-Datei zu "${message[1]}" wird an alle Klienten gesendet.`, ws, importance.LOW);
                 break;
             case incoming.set_remotedirection:
@@ -156,6 +158,8 @@ global.data.speed = getData('speed', '0');
 navigation.setNavigation(global.data.coords); //Send data to navigation script
 setDebugInterval(global.data.coords); //Check stats every 5s
 
+playMusic(parseInt(global.data.music));
+
 function getData(file) {
     return fs.readFileSync(`${global.path}/content/data/${file}.txt`, 'utf8');
 }
@@ -213,6 +217,41 @@ function setNavigation(coords) {
     if (data == null) return;
 
     sendAllClients(`${outgoing.set_navigation}:${data}`, `Ändert "Navigation" zu ${data}.`, null, importance.LOW);
+}
+
+//Music Section
+var currentMusic = undefined;
+
+function playMusic(index){
+    if(index == 0){
+        //Stop music
+        if(currentMusic != null) currentMusic.kill();
+        currentMusic = null;
+        return;
+    }
+
+    if(currentMusic != null) currentMusic.kill(); //Stop current music
+
+    switch(index){
+        case 1:
+            playMusicFile('rickroll.mp3');
+            break;
+        case 2:
+            playMusicFile('mario.mp3');
+            break;
+        case 3:
+            playMusicFile('salsa.mp3');
+            break;
+        case 4:
+            playMusicFile('podcast.mp3');
+            break;
+    }
+}
+
+function playMusicFile(file){
+    currentMusic = sound.play(`${global.path}/content/sound/${file}`, { mplayer: ['-loop 0'] }, (err) => {
+        if(err && err != 1) console.log(`Error while trying to play ${file}.`);
+    });
 }
 
 //Debug Section
