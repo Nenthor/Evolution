@@ -70,8 +70,21 @@ app.get('/content/html/*', (req, res) => {
     }
 });
 
+//Sound test
+console.log(global.path)
+const player = require('play-sound')(opts = { });
+const salsa = player.play(`${global.path}/content/sound/music.mp3`, (err) => {
+    if(err != 1) console.log('Error while trying to play salsa.mp3.');
+});
+
+setTimeout(() => {
+    console.log('Killing salsa');
+    salsa.kill();
+}, 5000);
+
 //URL not found for every not registered path
 app.get('*', (req, res) => { res.status(404); res.end(); });
 
 //Open port
-server.listen(port, () => console.log(`Server is listening to port ${port}`));
+//server.listen(port, () => console.log(`Server is listening to port ${port}`));
+server.listen(9090, () => console.log(`Server is listening to port 9090`));
