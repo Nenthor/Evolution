@@ -18,9 +18,11 @@ const port = os.type() == 'Linux' ? 80 : 8080;
 const app = express();
 const server = require('http').createServer(app);
 
+const debugMode = true; //TODO: Remove this line
+
 //Setup websocket
 global.wss = new WebSocket.Server({ server: server });
-require('./content/server/websocket'); //Websocket Code on different script (websocket.js)
+require('./content/backend/scripts/websocket'); //Websocket Code on different script (websocket.js)
 
 //Create array contains function
 Array.prototype.contains = function (obj) {
@@ -30,45 +32,50 @@ Array.prototype.contains = function (obj) {
 //Manage paths
 const localHtmlFiles = ['index', 'music', 'camera', 'map', 'debug'];
 const remoteHtmlFiles = ['index_remote', 'controll', 'map_remote', 'debug'];
+const htmlFiles = localHtmlFiles.concat(remoteHtmlFiles);
 
 //Set Startpage
 app.get('/', (req, res) => {
-    const redirection = req.socket.localAddress == req.ip ? '/content/html/index.html' : '/content/html/index_remote.html';
+    const redirection = req.socket.localAddress == req.ip ? '/index' : '/index_remote';
     res.status(100);
     res.redirect(redirection);
 });
 
 //Allow everyone to get CSS/fonts/images/JS files
-app.use('/content/CSS', express.static(path.join(global.path, 'content/CSS')));
-app.use('/content/fonts', express.static(path.join(global.path, 'content/fonts')));
-app.use('/content/images', express.static(path.join(global.path, 'content/images')));
-app.use('/content/JS', express.static(path.join(global.path, 'content/JS')));
-app.use('/content/html', express.static(path.join(global.path, 'content/html'))); //TODO: remove this line
+app.use('/CSS', express.static(path.join(global.path, 'content/frontend/CSS')));
+app.use('/fonts', express.static(path.join(global.path, 'content/frontend/fonts')));
+app.use('/images', express.static(path.join(global.path, 'content/frontend/images')));
+app.use('/JS', express.static(path.join(global.path, 'content/frontend/JS')));
 
-app.get('/content/html/*', (req, res) => {
-    const fileRequested = path.basename(req.path, '.html');
-    const allowedFiles = req.socket.localAddress == req.ip ? localHtmlFiles : remoteHtmlFiles;
+for (const pageIndex in htmlFiles) {
+    const page = htmlFiles[pageIndex];
+    if(htmlFiles.indexOf(page) != pageIndex) continue;
 
-    if (!localHtmlFiles.contains(fileRequested) && !remoteHtmlFiles.contains(fileRequested)) {
-        //URL not found
-        res.status(404);
-        res.end();
-        return;
-    }
-
-    if (allowedFiles.contains(fileRequested)) {
-        //Reading file
-        fs.readFile(path.join(global.path, `content/html/${fileRequested}.html`), (error, data) => {
-            if (error) res.status(500);
-            else res.write(data); //Sending file
+    app.get(`/${page}`, (req, res) => {
+        const fileRequested = path.basename(req.path);
+        const allowedFiles = req.socket.localAddress == req.ip ? localHtmlFiles : remoteHtmlFiles;
+    
+        if (!localHtmlFiles.contains(fileRequested) && !remoteHtmlFiles.contains(fileRequested)) {
+            //URL not found
+            res.status(404);
             res.end();
-        });
-    } else {
-        //Forbidden page - no permission
-        res.status(403);
-        res.end();
-    }
-});
+            return;
+        }
+    
+        if (allowedFiles.contains(fileRequested) || debugMode) {
+            //Reading file
+            fs.readFile(path.join(global.path, `content/frontend/html/${fileRequested}.html`), (error, data) => {
+                if (error) res.status(500);
+                else res.write(data); //Sending file
+                res.end();
+            });
+        } else {
+            //Forbidden page - no permission
+            res.status(403);
+            res.end();
+        }
+    });
+}
 
 //URL not found for every not registered path
 app.get('*', (req, res) => { res.status(404); res.end(); });
