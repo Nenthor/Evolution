@@ -9,7 +9,7 @@ const incoming = { //Incoming messages from web-clients
     set_remotedirection: 'set_remotedirection', set_remotespeed: 'set_remotespeed'
 };
 const fromHardware = { //Incoming hardware messages
-    music: 'music', settings: 'settings', battery: 'battery', speed: 'speed', coords: 'coords'
+    battery: 'battery', speed: 'speed', coords: 'coords', camera: 'camera'
 };
 const toHardware = { //Outgoing hardware messages
     shutdown: 'shutdown', remotedirection: 'remotedirection', remotespeed: 'remotespeed'
@@ -72,22 +72,22 @@ function onMessage(msg) {
         case fromHardware.speed:
             if (speed == message[1]) break;
             speed = message[1];
-            sendAllClients(`${outgoing.speed}:${speed}`, `Änderung der Geschwindigkeit zu "${speed}" wird an alle Klienten gesendet.`, null, importance.LOW);
+            sendAllClients(`${incoming.speed}:${speed}`, `Änderung der Geschwindigkeit zu "${speed}" wird an alle Klienten gesendet.`, null, importance.LOW);
             break;
         case fromHardware.battery:
             if (battery == message[1]) break;
             battery = message[1];
-            sendAllClients(`${outgoing.battery}:${battery}`, `Änderung des Akkustandes zu "${battery}" wird an alle Klienten gesendet.`, null, importance.LOW);
+            sendAllClients(`${incoming.battery}:${battery}`, `Änderung des Akkustandes zu "${battery}" wird an alle Klienten gesendet.`, null, importance.LOW);
             break;
         case fromHardware.camera:
             if (camera == message[1]) break;
             camera = message[1];
-            sendAllClients(`${outgoing.camera}:${camera}`, `Änderung der Kamera zu "${camera}" wird an alle Klienten gesendet.`, null, importance.LOW);
+            sendAllClients(`${incoming.camera}:${camera}`, `Änderung der Kamera zu "${camera}" wird an alle Klienten gesendet.`, null, importance.LOW);
             break;
         case fromHardware.coords:
             if (coords == message[1]) break;
             coords = message[1];
-            sendAllClients(`${outgoing.coords}:${coords}`, `Änderung der Koordinaten zu "${coords}" wird an alle Klienten gesendet.`, null, importance.LOW);
+            sendAllClients(`${incoming.coords}:${coords}`, `Änderung der Koordinaten zu "${coords}" wird an alle Klienten gesendet.`, null, importance.LOW);
             break;
         default:
             console.warn(`${message[0]} is not an available hardware message.`);

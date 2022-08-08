@@ -7,9 +7,6 @@
     <meta name="description" content="Evolution - So geht Mobilität!" />
     <meta name="theme-color" content="#3232cd" />
     <meta name="google" content="notranslate" />
-    <script defer src="/JS/external/jquery.js"></script>
-    <script defer src="/JS/external/zino_chart.js"></script>
-    <script defer src="/JS/external/zino_svg.js"></script>
     <link rel="icon" href="/images/icon.webp" />
     <link rel="stylesheet" href="/CSS/default.css" />
     <link rel="stylesheet" href="/CSS/camera.css" />
@@ -43,7 +40,16 @@
     </div>
     <!--Display-->
     <div class="display">
-      <div class="camera" id="camera"></div>
+      <div class="camera_box">
+        <div class="camera_frame">
+          <canvas
+            width="600"
+            height="300"
+            class="camera_canvas"
+            id="camera"
+          ></canvas>
+        </div>
+      </div>
     </div>
   </body>
 </html>

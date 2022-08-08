@@ -1,5 +1,5 @@
 # Evolution
-Node.js Server Projekt für das P-Seminar Mobilität. [ca. 280MB]
+Node.js Server Projekt für das P-Seminar Mobilität. [ca. 300MB]
 
 ## Installationsanleitung für Windows
 

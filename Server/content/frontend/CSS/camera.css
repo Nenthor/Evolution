@@ -9,8 +9,24 @@
   align-items: center;
 }
 
-.camera {
-  height: 300px;
-  width: 600px;
-  overflow: hidden;
+.camera_box {
+  display: flex;
+  border-radius: 10px;
+  margin-bottom: 2em;
+}
+
+.camera_frame {
+  background-color: #323232;
+  padding: 10px;
+  border-radius: 20px;
+  border: solid 5px #0d85d4;
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.camera_canvas {
+  width: 100%;
+  margin-bottom: -4px;
 }
