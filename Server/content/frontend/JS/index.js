@@ -324,6 +324,10 @@ function updateSpeed() {
     drawSpeedo(speed, 40);
 }
 
+document.fonts.ready.then(() => {
+    updateSpeed();
+});
+
 // --> BatteryIndicator <--
 const bar = document.getElementById("display_battery");
 const index = document.getElementById("display_batteryIndex");

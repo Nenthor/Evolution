@@ -4,6 +4,7 @@ const imageWidth = 2816;
 var currentX = 0, currentY = 0;
 var pixelX = 0, pixelY = 0;
 var destinationX = 0, destinationY = 0;
+var hasData = false;
 
 socket.addEventListener('open', () => {
     send('get_navigation');
@@ -14,7 +15,7 @@ socket.addEventListener('message', event => {
     switch (data[0]) {
         case 'set_navigation':
             extractNavigationMessage(data[1]);
-            displayMap();
+            if (hasData) displayMap();
             break;
         default:
             break;
@@ -23,6 +24,30 @@ socket.addEventListener('message', event => {
 
 function send(message) {
     socket.send(message);
+}
+
+
+//Waiting room
+const waitingdiv = document.getElementById('waitingdiv');
+const waitingtitle = document.getElementById('waitingtitle');
+var waitingAnimation = null;
+
+waitingdiv.style.display = 'flex';
+
+function activateWaitingRoom() {
+    waitingdiv.style.display = 'flex';
+    if (waitingAnimation != null) return;
+    waitingAnimation = setInterval(() => {
+        if (waitingtitle.textContent.endsWith('...'))
+            waitingtitle.textContent = waitingtitle.textContent.substring(0, waitingtitle.textContent.length - 3);
+        else
+            waitingtitle.textContent += '.';
+    }, 750);
+}
+
+function deactivateWaitingRoom() {
+    waitingdiv.style.display = 'none';
+    if (waitingAnimation != null) clearInterval(waitingAnimation);
 }
 
 //map canvas
@@ -43,13 +68,24 @@ function fix_dpi() {
 
 function extractNavigationMessage(message) {
     //Example: filename=geodata_18_19;pixelX=1455;pixelY=1355
+    if (message == 'Lokalisieren...') {
+        hasData = false;
+        activateWaitingRoom();
+        return;
+    }
+
     currentX = parseInt(message.split(';')[0].split('=')[1].split('_')[1]);
     currentY = parseInt(message.split(';')[0].split('=')[1].split('_')[2]);
     pixelX = parseInt(message.split(';')[1].split('=')[1]);
     pixelY = parseInt(message.split(';')[2].split('=')[1]);
+
+    if (!hasData) {
+        hasData = true;
+        deactivateWaitingRoom();
+    }
 }
 
-function displayMap(){
+function displayMap() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     loadGeoDataImage(currentX, currentY);
@@ -62,7 +98,7 @@ function displayMap(){
     loadGeoDataImage(currentX + x, currentY - y);
 }
 
-function loadGeoDataImage(x, y){
+function loadGeoDataImage(x, y) {
     const image = new Image();
     image.src = `/images/navigation/geodata_${x}_${y}.webp`;
 

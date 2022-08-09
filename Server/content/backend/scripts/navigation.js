@@ -45,16 +45,18 @@ function readNavigationFile() {
 
 //Set & Get Location
 function setNavigation(location) {
+    var data;
     calculateLocation(location);
     if (geodata.length != 0) getLocationImage();
-    if (currentTile == null) return;
-    const data = `filename=${currentTile.filename};pixelX=${pixelX};pixelY=${pixelY}`;
+    if (currentTile == null) data = `Lokalisieren...`;
+    else data = `filename=${currentTile.filename};pixelX=${pixelX};pixelY=${pixelY}`;
     sendAllClients(`${outgoing.set_navigation}:${data}`, `Ändert "Navigation" zu ${data}.`, null, importance.LOW);
 }
 
 function getNavigation(client) {
-    if (currentTile == null) return;
-    const data = `filename=${currentTile.filename};pixelX=${pixelX};pixelY=${pixelY}`;
+    var data;
+    if (currentTile == null) data = `Lokalisieren...`;
+    else data = `filename=${currentTile.filename};pixelX=${pixelX};pixelY=${pixelY}`;
     send(client, `${outgoing.set_navigation}:${data}`, `"Navigation" mit dem Wert "${data}" wird zum Klienten gesendet.`, importance.LOW);
 }
 

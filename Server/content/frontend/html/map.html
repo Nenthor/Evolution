@@ -48,7 +48,15 @@
         <p class="display_mapLizenz">
           Map data &copy OpenStreetMap contributors, CC-BY-SA
         </p>
-        <canvas class="display_canvas" id="canvas"></canvas>
+        <div class="display_mapBox">
+          <canvas class="display_canvas" id="canvas"></canvas>
+          <!--Waitingroom-->
+          <div class="waiting" id="waitingdiv">
+            <div class="waiting_titlebox">
+              <p class="waiting_title" id="waitingtitle">Lokalisieren</p>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="display_settings">
         <div class="display_destination" id="destinationButton">

@@ -10,8 +10,8 @@
 }
 
 .camera_box {
+  padding-top: calc(max(10vh, 75px) - 2em);
   display: flex;
-  border-radius: 10px;
   margin-bottom: 2em;
 }
 
