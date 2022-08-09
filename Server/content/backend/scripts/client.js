@@ -1,4 +1,5 @@
 const net = require('net');
+const ArrayQueue = require('./arrayqueue');
 const client = new net.Socket();
 
 const HOST = '127.0.0.1';
@@ -12,6 +13,8 @@ var onMessage;
 var isConnected = false;
 var retryCount = 0;
 
+var messageQueue = new ArrayQueue();
+
 /**
  * Connect to server.
  */
@@ -23,6 +26,17 @@ client.on('connect', () => {
     console.log('Connected to Hardware.');
     isConnected = true;
     retryCount = 0;
+
+    if(!messageQueue.isEmpty()){
+        const messageQueueInterval = setInterval(() => {
+            if(messageQueue.isEmpty()){
+                messageQueue.clear();
+                clearInterval(messageQueueInterval);
+                return;
+            } 
+            send(messageQueue.getElement())
+        }, 50);
+    }
 });
 
 client.on('data', data => {
@@ -52,6 +66,11 @@ client.on('close', () => {
  * Send messages to the server.
  */
 function send(message) {
+    if(!isConnected){
+        messageQueue.addElement(message);
+        return;
+    }
+
     messageLength = Buffer.from(String(message.length));
     data = Buffer.allocUnsafe(HEADER);
     data.fill(messageLength, 0, messageLength.length);
