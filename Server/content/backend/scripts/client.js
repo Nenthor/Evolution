@@ -7,7 +7,7 @@ const PORT = 5050;
 const HEADER = 16;
 const FORMAT = 'utf-8';
 const DISCONNECT_MESSAGE = '!DISCONNECT';
-const MAX_RETRYCOUNT = 300;
+const MAX_RETRYCOUNT = 300; //5min
 
 var onMessage;
 var isConnected = false;
@@ -43,7 +43,17 @@ client.on('data', data => {
     if (onMessage != null) onMessage(String(data).trim());
 });
 
-client.on('error', () => {
+client.on('error', retryConnecting);
+client.on('close', () => {
+    if (!isConnected && retryCount != 0) return;
+
+    console.log('Hardware connection is closed. Retrying...');
+    isConnected = false;
+
+    retryConnecting();
+});
+
+function retryConnecting(){    
     setTimeout(() => {
         if (retryCount >= MAX_RETRYCOUNT) {
             console.log('Could not establish connection to Hardware.');
@@ -53,14 +63,7 @@ client.on('error', () => {
         client.connect(PORT, HOST);
         retryCount++;
     }, 1000);
-});
-
-client.on('close', () => {
-    if (!isConnected && retryCount != 0) return;
-
-    console.log('Hardware connection is closed. Retrying...');
-    isConnected = false;
-});
+}
 
 /**
  * Send messages to the server.

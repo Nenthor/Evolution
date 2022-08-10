@@ -30,6 +30,7 @@ def __handleClient(conn, addr):
 
 def __bootServer():
     server = __socket.socket(__socket.AF_INET, __socket.SOCK_STREAM)
+    server.setsockopt(__socket.SOL_SOCKET, __socket.SO_REUSEADDR, 1)
     server.bind((__HOST, __PORT))
     server.listen()
     print(f"Hardware is listening to {__HOST}:{__PORT}")
