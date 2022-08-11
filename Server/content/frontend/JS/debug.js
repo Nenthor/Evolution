@@ -18,7 +18,6 @@ socket.addEventListener('message', event => {
             setSystemLoad(parseInt(data[1]));
             break;
         case 'add_debugmessage':
-            //console.log(data[1]);
             const incoming = data[1] == 'IN';
             createElement(data[2], incoming);
             break;

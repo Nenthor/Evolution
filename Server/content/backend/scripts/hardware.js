@@ -12,7 +12,7 @@ const fromHardware = { //Incoming hardware messages
     battery: 'battery', speed: 'speed', coords: 'coords', camera: 'camera'
 };
 const toHardware = { //Outgoing hardware messages
-    shutdown: 'shutdown', remotedirection: 'remotedirection', remotespeed: 'remotespeed'
+    get_camera: 'get_camera', shutdown: 'shutdown', remotedirection: 'remotedirection', remotespeed: 'remotespeed'
 };
 
 module.exports = {
@@ -95,5 +95,10 @@ function onMessage(msg) {
     }
 }
 
+function onConnect() {
+    client.send(`${toHardware.get_camera}`);
+}
+
 client.onMessage = onMessage;
+client.setOnConnectFunction = onConnect;
 client.connect();

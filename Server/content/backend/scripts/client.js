@@ -10,6 +10,7 @@ const DISCONNECT_MESSAGE = '!DISCONNECT';
 const MAX_RETRYCOUNT = 300; //5min
 
 var onMessage;
+var onConnect;
 var isConnected = false;
 var retryCount = 0;
 
@@ -24,6 +25,7 @@ function connect() {
 
 client.on('connect', () => {
     console.log('Connected to Hardware.');
+    if(onConnect != null) onConnect()
     isConnected = true;
     retryCount = 0;
 
@@ -90,6 +92,13 @@ function setOnMessageFunction(func) {
     onMessage = func;
 }
 
+/**
+ * Call this function to register get Mesages.
+ */
+function setOnConnectFunction(func) {
+    onConnect = func;
+}
+
 exitEvents = ['SIGINT', 'SIGUSR1', 'SIGUSR2', 'uncaughtException'];
 
 for (let event in exitEvents) {
@@ -102,5 +111,6 @@ for (let event in exitEvents) {
 module.exports = {
     connect,
     send,
-    setOnMessageFunction
+    setOnMessageFunction,
+    setOnConnectFunction
 }
