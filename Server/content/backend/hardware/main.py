@@ -8,7 +8,7 @@ sensor2 = 500
 sensor3 = 500
 
 server.start()
-sensors.start()
+# sensors.start() #TODO: Enable this line
 
 
 def onMessage(message):

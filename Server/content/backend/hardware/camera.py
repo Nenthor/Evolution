@@ -1,9 +1,9 @@
 from sensors import SENSOR_1 as __SENSOR_1, SENSOR_2 as __SENSOR_2, SENSOR_3 as __SENSOR_3
 import time as __time
 
-__FIRST_LEVEL = 100  # [200, 300[
-__MIDDLE_LEVEL = 50  # [100, 200[
-__LAST_LEVEL = 25  # [0, 100[
+__FIRST_LEVEL = 300  # [200, 300[
+__MIDDLE_LEVEL = 200  # [100, 200[
+__LAST_LEVEL = 100  # [0, 100[
 
 __camera = [0, 0, 0]
 __last_modified = __time.time()
