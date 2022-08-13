@@ -10,9 +10,9 @@ const DISCONNECT_MESSAGE = '!DISCONNECT';
 const MAX_RETRYCOUNT = 300; //5min
 
 var onMessage;
-var onConnect;
 var isConnected = false;
 var retryCount = 0;
+var onConnectMessages = [];
 
 var messageQueue = new ArrayQueue();
 
@@ -25,17 +25,19 @@ function connect() {
 
 client.on('connect', () => {
     console.log('Connected to Hardware.');
-    if(onConnect != null) onConnect()
     isConnected = true;
     retryCount = 0;
 
-    if(!messageQueue.isEmpty()){
+    onConnectMessages.forEach(msg => {
+        messageQueue.addElement(msg);
+    });
+    if (!messageQueue.isEmpty()) {
         const messageQueueInterval = setInterval(() => {
-            if(messageQueue.isEmpty()){
+            if (messageQueue.isEmpty()) {
                 messageQueue.clear();
                 clearInterval(messageQueueInterval);
                 return;
-            } 
+            }
             send(messageQueue.getElement())
         }, 50);
     }
@@ -55,7 +57,7 @@ client.on('close', () => {
     retryConnecting();
 });
 
-function retryConnecting(){    
+function retryConnecting() {
     setTimeout(() => {
         if (retryCount >= MAX_RETRYCOUNT) {
             console.log('Could not establish connection to Hardware.');
@@ -71,7 +73,7 @@ function retryConnecting(){
  * Send messages to the server.
  */
 function send(message) {
-    if(!isConnected){
+    if (!isConnected) {
         messageQueue.addElement(message);
         return;
     }
@@ -92,11 +94,8 @@ function setOnMessageFunction(func) {
     onMessage = func;
 }
 
-/**
- * Call this function to register get Mesages.
- */
-function setOnConnectFunction(func) {
-    onConnect = func;
+function getDataOnConnect(messages) {
+    onConnectMessages = messages;
 }
 
 exitEvents = ['SIGINT', 'SIGUSR1', 'SIGUSR2', 'uncaughtException'];
@@ -112,5 +111,5 @@ module.exports = {
     connect,
     send,
     setOnMessageFunction,
-    setOnConnectFunction
+    getDataOnConnect
 }

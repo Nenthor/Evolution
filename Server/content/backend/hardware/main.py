@@ -2,17 +2,24 @@ from time import sleep
 import server
 import sensors
 import camera
+import location
 
 sensor1 = 500
 sensor2 = 500
 sensor3 = 500
 
 server.start()
+location.start()
 # sensors.start() #TODO: Enable this line
 
 
 def onMessage(message):
-    print(message)
+    if message == 'get_camera':
+        camera.forceUpdate()
+    elif message == 'get_coords':
+        location.forceUpdate()
+    else:
+        print(f'{message} is not available.')
 
 
 def onSensorData(sensor, distance):
@@ -33,12 +40,14 @@ def onSensorData(sensor, distance):
 server.onMessage = onMessage
 sensors.onData = onSensorData
 camera.sendToServer = server.send
+location.sendToServer = server.send
 
 try:
     while True:
         sleep(1)
 except KeyboardInterrupt:
     sensors.stop()
+    location.stop()
 except Exception as e:
     sensors.stop()
     print(e)

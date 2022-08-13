@@ -27,6 +27,7 @@ debug.setSendFunction(send);
 remoteControll.setSendFunctions(send, sendAllClients);
 navigation.setSendFunctions(send, sendAllClients);
 hardware.setSendFunctions(send, sendAllClients);
+hardware.setOnCoords(navigation.setNavigation)
 
 //Send Messages to clients (and logging them)
 function send(client, message, debugMessage, important) {
@@ -56,7 +57,7 @@ wss.on('connection', ws => {
         switch (message[0]) {
             case incoming.get_coords:
                 receiveMessages('Anfrage für "Koordinaten"-Datei erhalten.', importance.LOW);
-                hardware.sendData(ws, outgoing.coords);
+                navigation.getNavigation(ws);
                 break;
             case incoming.get_settings:
                 receiveMessages('Anfrage für "Einstellungs"-Datei erhalten.', importance.LOW);

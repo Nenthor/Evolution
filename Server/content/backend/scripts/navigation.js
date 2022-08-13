@@ -10,7 +10,7 @@ var send, sendAllClients;
 
 const importance = { HIGH: 0, MEDIUM: 1, LOW: 2 }; //For debugging
 const outgoing = {  //Outgoing messages to web-clients
-    set_navigation: 'set_navigation',
+    set_navigation: 'set_navigation', coords: 'coords'
 };
 
 module.exports = {
@@ -50,38 +50,51 @@ function setNavigation(location) {
     if (geodata.length != 0) getLocationImage();
     if (currentTile == null) data = `Lokalisieren...`;
     else data = `filename=${currentTile.filename};pixelX=${pixelX};pixelY=${pixelY}`;
-    sendAllClients(`${outgoing.set_navigation}:${data}`, `Ändert "Navigation" zu ${data}.`, null, importance.LOW);
+
+    global.navigation = data;
+    global.coords = getDMSCoords(lat, long);
+
+    sendAllClients(`${outgoing.set_navigation}:${global.navigation}`, `Navigation" mit dem Wert "${global.navigation}" wird an alle Klienten gesendet.`, null, importance.LOW);
+    sendAllClients(`${outgoing.coords}:${global.coords}`, `Navigation" mit dem Wert "${global.coords}" wird an alle Klienten gesendet.`, null, importance.LOW);
 }
 
 function getNavigation(client) {
-    var data;
-    if (currentTile == null) data = `Lokalisieren...`;
-    else data = `filename=${currentTile.filename};pixelX=${pixelX};pixelY=${pixelY}`;
-    send(client, `${outgoing.set_navigation}:${data}`, `"Navigation" mit dem Wert "${data}" wird zum Klienten gesendet.`, importance.LOW);
+    send(client, `${outgoing.set_navigation}:${global.navigation}`, `"Navigation" mit dem Wert "${global.navigation}" wird zum Klienten gesendet.`, importance.LOW);
+    send(client, `${outgoing.coords}:${global.coords}`, `"Navigation" mit dem Wert "${global.coords}" wird zum Klienten gesendet.`, importance.LOW);
 }
 
-function calculateLocation(dmsData) {
-    //              Lat           Long
-    //Exampel: 48°4'20.336"N 11°40'40.903"O
-    if (dmsData == 'Lokalisieren...') {
+function calculateLocation(coords) {
+    if (coords == 'Lokalisieren...') {
         lat = -1;
         long = -1;
         return;
     }
 
-    dmsData = dmsData.split(' ');
-    lat = dmsToDD(dmsData[0]);
-    long = dmsToDD(dmsData[1]);
+    coords = coords.split(' ');
+    lat = parseFloat(coords[0]);
+    long = parseFloat(coords[1]);
 }
 
-function dmsToDD(dms) {
-    //dd = d + m/60 + s/3600
-    degrees = parseFloat(dms.split('°')[0]);
-    minutes = parseFloat(dms.split('°')[1].split(`'`)[0]);
-    seconds = parseFloat(dms.split(`'`)[1].split('"')[0]);
-    reverseOrigin = dms[dms.length - 1] == 'S' || dms[dms.length - 1] == 'W' ? -1 : 1;
+function getDMSCoords(lat, long) {
+    if (lat == -1 || long == -1) {
+        return 'Lokalisieren...';
+    }
+    return `${decimalToDMS(lat, true)} ${decimalToDMS(long, false)}`
+}
 
-    return degrees + minutes / 60 + seconds / 3600 * reverseOrigin;
+function decimalToDMS(decimal, islat) {
+    //              Lat           Long
+    //Exampel: 48°4'20.336"N 11°40'40.903"O
+    const direction = islat ? (decimal > 0 ? 'N' : 'S') : (decimal > 0 ? 'O' : 'W');
+    const degree = Math.floor(decimal);
+    decimal -= degree;
+    const minutes = Math.floor(decimal * 60);
+    decimal = (decimal * 60) - minutes
+    const seconds = Math.floor((decimal * 60) * 10) / 10;
+    decimal = (decimal * 60) - seconds
+
+    //console.log(`${degree}°${minutes}'${seconds}"${direction}`)
+    return `${degree}°${minutes}'${seconds}"${direction}`;
 }
 
 //Get Location

@@ -1,6 +1,6 @@
 const client = require('./client');
 
-var send, sendAllClients;
+var send = null, sendAllClients = null, onCoords = null;
 var speed = '0', battery = '0', camera = '000', coords = 'Lokalisieren...';
 
 const importance = { HIGH: 0, MEDIUM: 1, LOW: 2 }; //For debugging
@@ -12,12 +12,13 @@ const fromHardware = { //Incoming hardware messages
     battery: 'battery', speed: 'speed', coords: 'coords', camera: 'camera'
 };
 const toHardware = { //Outgoing hardware messages
-    get_camera: 'get_camera', shutdown: 'shutdown', remotedirection: 'remotedirection', remotespeed: 'remotespeed'
+    get_camera: 'get_camera', get_coords: 'get_coords', shutdown: 'shutdown', remotedirection: 'remotedirection', remotespeed: 'remotespeed'
 };
 
 module.exports = {
     sendData: onWebsocketData,
-    setSendFunctions
+    setSendFunctions,
+    setOnCoords
 }
 
 //Setup client script
@@ -25,7 +26,11 @@ client.setOnMessageFunction(onMessage);
 
 function setSendFunctions(singel, all) {
     send = singel;
-    sendAllClients = all
+    sendAllClients = all;
+}
+
+function setOnCoords(func) {
+    onCoords = func;
 }
 
 //Possible types: speed, battery, camera, coords
@@ -85,9 +90,8 @@ function onMessage(msg) {
             sendAllClients(`${incoming.camera}:${camera}`, `Änderung der Kamera zu "${camera}" wird an alle Klienten gesendet.`, null, importance.LOW);
             break;
         case fromHardware.coords:
-            if (coords == message[1]) break;
-            coords = message[1];
-            sendAllClients(`${incoming.coords}:${coords}`, `Änderung der Koordinaten zu "${coords}" wird an alle Klienten gesendet.`, null, importance.LOW);
+            if (onCoords != null)
+                onCoords(message[1])
             break;
         default:
             console.warn(`${message[0]} is not an available hardware message.`);
@@ -95,10 +99,6 @@ function onMessage(msg) {
     }
 }
 
-function onConnect() {
-    client.send(`${toHardware.get_camera}`);
-}
-
 client.onMessage = onMessage;
-client.setOnConnectFunction = onConnect;
+client.getDataOnConnect([toHardware.get_camera, toHardware.get_coords]);
 client.connect();

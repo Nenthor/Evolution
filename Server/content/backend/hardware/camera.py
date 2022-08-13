@@ -11,7 +11,7 @@ __last_modified = __time.time()
 
 def sendCameraData(sensor, distance):
     """If camera data has changed it will be sent to the server. Has a cooldown of 0.5s."""
-    global __last_modified
+    global __last_modified, __camera
     if __time.time() - __last_modified >= 0.5:
         __last_modified = __time.time()
         if sensor == __SENSOR_1:
@@ -45,3 +45,8 @@ def __isDifferentLevel(index, distance):
 def sendToServer(message):
     """Send messages to the server if camera has changed."""
     pass
+
+
+def forceUpdate():
+    global __camera
+    sendToServer(f"camera:{__camera[0]}{__camera[1]}{__camera[2]}")

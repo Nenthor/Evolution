@@ -14,10 +14,13 @@ __retryCount = 0
 __isConnected = False
 __messageQueue = set()
 
+
 def connect():
     """Connect to the Server as a client."""
-    thread = __threading.Thread(target=__connectToServer)
+    thread = __threading.Thread(target=__connectToServer, daemon=True)
+    thread.daemon = True
     thread.start()
+
 
 def __connectToServer():
     global __isConnected, __retryCount, __client, __messageQueue
@@ -45,7 +48,8 @@ def __connectToServer():
         if __retryCount >= 300:
             print("Could not establish connection to Hardware.")
         else:
-            __connectToServer() 
+            __connectToServer()
+
 
 def __sendToServer(message):
     global __client, __isConnected
@@ -57,10 +61,12 @@ def __sendToServer(message):
         __client.send(send_length)
         __client.send(msg)
 
+
 def send(message):
     """Send messages to the server."""
     global __messageQueue
     __messageQueue.add(message)
+
 
 def disconnect():
     """Disconnect from the Server. Does not need to be called before exiting."""
@@ -70,5 +76,6 @@ def disconnect():
         __isConnected = False
         __messageQueue.clear()
         print("Disconnected from Hardware.")
+
 
 __atexit.register(disconnect)

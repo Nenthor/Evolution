@@ -8,14 +8,16 @@
   flex-direction: row;
   display: flex;
   align-items: center;
+  justify-content: space-evenly;
+  position: relative;
 }
 
 /*--Settings--*/
 .display_settings {
-  margin-left: 3vw;
-  padding: calc((min(20vw, 200px) - 100px - 2vw) / 2);
-  width: 100px;
-  height: 55vh;
+  margin-left: calc(min(10vw, 100px) - 45px + 6vw);
+  margin-right: calc(min(10vw, 100px) - 45px + 1vw);
+  width: 75px;
+  height: 75%;
 }
 
 .display_settingsList {
@@ -54,9 +56,8 @@
 
 /*--Speedometer--*/
 .display_speedometer {
-  width: 100%;
+  width: 50%;
   height: 80%;
-  flex-grow: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -83,8 +84,7 @@
 /*--EnergyBar--*/
 .display_batteryContainer {
   background-color: #444;
-  margin-left: 5vw;
-  margin-right: 3vw;
+  margin-right: 5vw;
   padding: 1vw;
   width: min(20vw, 200px);
   height: min(25vw, 250px);
@@ -176,11 +176,6 @@
   color: white;
   font-family: robotoMono;
   list-style-type: none;
-}
-
-.footer_item:nth-child(2) {
-  margin-left: 5%;
-  margin-right: 5%;
 }
 
 @media screen and (max-width: 900px) {

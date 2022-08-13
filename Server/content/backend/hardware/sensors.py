@@ -94,6 +94,7 @@ def stop():
         __isActive = False
     __time.sleep(0.1)
     print('Deactivating gpio connection.')
+    __gpio.setwarnings(False)
     __gpio.cleanup()
 
 
@@ -121,5 +122,5 @@ def start():
         __gpio.add_event_detect(
             __GPIO_ECHO_3, __gpio.BOTH, callback=__onEdgeEvent)
 
-    thread = __threading.Thread(target=__startLoop)
+    thread = __threading.Thread(target=__startLoop, daemon=True)
     thread.start()
