@@ -9,15 +9,21 @@ sensor2 = 500
 sensor3 = 500
 
 server.start()
-location.start()
-# sensors.start() #TODO: Enable this line
+location.start()  # TODO: Enable this line
+# sensors.start() # TODO: Enable this line
 
 
 def onMessage(message):
     if message == 'get_camera':
         camera.forceUpdate()
     elif message == 'get_coords':
-        location.forceUpdate()
+        location.forceUpdate('coords')
+    elif message == 'get_compass':
+        location.forceUpdate('compass')
+    elif message == 'get_battery':
+        pass  # TODO: Do some coding
+    elif message == 'get_speed':
+        pass  # TODO: Do some coding
     else:
         print(f'{message} is not available.')
 

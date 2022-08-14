@@ -18,9 +18,10 @@ socket.addEventListener('message', event => {
     const data = String(event.data).split(':');
     switch (data[0]) {
         case 'coords':
-            console.log(data[1])
             coords = data[1];
             updateCoords();
+            break;
+        case 'compass':
             break;
         case 'settings':
             settings = data[1];

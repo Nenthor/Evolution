@@ -1,18 +1,19 @@
 const client = require('./client');
 
 var send = null, sendAllClients = null, onCoords = null;
-var speed = '0', battery = '0', camera = '000', coords = 'Lokalisieren...';
+var speed = '0', battery = '0', camera = '000', coords = 'Lokalisieren...', compass = '0';
 
 const importance = { HIGH: 0, MEDIUM: 1, LOW: 2 }; //For debugging
 const incoming = { //Incoming messages from web-clients
-    battery: 'battery', speed: 'speed', coords: 'coords', camera: 'camera', shutdown: 'shutdown',
+    battery: 'battery', speed: 'speed', coords: 'coords', compass: 'compass', camera: 'camera', shutdown: 'shutdown',
     set_remotedirection: 'set_remotedirection', set_remotespeed: 'set_remotespeed'
 };
 const fromHardware = { //Incoming hardware messages
-    battery: 'battery', speed: 'speed', coords: 'coords', camera: 'camera'
+    battery: 'battery', speed: 'speed', coords: 'coords', compass: 'compass', camera: 'camera'
 };
 const toHardware = { //Outgoing hardware messages
-    get_camera: 'get_camera', get_coords: 'get_coords', shutdown: 'shutdown', remotedirection: 'remotedirection', remotespeed: 'remotespeed'
+    get_camera: 'get_camera', get_coords: 'get_coords', get_compass: 'get_compass', get_battery: 'get_battery', get_speed: 'get_speed',
+    shutdown: 'shutdown', remotedirection: 'remotedirection', remotespeed: 'remotespeed'
 };
 
 module.exports = {
@@ -50,6 +51,9 @@ function onWebsocketData(ws, msg) {
             break;
         case incoming.coords:
             data = coords;
+            break;
+        case incoming.compass:
+            data = compass;
             break;
         case incoming.set_remotedirection:
             client.send(`${toHardware.remotedirection}:${message[1]}`);
@@ -93,6 +97,11 @@ function onMessage(msg) {
             if (onCoords != null)
                 onCoords(message[1])
             break;
+        case fromHardware.compass:
+            if (compass == message[1]) break;
+            compass = message[1];
+            sendAllClients(`${incoming.compass}:${compass}`, `Änderung des Kompass zu "${compass}" wird an alle Klienten gesendet.`, null, importance.LOW);
+            break;
         default:
             console.warn(`${message[0]} is not an available hardware message.`);
             break;
@@ -100,5 +109,5 @@ function onMessage(msg) {
 }
 
 client.onMessage = onMessage;
-client.getDataOnConnect([toHardware.get_camera, toHardware.get_coords]);
+client.getDataOnConnect([toHardware.get_speed, toHardware.get_battery, toHardware.get_coords, toHardware.get_compass, toHardware.get_camera]);
 client.connect();
