@@ -53,13 +53,13 @@
 
 .navbar_image {
   height: 100%;
+  margin: 0 10px;
   overflow: hidden;
 }
 
 .navbar_image img {
-  margin: 5%;
-  max-height: 90%;
-  max-width: 90%;
+  height: 150%;
+  transform: translateY(calc(-17%));
 }
 
 .navbar_list {
