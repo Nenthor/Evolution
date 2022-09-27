@@ -8,7 +8,8 @@ __SPEED_FREQUENCY = 100  # in Hz
 
 
 class Engine:
-    def __innit__(self):
+    def __init__(self):
+        self.speed_control: __gpio.PWM = None
         __gpio.setmode(__gpio.BCM)
         __gpio.setwarnings(False)
 
@@ -17,8 +18,6 @@ class Engine:
         self.speed_controll = __gpio.PWM(
             __GPIO_SPEED_CONTROLL, __SPEED_FREQUENCY)
         self.speed_controll.changeDutyCycle(0)
-
-        return self
 
     def setAutonomousState(self, enabled: bool):
         if enabled:
@@ -29,10 +28,7 @@ class Engine:
     def setSpeed(self, percentage):
         if self.speed_controll is None:
             return
-        if percentage == 0:
-            self.speed_controll.stop()
-        else:
-            self.speed_controll.changeDutyCycle(percentage)
+        self.speed_controll.changeDutyCycle(percentage)
 
     def setFrequency(self, frequency: int):
         if self.speed_controll is None:
