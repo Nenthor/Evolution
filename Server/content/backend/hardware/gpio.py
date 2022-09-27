@@ -1,4 +1,7 @@
 from mimetypes import init
+from tokenize import Double
+from unicodedata import decimal
+from xmlrpc.client import Boolean
 import RPi.GPIO as __GPIO
 
 UNKNOWN = -1
@@ -32,11 +35,11 @@ def getmode():
     return __GPIO.getmode()
 
 
-def setwarnings(isActive):
+def setwarnings(isActive:bool):
     __GPIO.setwarnings(isActive)
 
 
-def setup(channel, mode, initial=None, pull_up_down=None):
+def setup(channel:int, mode, initial=None, pull_up_down=None):
     if mode != IN and mode != OUT:
         print('Unknown channel setup mode.')
         return
@@ -59,11 +62,11 @@ def setup(channel, mode, initial=None, pull_up_down=None):
             __GPIO.setup(channel, mode, initial=initial)
 
 
-def input(channel):
+def input(channel:int):
     return __GPIO.input(channel)
 
 
-def output(channel, state):
+def output(channel:int, state):
     if state == LOW or state == HIGH:
         __GPIO.output(channel, state)
     else:
@@ -77,7 +80,7 @@ def cleanup(channel=None):
         __GPIO.cleanup(channel)
 
 
-def wait_for_edge(channel, event, timeout=None):
+def wait_for_edge(channel:int, event, timeout=None):
     """Timeout in milliseconds"""
     if event != FALLING and event != RISING and event != BOTH:
         print('Unknown edge event.')
@@ -88,7 +91,7 @@ def wait_for_edge(channel, event, timeout=None):
         return __GPIO.wait_for_edge(channel, event, timeout=timeout)
 
 
-def add_event_detect(channel, event, callback=None, bouncetime=None):
+def add_event_detect(channel:int, event, callback=None, bouncetime=None):
     """Bouncetime in milliseconds"""
     if event != FALLING and event != RISING and event != BOTH:
         print('Unknown event.')
@@ -105,35 +108,39 @@ def add_event_detect(channel, event, callback=None, bouncetime=None):
             __GPIO.add_event_detect(channel, event, callback=callback, bouncetime=bouncetime)
 
 
-def add_event_callback(channel, callback):
+def add_event_callback(channel:int, callback:function):
     __GPIO.add_event_callback(channel, callback)
 
 
-def event_detected(channel):
+def event_detected(channel:int):
     return __GPIO.event_detected(channel)
 
 
-def remove_event_detect(channel):
+def remove_event_detect(channel:int):
     __GPIO.remove_event_detect(channel)
 
 
-def GPIO_function(pin):
+def GPIO_function(pin:int):
     return __GPIO.__GPIO_function(pin)
 
 
 class PWM:
-    def __innit__(self, channel, frequency):
+    def __innit__(self, channel:int, frequency:int):
         self.PWM = __GPIO.PWM(channel, frequency)
         return self.PWM
 
-    def start(self, dc):
+    def start(self, dc:float):
         self.PWM.start(dc)
 
-    def changeFrequency(self, freq):
+    def changeFrequency(self, freq:int):
         self.PWM.changeFrequency(freq)
 
-    def changeDutyCycle(self, dc):
-        self.PWM.changeDutyCycle(dc)
+    def changeDutyCycle(self, dc:float):
+        if 0 <= dc and dc >= 100:
+            self.PWM.changeDutyCycle(dc)
+        else:
+            self.PWM.changeDutyCycle(0)
+            print('{dc} is not a valid input for duty cycle.')
 
     def stop(self):
         self.PWM.stop()

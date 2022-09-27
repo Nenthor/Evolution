@@ -9,8 +9,8 @@ sensor2 = 500
 sensor3 = 500
 
 server.start()
-location.start()  # TODO: Enable this line
-# sensors.start() # TODO: Enable this line
+# location.start() # TODO: Enable this line
+# sensors.start()  # TODO: Enable this line
 
 
 def onMessage(message):

@@ -105,5 +105,3 @@ dist
 
 #Pycache
 __pycache__
-engine.py
-main.py
