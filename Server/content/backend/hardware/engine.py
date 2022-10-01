@@ -1,29 +1,28 @@
-import gpio as __gpio
-
-__GPIO_AUTONOMOUS_SWITCH = 4  # OUT -> HIGH = on : LOW = off
-__GPIO_REVERSE_GEAR = 17      # OUT -> HIGH = on : LOW = off
-__GPIO_SPEED_CONTROLL = 25    # OUT -> PWM: 100% = FULL_SPEED : 0% = 0 km/h
-
-__SPEED_FREQUENCY = 100  # in Hz
-
-
 class Engine:
-    def __init__(self):
-        self.speed_control: __gpio.PWM = None
-        __gpio.setmode(__gpio.BCM)
-        __gpio.setwarnings(False)
+    import gpio
 
-        __gpio.setup(__GPIO_AUTONOMOUS_SWITCH, __gpio.OUT, initial=__gpio.LOW)
-        __gpio.setup(__GPIO_REVERSE_GEAR, __gpio.OUT, initial=__gpio.HIGH)
-        self.speed_controll = __gpio.PWM(
-            __GPIO_SPEED_CONTROLL, __SPEED_FREQUENCY)
+    gpio_AUTONOMOUS_SWITCH = 4  # OUT -> HIGH = on : LOW = off
+    gpio_REVERSE_GEAR = 17      # OUT -> HIGH = on : LOW = off
+    gpio_SPEED_CONTROLL = 25    # OUT -> PWM: 100% = FULL_SPEED : 0% = 0 km/h
+
+    SPEED_FREQUENCY = 100  # in Hz
+
+    def __init__(self):
+        self.speed_control: self.gpio.PWM = None
+        self.gpio.setmode(self.gpio.BCM)
+        self.gpio.setwarnings(False)
+
+        self.gpio.setup(self.gpio_AUTONOMOUS_SWITCH, self.gpio.OUT, initial=self.gpio.LOW)
+        self.gpio.setup(self.gpio_REVERSE_GEAR, self.gpio.OUT, initial=self.gpio.HIGH)
+        self.speed_controll = self.gpio.PWM(
+            self.gpio_SPEED_CONTROLL, self.SPEED_FREQUENCY)
         self.speed_controll.changeDutyCycle(0)
 
     def setAutonomousState(self, enabled: bool):
         if enabled:
-            __gpio.output(__GPIO_AUTONOMOUS_SWITCH, __gpio.HIGH)
+            self.gpio.output(self.gpio_AUTONOMOUS_SWITCH, self.gpio.HIGH)
         else:
-            __gpio.output(__GPIO_AUTONOMOUS_SWITCH, __gpio.LOW)
+            self.gpio.output(self.gpio_AUTONOMOUS_SWITCH, self.gpio.LOW)
 
     def setSpeed(self, percentage):
         if self.speed_controll is None:
@@ -39,4 +38,4 @@ class Engine:
         if self.speed_controll is not None:
             self.speed_controll.stop()
             self.speed_controll = None
-        __gpio.cleanup()
+        self.gpio.cleanup()

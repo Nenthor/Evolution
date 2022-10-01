@@ -105,7 +105,7 @@ def add_event_detect(channel: int, event, callback=None, bouncetime=None):
                 channel, event, callback=callback, bouncetime=bouncetime)
 
 
-def add_event_callback(channel: int, callback: function):
+def add_event_callback(channel: int, callback):
     __GPIO.add_event_callback(channel, callback)
 
 
@@ -122,10 +122,11 @@ def GPIO_function(pin: int):
 
 
 class PWM:
+    import RPi.GPIO as gpio
     def __init__(self, channel: int, frequency: int):
         setup(channel, OUT)
         self.channel = channel
-        self.PWM = __GPIO.PWM(channel, frequency)
+        self.PWM = self.gpio.PWM(channel, frequency)
 
     def start(self, dc: float):
         self.PWM.start(dc)
