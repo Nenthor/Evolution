@@ -41,112 +41,117 @@ function receiveMessages(message, important) {
 }
 
 function sendAllClients(message, debugMessage, exeption, importance) {
-    wss.clients.forEach(client => {
-        if (client != exeption) {
-            if (client.readyState == WebSocket.OPEN) client.send(message);
-        }
-    });
+    [wss, wssSecure].forEach(element => {
+        element.clients.forEach(client => {
+            if (client != exeption) {
+                if (client.readyState == WebSocket.OPEN) client.send(message);
+            }
+        });
+    })
     if (importance <= currentImportance && debugMessage != null) debug.addDebugMessage(debugMessage, false);
 }
 
 //Websocket ServerListener
 const wss = new WebSocket.Server({ server: global.server });
-wss.on('connection', ws => {
-    ws.on('message', data => {
-        const message = String(data).split(':');
-        switch (message[0]) {
-            case incoming.get_coords:
-                receiveMessages('Anfrage für "Koordinaten"-Wert erhalten.', importance.LOW);
-                navigation.getNavigation(ws);
-                break;
-            case incoming.get_compass:
-                receiveMessages('Anfrage für "Kompass"-Wert erhalten.', importance.LOW);
-                hardware.sendData(ws, outgoing.compass);
-                break;
-            case incoming.get_settings:
-                receiveMessages('Anfrage für "Einstellungs"-Wert erhalten.', importance.LOW);
-                send(ws, `${outgoing.settings}:${global.settings}`, `"settings" mit dem Wert "${global.settings}" wird zum Klienten gesendet.`, importance.LOW);
-                break;
-            case incoming.get_camera:
-                receiveMessages('Anfrage für "Kamera"-Wert erhalten.', importance.LOW);
-                hardware.sendData(ws, outgoing.camera);
-                break;
-            case incoming.get_music:
-                receiveMessages('Anfrage für "Musik"-Wert erhalten.', importance.LOW);
-                send(ws, `${outgoing.music}:${global.music}`, `"music" mit dem Wert "${global.music}" wird zum Klienten gesendet.`, importance.LOW);
-                break;
-            case incoming.get_speed:
-                receiveMessages('Anfrage für "Geschwindigkeits"-Wert erhalten.', importance.LOW);
-                hardware.sendData(ws, outgoing.speed);
-                break;
-            case incoming.get_battery:
-                receiveMessages('Anfrage für "Batterie"-Wert erhalten.', importance.LOW);
-                hardware.sendData(ws, outgoing.battery);
-                break;
-            case incoming.get_navigation:
-                receiveMessages('Anfrage für "Navigations"-Wert erhalten.', importance.LOW);
-                navigation.getNavigation(ws);
-                break;
-            case incoming.get_remotecontrollstate:
-                receiveMessages('Anfrage für "Fernsteuerungs-Zustand" erhalten.', importance.LOW);
-                remoteControll.hasRemoteConnection(ws);
-                break;
-            case incoming.set_music:
-                receiveMessages(`Änderung des "Musik"-Werts zu "${message[1]}" erhalten.`, importance.MEDIUM);
-                writeFile(message[1], 'music');
-                global.music = String(message[1]);
-                music.playMusic();
-                sendAllClients(`${outgoing.music}:${global.music}`, `Änderung des "Musik"-Werts zu "${message[1]}" wird an alle Klienten gesendet.`, ws, importance.LOW);
-                break;
-            case incoming.set_remotedirection:
-                receiveMessages(`Fernsteuerung wird auf "${message[1]}" gesetzt.`, importance.MEDIUM);
-                hardware.sendData(null, `${incoming.set_remotedirection}:${message[1]}`);
-                break;
-            case incoming.set_remotespeed:
-                receiveMessages(`Geschwindigkeit der Fernsteuerung wird auf "${message[1]}" gesetzt.`, importance.MEDIUM);
-                hardware.sendData(null, `${incoming.set_remotespeed}:${message[1]}`);
-                break;
-            case incoming.set_settings:
-                receiveMessages(`Änderung der "Einstellungs"-Datei zu "${message[1]}" erhalten.`, importance.MEDIUM);
-                writeFile(message[1], 'settings');
-                global.settings = String(message[1]);
-                music.checkForMute();
-                remoteControll.remoteControllUpdate();
-                sendAllClients(`${outgoing.settings}:${global.settings}`, `Änderung der "Einstellungs"-Datei zu "${message[1]}" wird an alle Klienten gesendet.`, ws, importance.LOW);
-                break;
-            case incoming.set_importance:
-                receiveMessages(`Änderung der "Debug-Nachrichtenstufe" auf "${message[1]}" erhalten.`, importance.LOW);
-                currentImportance = parseInt(message[1]);
-                break;
-            case incoming.shutdown:
-                receiveMessages(`Anfrage auf "System-Shutdown" erhalten.`, importance.HIGH);
-                hardware.sendData(null, incoming.shutdown);
-                break;
-            case incoming.add_debuglistener:
-                receiveMessages(`Debug-Klient wird hinzugefügt.`, importance.LOW);
-                debug.addDebugListener(ws);
-                debug.sendDebugData(ws, true);
-                break;
-            case incoming.remove_debuglistener:
-                receiveMessages(`Debug-Klient wird entfernt.`, importance.LOW);
-                debug.removeDebugListener(ws);
-                break;
-            case incoming.controll_request:
-                receiveMessages(`Anfrage auf "Fernsteuerungs-Kontrolle" erhalten.`, importance.MEDIUM);
-                remoteControll.manageControllRequest(ws);
-                break;
-            case incoming.controll_check:
-                receiveMessages(`Kontroll-Check erhalten.`, importance.LOW);
-                if (remoteControll.isController(ws)) remoteControll.checkReceived();
-                break;
-            case incoming.remote_devicelogout:
-                receiveMessages(`"Fernsteuerungs-Klient" wurde ausgeloggt.`, importance.HIGH);
-                remoteControll.remoteDeviceLogout(ws);
-                break;
-            default:
-                console.warn(`${message[0]} is not available.`);
-                break;
-        }
+const wssSecure = new WebSocket.Server({ server: global.serverSecure });
+[wss, wssSecure].forEach(element => {
+    element.on('connection', ws => {
+        ws.on('message', data => {
+            const message = String(data).split(':');
+            switch (message[0]) {
+                case incoming.get_coords:
+                    receiveMessages('Anfrage für "Koordinaten"-Wert erhalten.', importance.LOW);
+                    navigation.getNavigation(ws);
+                    break;
+                case incoming.get_compass:
+                    receiveMessages('Anfrage für "Kompass"-Wert erhalten.', importance.LOW);
+                    hardware.sendData(ws, outgoing.compass);
+                    break;
+                case incoming.get_settings:
+                    receiveMessages('Anfrage für "Einstellungs"-Wert erhalten.', importance.LOW);
+                    send(ws, `${outgoing.settings}:${global.settings}`, `"settings" mit dem Wert "${global.settings}" wird zum Klienten gesendet.`, importance.LOW);
+                    break;
+                case incoming.get_camera:
+                    receiveMessages('Anfrage für "Kamera"-Wert erhalten.', importance.LOW);
+                    hardware.sendData(ws, outgoing.camera);
+                    break;
+                case incoming.get_music:
+                    receiveMessages('Anfrage für "Musik"-Wert erhalten.', importance.LOW);
+                    send(ws, `${outgoing.music}:${global.music}`, `"music" mit dem Wert "${global.music}" wird zum Klienten gesendet.`, importance.LOW);
+                    break;
+                case incoming.get_speed:
+                    receiveMessages('Anfrage für "Geschwindigkeits"-Wert erhalten.', importance.LOW);
+                    hardware.sendData(ws, outgoing.speed);
+                    break;
+                case incoming.get_battery:
+                    receiveMessages('Anfrage für "Batterie"-Wert erhalten.', importance.LOW);
+                    hardware.sendData(ws, outgoing.battery);
+                    break;
+                case incoming.get_navigation:
+                    receiveMessages('Anfrage für "Navigations"-Wert erhalten.', importance.LOW);
+                    navigation.getNavigation(ws);
+                    break;
+                case incoming.get_remotecontrollstate:
+                    receiveMessages('Anfrage für "Fernsteuerungs-Zustand" erhalten.', importance.LOW);
+                    remoteControll.hasRemoteConnection(ws);
+                    break;
+                case incoming.set_music:
+                    receiveMessages(`Änderung des "Musik"-Werts zu "${message[1]}" erhalten.`, importance.MEDIUM);
+                    writeFile(message[1], 'music');
+                    global.music = String(message[1]);
+                    music.playMusic();
+                    sendAllClients(`${outgoing.music}:${global.music}`, `Änderung des "Musik"-Werts zu "${message[1]}" wird an alle Klienten gesendet.`, ws, importance.LOW);
+                    break;
+                case incoming.set_remotedirection:
+                    receiveMessages(`Fernsteuerung wird auf "${message[1]}" gesetzt.`, importance.MEDIUM);
+                    hardware.sendData(null, `${incoming.set_remotedirection}:${message[1]}`);
+                    break;
+                case incoming.set_remotespeed:
+                    receiveMessages(`Geschwindigkeit der Fernsteuerung wird auf "${message[1]}" gesetzt.`, importance.MEDIUM);
+                    hardware.sendData(null, `${incoming.set_remotespeed}:${message[1]}`);
+                    break;
+                case incoming.set_settings:
+                    receiveMessages(`Änderung der "Einstellungs"-Datei zu "${message[1]}" erhalten.`, importance.MEDIUM);
+                    writeFile(message[1], 'settings');
+                    global.settings = String(message[1]);
+                    music.checkForMute();
+                    remoteControll.remoteControllUpdate();
+                    sendAllClients(`${outgoing.settings}:${global.settings}`, `Änderung der "Einstellungs"-Datei zu "${message[1]}" wird an alle Klienten gesendet.`, ws, importance.LOW);
+                    break;
+                case incoming.set_importance:
+                    receiveMessages(`Änderung der "Debug-Nachrichtenstufe" auf "${message[1]}" erhalten.`, importance.LOW);
+                    currentImportance = parseInt(message[1]);
+                    break;
+                case incoming.shutdown:
+                    receiveMessages(`Anfrage auf "System-Shutdown" erhalten.`, importance.HIGH);
+                    hardware.sendData(null, incoming.shutdown);
+                    break;
+                case incoming.add_debuglistener:
+                    receiveMessages(`Debug-Klient wird hinzugefügt.`, importance.LOW);
+                    debug.addDebugListener(ws);
+                    debug.sendDebugData(ws, true);
+                    break;
+                case incoming.remove_debuglistener:
+                    receiveMessages(`Debug-Klient wird entfernt.`, importance.LOW);
+                    debug.removeDebugListener(ws);
+                    break;
+                case incoming.controll_request:
+                    receiveMessages(`Anfrage auf "Fernsteuerungs-Kontrolle" erhalten.`, importance.MEDIUM);
+                    remoteControll.manageControllRequest(ws);
+                    break;
+                case incoming.controll_check:
+                    receiveMessages(`Kontroll-Check erhalten.`, importance.LOW);
+                    if (remoteControll.isController(ws)) remoteControll.checkReceived();
+                    break;
+                case incoming.remote_devicelogout:
+                    receiveMessages(`"Fernsteuerungs-Klient" wurde ausgeloggt.`, importance.HIGH);
+                    remoteControll.remoteDeviceLogout(ws);
+                    break;
+                default:
+                    console.warn(`${message[0]} is not available.`);
+                    break;
+            }
+        });
     });
 });
 

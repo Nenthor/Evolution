@@ -1,3 +1,7 @@
+* {
+  user-select: text;
+}
+
 /*--Frontpage--*/
 .frontpage {
   height: 90vh;
@@ -42,6 +46,7 @@
   font-weight: bolder;
   font-family: robotoMono;
   font-size: 1.1rem;
+  user-select: none;
 }
 
 @media (pointer: fine) {
@@ -88,6 +93,7 @@
   font-weight: bolder;
   font-family: robotoMono;
   font-size: 1.1rem;
+  user-select: none;
 }
 
 @media (pointer: fine) {

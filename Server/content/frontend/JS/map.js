@@ -26,7 +26,6 @@ function send(message) {
     socket.send(message);
 }
 
-
 //Waiting room
 const waitingdiv = document.getElementById('waitingdiv');
 const waitingtitle = document.getElementById('waitingtitle');
