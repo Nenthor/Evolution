@@ -124,12 +124,12 @@ def GPIO_function(pin: int):
 class PWM:
     import RPi.GPIO as gpio
     def __init__(self, channel: int, frequency: int):
-        setup(channel, OUT)
+        self.gpio.setmode(11) # 11 = BCM
+        self.gpio.setwarnings(False)
+        self.gpio.setup(channel, 0) # 0 = OUT ; 1 = IN
         self.channel = channel
         self.PWM = self.gpio.PWM(channel, frequency)
-
-    def start(self, dc: float):
-        self.PWM.start(dc)
+        self.PWM.start(0)
 
     def changeFrequency(self, freq: int):
         self.PWM.ChangeFrequency(freq)

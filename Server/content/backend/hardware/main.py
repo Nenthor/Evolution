@@ -13,19 +13,22 @@ server.start()
 # sensors.start()  # TODO: Enable this line
 
 
-def onMessage(message):
-    if message == 'get_camera':
+def onMessage(message:str):
+    msg = message.split(':')
+    if msg[0] == 'get_camera':
         camera.forceUpdate()
-    elif message == 'get_coords':
+    elif msg[0] == 'get_coords':
         location.forceUpdate('coords')
-    elif message == 'get_compass':
+    elif msg[0] == 'get_compass':
         location.forceUpdate('compass')
-    elif message == 'get_battery':
+    elif msg[0] == 'get_battery':
         pass  # TODO: Do some coding
-    elif message == 'get_speed':
+    elif msg[0] == 'get_speed':
         pass  # TODO: Do some coding
+    elif msg[0] == 'remotedirection':
+        print(f'{msg[0]}: {msg[1]}')
     else:
-        print(f'{message} is not available.')
+        print(f'{msg[0]} is not available.')
 
 
 def onSensorData(sensor, distance):
