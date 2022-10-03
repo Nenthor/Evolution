@@ -4,6 +4,7 @@ global.music = '0';
 global.navigation = 'Lokalisieren...';
 global.coords = 'Lokalisieren...';
 global.compass = '0';
+global.debug = true;
 
 //Setup webserver
 require('./content/backend/scripts/website');

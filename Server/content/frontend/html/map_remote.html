@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#3232cd" />
     <link rel="icon" href="/images/icon.webp" />
     <link rel="stylesheet" href="/CSS/default.css" />
+    <link rel="stylesheet" href="/CSS/map.css" />
     <link rel="stylesheet" href="/CSS/map_remote.css" />
     <script defer src="/JS/mobile_menu.js"></script>
     <script defer src="/JS/map_remote.js"></script>
@@ -26,21 +27,20 @@
       </div>
       <ul class="navbar_list">
         <li class="navbar_item">
-          <a class="navbar_link" id="back_button">Zurück</a>
+          <a href="/index_remote" class="navbar_link">Zurück</a>
         </li>
       </ul>
     </nav>
     <div class="navbar_mobilmenu" id="mobilmenu">
       <ul class="navbar_mobillist">
         <li class="navbar_mobilitem">
-          <a class="navbar_mobillink" id="mobil_back_button">Zurück</a>
+          <a href="/index_remote" class="navbar_mobillink">Zurück</a>
         </li>
       </ul>
     </div>
     <!--Display-->
     <div class="display">
-      <div class="display_map" id="mapBackground">
-        <p class="display_mapChooseDestinationText" id="destinationText">Wähle Zielort</p>
+      <div class="display_map">
         <div class="display_locationDot"></div>
         <p class="display_mapLizenz">Map data &copy OpenStreetMap contributors, CC-BY-SA</p>
         <div class="display_mapBox">
@@ -55,7 +55,7 @@
       </div>
       <div class="display_settings">
         <div class="display_destination" id="destinationButton">
-          <p class="display_destinationText">Ziel setzen</p>
+          <p class="display_destinationText">Ekart rufen</p>
         </div>
       </div>
     </div>

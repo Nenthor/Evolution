@@ -17,11 +17,8 @@ socket.addEventListener('message', event => {
             updateBatterytext(data[1]);
             break;
         case 'controll_request':
-            if (data[1] == 'accepted') {
-                controllRequest(true, null);
-            } else {
-                controllRequest(false, data[1]);
-            }
+            if (data[1] == 'accepted') controllRequest(true, null);
+            else controllRequest(false, data[1]);
             break;
         case 'controll_check':
             send('controll_check');
@@ -45,7 +42,7 @@ backbutton.addEventListener('click', logout, { passive: true });
 mobilbackbutton.addEventListener('click', logout, { passive: true });
 
 function logout() {
-    open('/index_remote', '_self');
+    open('/homepage', '_self');
 }
 
 window.addEventListener('beforeunload', event => {
@@ -212,9 +209,3 @@ function onControllerEnd(index) {
 function sendCurrentdirection() {
     send(`set_remotedirection:${currentdirection}`);
 }
-
-//Speed methods
-var slider = document.getElementById('slider');
-slider.addEventListener('change', event => {
-    send(`set_remotespeed:${slider.value}`);
-}, { passive: true });

@@ -29,14 +29,12 @@ serverSecure.listen(portSecure);
 
 //Manage paths
 const localHtmlPages = ['index', 'music', 'camera', 'map', 'debug'];
-const remoteHtmlPages = ['index_remote', 'controll', 'map_remote', 'debug'];
+const remoteHtmlPages = ['homepage', 'controll', 'map_remote', 'debug'];
 const htmlPages = localHtmlPages.concat(remoteHtmlPages);
-
-const debugMode = true; //TODO: Remove this line
 
 //Set Startpage
 app.get('/', (req, res) => {
-    const redirection = req.socket.localAddress == req.ip ? '/index' : '/index_remote';
+    const redirection = req.socket.localAddress == req.ip ? '/index' : '/homepage';
     res.status(100);
     res.redirect(redirection);
 });
@@ -70,7 +68,7 @@ for (const pageIndex in htmlPages) {
 app.get('*', (req, res) => { res.status(404); res.end(); });
 appSecure.get('*', (req, res) => {
     res.status(100);
-    res.redirect(`http://${req.headers.host}${req.url}`)
+    res.redirect(`http://${req.headers.host}:${port}${req.url}`)
 });
 
 //Start websocketServer
@@ -80,7 +78,7 @@ require('./websocket');
 
 function setPageAccess(req, res) {
     const fileRequested = path.basename(req.path);
-    const allowedFiles = req.socket.localAddress == req.ip ? localHtmlPages : remoteHtmlPages;
+    const allowedFiles = req.socket.localAddress == req.socket.remoteAdress ? localHtmlPages : remoteHtmlPages;
 
     if (!localHtmlPages.contains(fileRequested) && !remoteHtmlPages.contains(fileRequested)) {
         //URL not found
@@ -89,11 +87,11 @@ function setPageAccess(req, res) {
         return;
     }
 
-    if (allowedFiles.contains(fileRequested) || debugMode) {
+    if (allowedFiles.contains(fileRequested) || global.debug) {
         //Reading file
         if (fileRequested == 'map_remote') {
             res.status(100);
-            res.redirect(`https://${req.headers.host}${req.url}`)
+            res.redirect(`https://${req.headers.host}:${portSecure}${req.url}`)
             return;
         }
         fs.readFile(path.join(global.path, `content/frontend/html/${fileRequested}.html`), (error, data) => {

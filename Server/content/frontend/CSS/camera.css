@@ -1,7 +1,7 @@
 /*--Display--*/
 .display {
-  height: 90vh;
-  max-height: calc(100vh - 75px);
+  height: calc(100vh - 75px);
+  margin-top: 75px;
   width: 100%;
   background-color: #161616;
   display: flex;

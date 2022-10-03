@@ -2,8 +2,7 @@
 .waiting {
   background-color: #000a;
   position: fixed;
-  height: 90vh;
-  max-height: calc(100vh - 60px);
+  height: calc(100vh - 75px);
   width: 100%;
   z-index: 98;
   display: flex;
@@ -38,34 +37,24 @@
 .controll {
   background-color: #161616;
   width: 100%;
-  height: 90vh;
-  max-height: calc(100vh - 60px);
+  margin-top: 75px;
+  height: calc(100% - 75px);
   position: fixed;
-  display: flex;
-  justify-content: start;
-  align-items: center;
-  flex-direction: column;
 }
 
 .controll_servicebox {
   display: flex;
-  justify-content: space-evenly;
-  width: 100%;
-  height: 100%;
+  justify-content: center;
   align-items: center;
-  flex-direction: column;
+  width: 100%;
+  height: calc(100% - 125px);
 }
 
-@media (orientation: landscape) {
-  .controll_servicebox {
-    flex-direction: row;
-  }
-}
 /*--Informationtext--*/
 .controll_informationbox {
   background-color: #444;
   width: 100%;
-  height: 40px;
+  height: 50px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -83,8 +72,7 @@
 /*--Controller--*/
 .controll_controllerbox {
   aspect-ratio: 1 / 1;
-  width: min(60vw, 50vh);
-  margin: 25px;
+  width: min(80vw, 70vh);
   background-color: #323232;
   border-radius: 40%;
 }
@@ -96,36 +84,30 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 40%;
+  height: 40%;
 }
 
 .controll_controllerbutton:nth-child(1) {
-  width: 40%;
-  height: 40%;
   margin-left: calc(50% - 40% / 2);
   transform: rotate(270deg);
   -moz-transform: rotate(270deg);
 }
 
 .controll_controllerbutton:nth-child(2) {
-  width: 40%;
-  height: 40%;
   margin-top: calc(50% - 40% - 40% / 2);
   transform: rotate(180deg);
   -moz-transform: rotate(180deg);
 }
 
 .controll_controllerbutton:nth-child(3) {
-  top: calc(min(50vw, 40vh) / -2);
+  top: calc(min(80vw, 70vh) / -2.5);
   margin-left: calc(100% - 40%);
-  width: 40%;
-  height: 40%;
   transform: rotate(0deg);
   -moz-transform: rotate(0deg);
 }
 
 .controll_controllerbutton:nth-child(4) {
-  width: 40%;
-  height: 40%;
   margin-top: -50%;
   margin-left: calc(50% - 40% / 2);
   transform: rotate(90deg);
@@ -138,76 +120,36 @@
   margin-left: 10%;
   background-image: url(/images/arrow.webp);
   background-size: contain;
-}
-/*--Speed--*/
-.controll_speedbox {
-  margin: 3%;
-  background-color: transparent;
-  border-radius: 15%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background-repeat: no-repeat;
 }
 
-.controll_speedslider {
-  aspect-ratio: 1.5 / 1;
-  height: min(30vw, 30vh);
-  -webkit-appearance: none;
-  appearance: none;
-  transform: rotate(-90deg);
-  background-image: url(/images/remotecontrollspeed.webp);
-  background-size: contain;
-  border-radius: 15%;
-}
+@media screen and (min-aspect-ratio: 7 / 10) and (max-height: 750px) {
+  .controll_controllerbox {
+    width: 55vh;
+  }
 
-.controll_speedslider::-webkit-slider-runnable-track {
-  -webkit-appearance: none;
-  appearance: none;
-  background-color: transparent;
-}
+  .controll_controllerbutton:nth-child(3) {
+    top: calc(55vh / -2.5);
+  }
 
-.controll_speedslider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  background-image: url(/images/remotecontrollspeedhandle.webp);
-  background-size: contain;
-  border-radius: 25%;
-  aspect-ratio: 1 / 3;
-  height: min(30vw, 30vh);
-}
+  .controll_settings {
+    height: 50px;
+  }
 
-@media (orientation: landscape) {
-  .controll_speedbox {
-    flex-direction: row;
+  .controll_informationbox {
+    height: 25px;
+  }
+
+  .controll_servicebox {
+    height: calc(100% - 75px);
   }
 }
 
-@media screen and (max-height: 850px) and (orientation: portrait) {
-  .controll_speedslider {
-    height: min(13vh, 13vh);
-  }
-
-  .controll_speedslider::-webkit-slider-thumb {
-    height: min(13vh, 13vh);
-  }
-}
-
-@media screen and (min-height: 850px) and (orientation: portrait) {
-  .controll_speedslider {
-    height: min(17vh, 17vh);
-  }
-
-  .controll_speedslider::-webkit-slider-thumb {
-    height: min(17vh, 17vh);
-  }
-}
-
-@media screen and (orientation: landscape) {
-  .controll_speedslider {
-    height: min(25vw, 25vh);
-  }
-
-  .controll_speedslider::-webkit-slider-thumb {
-    height: min(25vw, 25vh);
-  }
+.controll_settings {
+  position: relative;
+  z-index: -1;
+  bottom: 0;
+  width: 100%;
+  height: 75px;
+  background-color: #323232;
 }

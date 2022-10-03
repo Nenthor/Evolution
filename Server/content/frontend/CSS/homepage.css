@@ -4,8 +4,8 @@
 
 /*--Frontpage--*/
 .frontpage {
-  height: 90vh;
-  max-height: calc(100vh - 75px);
+  height: calc(100vh - 75px);
+  margin-top: 75px;
   width: 100%;
   background-image: url(/images/frontPage_backround.webp);
   background-size: cover;

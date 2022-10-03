@@ -23,7 +23,9 @@ socket.addEventListener('message', event => {
 }, { passive: true });
 
 function send(message) {
-    socket.send(message);
+    if (socket.readyState == WebSocket.OPEN) {
+        socket.send(message);
+    }
 }
 
 //Waiting room
@@ -125,47 +127,44 @@ function drawImage(image, x, y) {
 }
 
 window.addEventListener('resize', () => {
+    if (!hasData) return;
     fix_dpi();
     displayMap();
 }, { passive: true });
 
-//canvas onclick
+//Call Ekart button
 const destinationButton = document.getElementById('destinationButton');
-const destinationText = document.getElementById('destinationText');
-const mapBackground = document.getElementById('mapBackground');
 
-mapBackground.style.backgroundImage = 'linear-gradient(to bottom right, #2f81df, #2a5cb9)';
-destinationText.style.display = 'none';
-canvas.style.cursor = 'default';
+destinationButton.style.backgroundColor = '#444';
+destinationButton.style.cursor = 'default';
+var destination = null;
 
-var setDestination = false;
+if (!navigator.geolocation) {
+    //geolocation api is not available
+    destinationButton.style.display = 'none';
+}
+
+function checkButtonStatus() {
+    if (hasData) {
+        destinationButton.style.backgroundColor = '#2f81df';
+        destinationButton.style.cursor = 'pointer';
+    } else {
+        destinationButton.style.backgroundColor = '#444';
+        destinationButton.style.cursor = 'default';
+    }
+}
 
 destinationButton.addEventListener('click', () => {
-    if (setDestination) {
-        setDestination = false;
-        destinationText.style.display = 'none';
-        canvas.style.cursor = 'default';
-        mapBackground.style.backgroundImage = 'linear-gradient(to bottom right, #2f81df, #2a5cb9)';
-    } else {
-        setDestination = true;
-        destinationText.style.display = 'flex';
-        canvas.style.cursor = 'pointer';
-        mapBackground.style.backgroundImage = 'linear-gradient(to bottom right, #e77e05, #973007)';
-    }
+    if (!hasData) return;
+    getDestination();
 }, { passive: true });
 
-["mousedown", "touchstart"].forEach(event => {
-    canvas.addEventListener(event, e => {
-        getCursorPosition(e);
-    }, { passive: true })
-});
-
-function getCursorPosition(event) {
-    if (!setDestination) return;
-
-    const rect = canvas.getBoundingClientRect();
-    destinationX = Math.round(event.clientX - rect.left);
-    destinationY = Math.round(event.clientY - rect.top);
-
-    displayMap();
+function getDestination() {
+    navigator.geolocation.getCurrentPosition(location => {
+        const lat = location.coords.latitude;
+        const long = location.coords.longitude;
+        console.log(`coords:${lat} ${long}`);
+    }, err => {
+        console.log('Error:', err.message);
+    }, { enableHighAccuracy: true, maximumAge: 0, timeout: 3000 });
 }
