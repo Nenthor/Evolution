@@ -9,6 +9,7 @@ class Engine:
 
     def __init__(self):
         self.speed_control: self.gpio.PWM = None
+        self.reverse_state = False
         self.gpio.setmode(self.gpio.BCM)
         self.gpio.setwarnings(False)
 
@@ -24,10 +25,12 @@ class Engine:
             self.gpio.output(self.__gpio_AUTONOMOUS_SWITCH, self.gpio.LOW)
 
     def setReverseState(self, enabled: bool):
+        if self.reverse_state == enabled: return
         if enabled:
             self.gpio.output(self.__gpio_REVERSE_GEAR, self.gpio.HIGH)
         else:
             self.gpio.output(self.__gpio_REVERSE_GEAR, self.gpio.LOW)
+        self.reverse_state = enabled
 
     def setSpeed(self, percentage):
         if self.speed_controll is None:

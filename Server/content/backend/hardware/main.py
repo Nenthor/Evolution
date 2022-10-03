@@ -3,17 +3,19 @@ import server
 import sensors
 import camera
 import location
+import engine_high as engine
 
 sensor1 = 500
 sensor2 = 500
 sensor3 = 500
 
 server.start()
-# location.start() # TODO: Enable this line
-# sensors.start()  # TODO: Enable this line
+# location.start()  # TODO: Enable this line
+# sensors.start()   # TODO: Enable this line
+# engine.start()     # TODO: Enable this line
 
 
-def onMessage(message:str):
+def onMessage(message: str):
     msg = message.split(':')
     if msg[0] == 'get_camera':
         camera.forceUpdate()
@@ -26,7 +28,8 @@ def onMessage(message:str):
     elif msg[0] == 'get_speed':
         pass  # TODO: Do some coding
     elif msg[0] == 'remotedirection':
-        print(f'{msg[0]}: {msg[1]}')
+        if len(msg) == 2:
+            engine.onRemotedirection(msg[1])
     else:
         print(f'{msg[0]} is not available.')
 
@@ -50,6 +53,7 @@ server.onMessage = onMessage
 sensors.onData = onSensorData
 camera.sendToServer = server.send
 location.sendToServer = server.send
+engine.sendToServer = server.send
 
 try:
     while True:
