@@ -1,28 +1,25 @@
 @font-face {
-  font-family: "comfortaa";
-  src: url(/fonts/comfortaa/comfortaa.woff2) format("woff2"),
-    url(/fonts/comfortaa/comfortaa.woff) format("woff"),
-    url(/fonts/comfortaa/comfortaa.ttf) format("truetype");
+  font-family: 'comfortaa';
+  src: url(/fonts/comfortaa/comfortaa.woff2) format('woff2'), url(/fonts/comfortaa/comfortaa.woff) format('woff'),
+    url(/fonts/comfortaa/comfortaa.ttf) format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "robotoMono";
-  src: url(/fonts/robotoMono/robotoMono.woff2) format("woff2"),
-    url(/fonts/robotoMono/robotoMono.woff) format("woff"),
-    url(/fonts/comfortaa/robotoMono.ttf) format("truetype");
+  font-family: 'robotoMono';
+  src: url(/fonts/robotoMono/robotoMono.woff2) format('woff2'), url(/fonts/robotoMono/robotoMono.woff) format('woff'),
+    url(/fonts/comfortaa/robotoMono.ttf) format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "goldman";
-  src: url(/fonts/goldman/goldman.woff2) format("woff2"),
-    url(/fonts/goldman/goldman.woff) format("woff"),
-    url(/fonts/comfortaa/goldman.ttf) format("truetype");
+  font-family: 'goldman';
+  src: url(/fonts/goldman/goldman.woff2) format('woff2'), url(/fonts/goldman/goldman.woff) format('woff'),
+    url(/fonts/comfortaa/goldman.ttf) format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -38,8 +35,8 @@
 }
 
 body {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
 }
 
 /*--Navbar--*/

@@ -121,7 +121,7 @@
 }
 
 .display_innerCircle {
-  content: "";
+  content: '';
   background-color: #444;
   height: 92%;
   width: 92%;
