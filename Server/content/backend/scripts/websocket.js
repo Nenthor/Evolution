@@ -11,8 +11,7 @@ const importance = { HIGH: 0, MEDIUM: 1, LOW: 2 }; //For debugging
 var currentImportance = importance.MEDIUM;
 
 const incoming = {  //Incoming websocket messages
-    get_coords: 'get_coords', get_compass: 'get_compass', get_settings: 'get_settings', get_camera: 'get_camera', get_music: 'get_music', get_speed: 'get_speed', get_battery: 'get_battery', set_navigation: 'set_navigation', get_navigation: 'get_navigation', get_debugdata: 'get_debugdata', get_remotecontrollstate: 'get_remotecontrollstate', set_music: 'set_music', set_remotedirection: 'set_remotedirection', set_settings: 'set_settings', shutdown: 'shutdown', add_debuglistener: 'add_debuglistener', remove_debuglistener: 'remove_debuglistener', controll_request: 'controll_request', controll_check: 'controll_check', remote_devicelogout: 'remote_devicelogout',
-    set_importance: 'set_importance'
+    get_coords: 'get_coords', get_compass: 'get_compass', get_settings: 'get_settings', get_camera: 'get_camera', get_music: 'get_music', get_speed: 'get_speed', get_battery: 'get_battery', set_navigation: 'set_navigation', get_navigation: 'get_navigation', set_target: 'set_target', get_target: 'get_target', get_debugdata: 'get_debugdata', get_remotecontrollstate: 'get_remotecontrollstate', set_music: 'set_music', set_remotedirection: 'set_remotedirection', set_settings: 'set_settings', shutdown: 'shutdown', add_debuglistener: 'add_debuglistener', remove_debuglistener: 'remove_debuglistener', controll_request: 'controll_request', controll_check: 'controll_check', remote_devicelogout: 'remote_devicelogout', set_importance: 'set_importance'
 };
 
 const outgoing = {  //Outgoing messages to web-clients
@@ -91,6 +90,14 @@ const wssSecure = new WebSocket.Server({ server: global.serverSecure });
                 case incoming.set_navigation:
                     receiveMessages('Änderung des "Navigations"-Werts erhalten.', importance.MEDIUM);
                     navigation.setNavigation(message[1]);
+                    break;
+                case incoming.set_target:
+                    receiveMessages('Ziel Koordinaten erhalten.', importance.HIGH);
+                    navigation.setTarget(message[1]);
+                    break;
+                case incoming.get_target:
+                    receiveMessages('Ziel Koordinaten erhalten.', importance.HIGH);
+                    navigation.getTarget(ws);
                     break;
                 case incoming.get_remotecontrollstate:
                     receiveMessages('Anfrage für "Fernsteuerungs-Zustand" erhalten.', importance.LOW);

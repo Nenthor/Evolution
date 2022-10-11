@@ -3,11 +3,13 @@ const socket = new WebSocket(`wss://${location.host}`);
 const imageWidth = 2816;
 var currentX = 0, currentY = 0;
 var pixelX = 0, pixelY = 0;
-var destinationX = 0, destinationY = 0;
-var hasData = false;
+var targetX = 0, targetY = 0;
+var hasData = false, hasTarget = false, hasLoaded = 0;
 
 socket.addEventListener('open', () => {
     send('get_navigation');
+    send('get_target');
+    send('set_navigation:48.082 11.6625');
 }, { passive: true });
 
 socket.addEventListener('message', event => {
@@ -16,7 +18,17 @@ socket.addEventListener('message', event => {
         case 'set_navigation':
             extractNavigationMessage(data[1]);
             if (hasData) displayMap();
+            checkButtonStatus();
             break;
+        case 'target':
+            const firstTarget = !hasTarget
+            extractTargetMessage(data[1]);
+
+            if(firstTarget && hasTarget && hasData && hasLoaded == 3)
+                drawTarget()
+            else if(hasData) {
+                displayMap();
+            }
         default:
             break;
     }
@@ -87,6 +99,7 @@ function extractNavigationMessage(message) {
 }
 
 function displayMap() {
+    hasLoaded = 0;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     loadGeoDataImage(currentX, currentY);
@@ -118,12 +131,8 @@ function drawImage(image, x, y) {
 
     ctx.drawImage(image, 0, 0, image.width, image.height, x * image.width * scale - pixelX * scale + canvas.width / 2, y * image.width * scale - pixelY * scale + canvas.height / 2, image.width * scale, image.height * scale);
 
-    if ((destinationX != 0 || destinationY != 0) && x == 0 && y == 0) {
-        ctx.beginPath();
-        ctx.arc(destinationX, destinationY, 10, 0, 2 * Math.PI);
-        ctx.fillStyle = "rgb(32, 32, 32)";
-        ctx.fill();
-    }
+    hasLoaded++;
+    if (hasTarget && hasLoaded == 3) drawTarget()
 }
 
 window.addEventListener('resize', () => {
@@ -134,9 +143,11 @@ window.addEventListener('resize', () => {
 
 //Call Ekart button
 const destinationButton = document.getElementById('destinationButton');
+const errorMessage = document.getElementById('errorMessage');
 
 destinationButton.style.backgroundColor = '#444';
 destinationButton.style.cursor = 'default';
+errorMessage.style.display = 'none';
 var destination = null;
 
 if (!navigator.geolocation) {
@@ -163,8 +174,40 @@ function getDestination() {
     navigator.geolocation.getCurrentPosition(location => {
         const lat = location.coords.latitude;
         const long = location.coords.longitude;
-        console.log(`coords:${lat} ${long}`);
+        send(`set_target:${lat} ${long}`);
     }, err => {
-        console.log('Error:', err.message);
-    }, { enableHighAccuracy: true, maximumAge: 0, timeout: 3000 });
+        console.error('GPS-Error:', err.message);
+        errorMessage.style.display = 'block';
+        setTimeout(() => {
+            errorMessage.style.display = 'none';
+        }, 5000); // 5s
+    }, { enableHighAccuracy: true, maximumAge: 500, timeout: 3000 });
+}
+
+function extractTargetMessage(message) {
+    if (message == '-1') {
+        targetX = 0;
+        targetY = 0;
+        hasTarget = false;
+        return;
+    }
+
+    hasTarget = true;
+    values = message.split(' ');
+    targetX = parseInt(values[0]);
+    targetY = parseInt(values[1]);
+}
+
+function drawTarget() {
+    setTimeout(() => {
+        ctx.strokeStyle = '#323232';
+        ctx.fillStyle = '#3232cd';
+        ctx.lineWidth = 3;
+    
+        ctx.beginPath();
+        ctx.moveTo(canvas.width / 2, canvas.height / 2);
+        ctx.lineTo(canvas.width / 2 + targetX + 6, canvas.height / 2 - targetY + 6);
+        ctx.stroke()
+        ctx.fillRect(canvas.width / 2 + targetX, canvas.height / 2 - targetY, 12, 12);    
+    }, 500);
 }
