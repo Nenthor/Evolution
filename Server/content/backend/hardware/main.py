@@ -12,7 +12,6 @@ sensor3 = 500
 server.start()
 # location.start()  # TODO: Enable this line
 # sensors.start()   # TODO: Enable this line
-# engine.start()     # TODO: Enable this line
 
 
 def onMessage(message: str):
@@ -28,8 +27,10 @@ def onMessage(message: str):
     elif msg[0] == 'get_speed':
         pass  # TODO: Do some coding
     elif msg[0] == 'remotedirection':
-        if len(msg) == 2:
-            engine.onRemotedirection(msg[1])
+        engine.onRemotedirection(msg[1])
+    elif msg[0] == 'remote_controll':
+        if msg[1] == 'on': engine.onRemoteControll(True)
+        else: engine.onRemoteControll(False)
     else:
         print(f'{msg[0]} is not available.')
 

@@ -21,10 +21,10 @@ const outgoing = {  //Outgoing messages to web-clients
 
 //Setup debug & remoteControll & navigation & hardware script
 debug.setSendFunction(send);
-remoteControll.setSendFunctions(send, sendAllClients);
 navigation.setSendFunctions(send, sendAllClients);
 hardware.setSendFunctions(send, sendAllClients);
 hardware.setOnCoords(navigation.setNavigation)
+remoteControll.setSendFunctions(send, sendAllClients, hardware.sendData);
 
 //Send Messages to clients (and logging them)
 function send(client, message, debugMessage, important) {
