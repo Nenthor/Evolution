@@ -5,18 +5,21 @@ const geodata = [];
 
 var lat = Infinity, long = Infinity; //Unreachable default values
 var pixelX = 0, pixelY = 0;
+var targetPixelX = 0, targetPixelY = 0;
 var currentTile = null;
 var send, sendAllClients;
 
 const importance = { HIGH: 0, MEDIUM: 1, LOW: 2 }; //For debugging
 const outgoing = {  //Outgoing messages to web-clients
-    set_navigation: 'set_navigation', coords: 'coords'
+    set_navigation: 'set_navigation', coords: 'coords', target: 'target'
 };
 
 module.exports = {
     getNavigation,
     setNavigation,
-    setSendFunctions
+    setSendFunctions,
+    setTarget,
+    getTarget
 }
 
 function setSendFunctions(single, all) {
@@ -54,13 +57,13 @@ function setNavigation(location) {
     global.navigation = data;
     global.coords = getDMSCoords(lat, long);
 
-    sendAllClients(`${outgoing.set_navigation}:${global.navigation}`, `Navigation" mit dem Wert "${global.navigation}" wird an alle Klienten gesendet.`, null, importance.LOW);
-    sendAllClients(`${outgoing.coords}:${global.coords}`, `Navigation" mit dem Wert "${global.coords}" wird an alle Klienten gesendet.`, null, importance.LOW);
+    sendAllClients(`${outgoing.set_navigation}:${global.navigation}`, `Navigation mit dem Wert "${global.navigation}" wird an alle Klienten gesendet.`, null, importance.LOW);
+    sendAllClients(`${outgoing.coords}:${global.coords}`, `Navigation mit dem Wert "${global.coords}" wird an alle Klienten gesendet.`, null, importance.LOW);
 }
 
 function getNavigation(client) {
-    send(client, `${outgoing.set_navigation}:${global.navigation}`, `"Navigation" mit dem Wert "${global.navigation}" wird zum Klienten gesendet.`, importance.LOW);
-    send(client, `${outgoing.coords}:${global.coords}`, `"Navigation" mit dem Wert "${global.coords}" wird zum Klienten gesendet.`, importance.LOW);
+    send(client, `${outgoing.set_navigation}:${global.navigation}`, `Navigation mit dem Wert "${global.navigation}" wird zum Klienten gesendet.`, importance.LOW);
+    send(client, `${outgoing.coords}:${global.coords}`, `Navigation mit dem Wert "${global.coords}" wird zum Klienten gesendet.`, importance.LOW);
 }
 
 function calculateLocation(coords) {
@@ -76,10 +79,10 @@ function calculateLocation(coords) {
 }
 
 function getDMSCoords(lat, long) {
-    if (lat == -1 || long == -1) {
+    if (lat == -1 || long == -1)
         return 'Lokalisieren...';
-    }
-    return `${decimalToDMS(lat, true)} ${decimalToDMS(long, false)}`
+    else
+        return `${decimalToDMS(lat, true)} ${decimalToDMS(long, false)}`
 }
 
 function decimalToDMS(decimal, islat) {
@@ -133,4 +136,41 @@ function getLocationIndex() {
         return index;
     }
     return -1;
+}
+
+// Call-Ekart functions
+function setTarget(value) {
+    if (value == '-1') {
+        targetPixelX = 0;
+        targetPixelY = 0;
+        return;
+    }
+
+    const values = value.split(' ');
+    targetLat = parseFloat(values[0]);
+    targetLong = parseFloat(values[1]);
+
+    calculateTarget(targetLat, targetLong);
+}
+
+function getTarget(client) {
+    var message;
+    if (targetPixelX == 0 && targetPixelY == 0)
+        message = '-1';
+    else
+        message = `${targetPixelX} ${targetPixelY}`
+
+    send(client, `${outgoing.target}:${message}`, `Zielpunkt mit dem Wert "${targetPixelX} ${targetPixelY}" wird zum Klienten gesendet.`, null, importance.LOW);
+}
+
+function calculateTarget(targetLat, targetLong) {
+    if (lat == -1 || long == -1) return;
+
+    diffLat = targetLat - lat;
+    diffLong = targetLong - long
+
+    targetPixelX = Math.round(diffLong / Math.abs(stats.widthPixelLong));
+    targetPixelY = Math.round(diffLat / Math.abs(stats.widthPixelLat));
+
+    sendAllClients(`${outgoing.target}:${targetPixelX} ${targetPixelY}`, `Zielpunkt mit dem Wert "${targetPixelX} ${targetPixelY}" wird an alle Klienten gesendet.`, null, importance.LOW);
 }
