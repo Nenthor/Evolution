@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Evolution - So geht Mobilität!" />
     <meta name="theme-color" content="#3232cd" />
-    <meta name="google" content="notranslate" />
     <link rel="icon" href="/images/icon.webp" />
     <link rel="stylesheet" href="/CSS/default.css" />
     <link rel="stylesheet" href="/CSS/map.css" />
@@ -40,7 +39,8 @@
     </div>
     <!--Display-->
     <div class="display">
-      <div class="display_map" id="mapBackground">
+      <div class="display_map">
+        <p class="display_errorMessage" id="errorMessage">GPS konnte nicht abgerufen werden.<br />Überprüfe die GPS-Einstellungen.</p>
         <div class="display_locationDot"></div>
         <p class="display_mapLizenz">Map data &copy OpenStreetMap contributors, CC-BY-SA</p>
         <div class="display_mapBox">
@@ -51,6 +51,11 @@
               <p class="waiting_title" id="waitingtitle">Lokalisieren</p>
             </div>
           </div>
+        </div>
+      </div>
+      <div class="display_settings">
+        <div class="display_destination" id="destinationButton">
+          <p class="display_destinationText" id="destinationText">CallMyEkart</p>
         </div>
       </div>
     </div>

@@ -83,7 +83,7 @@ body {
   position: fixed;
   top: calc(75px + 7.5px);
   width: calc(100% - 15px);
-  bottom: calc(7.5px);
+  bottom: calc(7.5px + 50px);
   z-index: 98;
   display: flex;
   justify-content: center;
@@ -103,4 +103,51 @@ body {
   font-weight: bold;
   font-family: robotoMono;
   text-align: center;
+}
+
+.display_errorMessage {
+  position: absolute;
+  display: none;
+  width: calc(80% - 15px);
+  border-radius: 15px;
+  top: 15px;
+  padding: 5px 5vw;
+  background-color: #16161699;
+  text-align: center;
+  font-size: min(4vw, 1rem);
+  font-weight: bold;
+  line-height: calc(min(4vw, 1rem) + 5px);
+  text-shadow: 0 0 5px #161616;
+  color: #c33;
+}
+
+.display_settings {
+  background-color: #555;
+  width: 100%;
+  min-height: 50px;
+  bottom: 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.display_destination {
+  display: none;
+  background-color: #444;
+  padding: 10px 10px;
+  min-width: 33.3vw;
+  border-radius: 50px;
+  box-shadow: 0 0 20px 1px #161616;
+  cursor: pointer;
+  justify-content: center;
+  align-items: center;
+}
+
+.display_destination:hover {
+  padding: 10px 10px;
+}
+
+.display_destinationText {
+  font-weight: bold;
+  color: white;
 }

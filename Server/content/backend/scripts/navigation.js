@@ -4,6 +4,7 @@ const stats = { pixelCount: -1, widthPixelLong: -1.0, widthPixelLat: -1.0, maxTa
 const geodata = [];
 
 var lat = Infinity, long = Infinity; //Unreachable default values
+var targetLat = Infinity, targetLong= Infinity;
 var pixelX = 0, pixelY = 0;
 var targetPixelX = 0, targetPixelY = 0;
 var currentTile = null;
@@ -59,6 +60,7 @@ function setNavigation(location) {
 
     sendAllClients(`${outgoing.set_navigation}:${global.navigation}`, `Navigation mit dem Wert "${global.navigation}" wird an alle Klienten gesendet.`, null, importance.LOW);
     sendAllClients(`${outgoing.coords}:${global.coords}`, `Navigation mit dem Wert "${global.coords}" wird an alle Klienten gesendet.`, null, importance.LOW);
+    calculateTarget(targetLat, targetLong);
 }
 
 function getNavigation(client) {
@@ -143,6 +145,8 @@ function setTarget(value) {
     if (value == '-1') {
         targetPixelX = 0;
         targetPixelY = 0;
+        targetLat = Infinity;
+        targetLong = Infinity;
         return;
     }
 
