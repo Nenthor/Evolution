@@ -2,16 +2,14 @@ const ArrayQueue = require('./arrayqueue');
 
 const controllqueue = new ArrayQueue();
 
-var send, sendAllClients;
+var send, sendAllClients, hardware;
 var controllClient = null;
 var connectionCheck = null;
 var checkreceived = false;
-var remoteDirection = 'STANDBY';
-var remoteSpeed = 0;
 
 const importance = { HIGH: 0, MEDIUM: 1, LOW: 2 }; //For debugging
 const outgoing = {  //Outgoing messages to web-clients
-    controll_request: 'controll_request', remote_controll: 'remote_controll', controll_check: 'controll_check'
+    controll_request: 'controll_request', remote_controll: 'remote_controll', controll_check: 'controll_check', 
 };
 
 module.exports = {
@@ -24,9 +22,10 @@ module.exports = {
     checkReceived
 }
 
-function setSendFunctions(singel, all) {
+function setSendFunctions(singel, all, toHardware) {
     send = singel;
-    sendAllClients = all
+    sendAllClients = all;
+    hardware = toHardware;
 }
 
 function manageControllRequest(client) {
@@ -59,11 +58,13 @@ function remoteControllUpdate() {
 function acceptControllRequest(client) {
     send(client, `${outgoing.controll_request}:accepted`, 'Anfrage auf "Fernsteuerungs-Kontrolle" akzeptiert.', importance.HIGH);
     sendAllClients(`${outgoing.remote_controll}:on`, `Fernsteuerung wird aktiviert.`, client, importance.MEDIUM);
+    hardware(null, `${outgoing.remote_controll}:on`);
 }
 
 function remoteDeviceLogout(client) {
     if (client == controllClient) {
         controllClient = null;
+        hardware(null, `${outgoing.remote_controll}:off`);
         if (connectionCheck != null) { clearInterval(connectionCheck); connectionCheck = null; }
 
         if (global.settings[2] == '1' && !controllqueue.isEmpty()) {
