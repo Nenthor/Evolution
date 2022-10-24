@@ -1,23 +1,44 @@
 var obstacles = [0, 0, 0];
 
 //Server data
-const socket = new WebSocket(`ws://${location.host}`);
+var socket = new WebSocket(`ws://${location.host}`);
 
-socket.addEventListener('open', () => {
-    socket.send('get_camera');
-}, { passive: true });
+addSocketEvents();
+function addSocketEvents() {
+    socket.addEventListener('open', () => {
+        socket.send('get_camera');
+    }, { passive: true });
 
-socket.addEventListener('message', event => {
-    const data = String(event.data).split(':');
-    switch (data[0]) {
-        case 'camera':
-            obstacles = getObstacles(data[1]);
-            drawCamera();
-            break;
-        default:
-            break;
-    }
-}, { passive: true });
+    socket.addEventListener('close', () => {
+        console.warn('Server has closed. Retrying...');
+        reconnect();
+    });
+
+    socket.addEventListener('message', event => {
+        const data = String(event.data).split(':');
+        switch (data[0]) {
+            case 'camera':
+                obstacles = getObstacles(data[1]);
+                drawCamera();
+                break;
+            default:
+                break;
+        }
+    }, { passive: true });
+}
+
+function reconnect() {
+    fetch(`${location.protocol}//${location.host}`, { method: 'GET' })
+        .then(() => {
+            socket = new WebSocket(`ws://${location.host}`);
+            addSocketEvents();
+            console.log('Reconnected to Server.');
+        }).catch(() => {
+            setTimeout(() => {
+                reconnect();
+            }, 1000); // 1s
+        });
+}
 
 function getObstacles(data) {
     return [parseInt(data[0]), parseInt(data[1]), parseInt(data[2])];

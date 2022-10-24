@@ -1,36 +1,57 @@
 //Server data
-const socket = new WebSocket(`ws://${location.host}`);
+var socket = new WebSocket(`ws://${location.host}`);
 
-socket.addEventListener('open', () => {
-    send('add_debuglistener');
-}, { passive: true });
+addSocketEvents();
+function addSocketEvents() {
+    socket.addEventListener('open', () => {
+        send('add_debuglistener');
+    }, { passive: true });
 
-socket.addEventListener('message', event => {
-    const data = String(event.data).split(':');
-    switch (data[0]) {
-        case 'set_memoryusage':
-            setMemoryUsage(parseInt(data[1]));
-            break;
-        case 'set_cpuusage':
-            setCpuUsage(parseInt(data[1]));
-            break;
-        case 'set_systemload':
-            setSystemLoad(parseInt(data[1]));
-            break;
-        case 'add_debugmessage':
-            const incoming = data[1] == 'IN';
-            createElement(data[2], incoming);
-            break;
-        default:
-            break;
-    }
-}, { passive: true });
+    socket.addEventListener('close', () => {
+        console.warn('Server has closed. Retrying...');
+        reconnect();
+    });
+
+    socket.addEventListener('message', event => {
+        const data = String(event.data).split(':');
+        switch (data[0]) {
+            case 'set_memoryusage':
+                setMemoryUsage(parseInt(data[1]));
+                break;
+            case 'set_cpuusage':
+                setCpuUsage(parseInt(data[1]));
+                break;
+            case 'set_systemload':
+                setSystemLoad(parseInt(data[1]));
+                break;
+            case 'add_debugmessage':
+                const incoming = data[1] == 'IN';
+                createElement(data[2], incoming);
+                break;
+            default:
+                break;
+        }
+    }, { passive: true });
+}
+
+function reconnect() {
+    fetch(`${location.protocol}//${location.host}`, { method: 'GET' })
+        .then(() => {
+            socket = new WebSocket(`ws://${location.host}`);
+            addSocketEvents();
+            console.log('Reconnected to Server.');
+        }).catch(() => {
+            setTimeout(() => {
+                reconnect();
+            }, 1000); // 1s
+        });
+}
 
 function send(message) {
     socket.send(message);
 }
 
-window.addEventListener('beforeunload', event => {
+window.addEventListener('beforeunload', () => {
     send('remove_debuglistener');
 }, { passive: true });
 

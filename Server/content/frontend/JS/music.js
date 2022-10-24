@@ -2,24 +2,45 @@ const playButton = document.getElementById("navbar_playButton");
 const musicItems = document.getElementsByClassName("display_musicItem");
 
 //Server data
-const socket = new WebSocket(`ws://${location.host}`);
+var socket = new WebSocket(`ws://${location.host}`);
 var music = 0;
 
-socket.addEventListener('open', () => {
-    socket.send('get_music');
-}, { passive: true });
+addSocketEvents();
+function addSocketEvents() {
+    socket.addEventListener('open', () => {
+        socket.send('get_music');
+    }, { passive: true });
 
-socket.addEventListener('message', event => {
-    const data = String(event.data).split(':');
-    switch (data[0]) {
-        case 'music':
-            music = parseInt(data[1]);
-            updateMusic();
-            break;
-        default:
-            break;
-    }
-}, { passive: true });
+    socket.addEventListener('close', () => {
+        console.warn('Server has closed. Retrying...');
+        reconnect();
+    });
+
+    socket.addEventListener('message', event => {
+        const data = String(event.data).split(':');
+        switch (data[0]) {
+            case 'music':
+                music = parseInt(data[1]);
+                updateMusic();
+                break;
+            default:
+                break;
+        }
+    }, { passive: true });
+}
+
+function reconnect() {
+    fetch(`${location.protocol}//${location.host}`, { method: 'GET' })
+        .then(() => {
+            socket = new WebSocket(`ws://${location.host}`);
+            addSocketEvents();
+            console.log('Reconnected to Server.');
+        }).catch(() => {
+            setTimeout(() => {
+                reconnect();
+            }, 1000); // 1s
+        });
+}
 
 //Setup
 playButton.addEventListener("click", function () { onPlayClick(); }, { passive: true });

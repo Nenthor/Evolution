@@ -1,48 +1,69 @@
 //Server data
-const socket = new WebSocket(`ws://${location.host}`);
+var socket = new WebSocket(`ws://${location.host}`);
 var coords = 'Lokalisieren...';
 var settings = '000';
 var speed = '0';
 var battery = 0;
 
-socket.addEventListener('open', () => {
-    send('get_coords');
-    send('get_settings');
-    send('get_speed');
-    send('get_battery');
-    send('get_battery');
-    send('get_remotecontrollstate');
-}, { passive: true });
+addSocketEvents();
+function addSocketEvents() {
+    socket.addEventListener('open', () => {
+        send('get_coords');
+        send('get_settings');
+        send('get_speed');
+        send('get_battery');
+        send('get_battery');
+        send('get_remotecontrollstate');
+    }, { passive: true });
 
-socket.addEventListener('message', event => {
-    const data = String(event.data).split(':');
-    switch (data[0]) {
-        case 'coords':
-            coords = data[1];
-            updateCoords();
-            break;
-        case 'compass':
-            break;
-        case 'settings':
-            settings = data[1];
-            updateSettings();
-            break;
-        case 'speed':
-            speed = data[1];
-            updateSpeed();
-            break;
-        case 'battery':
-            battery = parseInt(data[1]);
-            updateBattery();
-            break;
-        case 'remote_controll':
-            if (data[1] == 'on') remoteControllEnabled();
-            else if (data[1] == 'off') remoteControllDisabled();
-            break;
-        default:
-            break;
-    }
-}, { passive: true });
+    socket.addEventListener('close', () => {
+        console.warn('Server has closed. Retrying...');
+        reconnect();
+    });
+
+    socket.addEventListener('message', event => {
+        const data = String(event.data).split(':');
+        switch (data[0]) {
+            case 'coords':
+                coords = data[1];
+                updateCoords();
+                break;
+            case 'compass':
+                break;
+            case 'settings':
+                settings = data[1];
+                updateSettings();
+                break;
+            case 'speed':
+                speed = data[1];
+                updateSpeed();
+                break;
+            case 'battery':
+                battery = parseInt(data[1]);
+                updateBattery();
+                break;
+            case 'remote_controll':
+                if (data[1] == 'on') remoteControllEnabled();
+                else if (data[1] == 'off') remoteControllDisabled();
+                break;
+            default:
+                break;
+        }
+    }, { passive: true });
+}
+
+function reconnect() {
+    fetch(`${location.protocol}//${location.host}`, { method: 'GET' })
+        .then(() => {
+            socket = new WebSocket(`ws://${location.host}`);
+            addSocketEvents();
+            console.log('Reconnected to Server.');
+        }).catch(() => {
+            setTimeout(() => {
+                reconnect();
+            }, 1000); // 1s
+        });
+}
 
 function send(message) {
     socket.send(message);

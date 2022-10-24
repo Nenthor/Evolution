@@ -1,5 +1,5 @@
 //Server data
-const socket = location.protocol == 'http:' ? new WebSocket(`ws://${location.host}`) : new WebSocket(`wss://${location.host}`);
+var socket = getWebsocket();
 const imageWidth = 2816;
 const images = [];
 var isLocal = location.protocol == 'http:';
@@ -9,39 +9,62 @@ var targetX = 0, targetY = 0;
 var hasData = false, hasTarget = false, hasLoaded = 0;
 var gpsWatch = null, gpsWatchTimeout = null;
 
-socket.addEventListener('open', () => {
-    send('get_navigation');
-    send('get_target');
-}, { passive: true });
+addSocketEvents();
+function addSocketEvents() {
+    socket.addEventListener('open', () => {
+        send('get_navigation');
+        send('get_target');
+    }, { passive: true });
 
-socket.addEventListener('message', event => {
-    const data = String(event.data).split(':');
-    switch (data[0]) {
-        case 'set_navigation':
-            extractNavigationMessage(data[1]);
-            if (hasData) displayMap();
-            checkButtonStatus();
-            checkMapImages()
-            break;
-        case 'target':
-            const firstTarget = !hasTarget
-            extractTargetMessage(data[1]);
+    socket.addEventListener('close', () => {
+        console.warn('Server has closed. Retrying...');
+        reconnect();
+    });
 
-            if (firstTarget && hasTarget && hasData && hasLoaded == 3) {
-                drawTarget()
-            }
-            else if (hasData) {
-                displayMap();
-            }
-        default:
-            break;
-    }
-}, { passive: true });
-
+    socket.addEventListener('message', event => {
+        const data = String(event.data).split(':');
+        switch (data[0]) {
+            case 'set_navigation':
+                extractNavigationMessage(data[1]);
+                if (hasData) displayMap();
+                checkButtonStatus();
+                checkMapImages()
+                break;
+            case 'target':
+                const firstTarget = !hasTarget
+                extractTargetMessage(data[1]);
+                if (firstTarget && hasTarget && hasData && hasLoaded == 3)
+                    drawTarget()
+                else if (hasData)
+                    displayMap();
+                break;
+            default:
+                break;
+        }
+    }, { passive: true });
+}
 function send(message) {
     if (socket.readyState == WebSocket.OPEN) {
         socket.send(message);
     }
+}
+
+function getWebsocket() {
+    const protocol = location.protocol == 'http:' ? 'ws' : 'wss';
+    return new WebSocket(`${protocol}://${location.host}`);
+}
+
+function reconnect() {
+    fetch(`${location.protocol}//${location.host}`, { method: 'GET' })
+        .then(() => {
+            socket = getWebsocket();
+            addSocketEvents();
+            console.log('Reconnected to Server.');
+        }).catch(() => {
+            setTimeout(() => {
+                reconnect();
+            }, 1000); // 1s
+        });
 }
 
 //Waiting room

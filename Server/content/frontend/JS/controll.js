@@ -1,33 +1,54 @@
 //Server data
-const socket = new WebSocket(`ws://${location.host}`);
+var socket = new WebSocket(`ws://${location.host}`);
 
-socket.addEventListener('open', () => {
-    send('get_speed');
-    send('get_battery');
-    send('controll_request');
-}, { passive: true });
+addSocketEvents();
+function addSocketEvents() {
+    socket.addEventListener('open', () => {
+        send('get_speed');
+        send('get_battery');
+        if (document.hasFocus()) send('controll_request');
+    }, { passive: true });
 
-socket.addEventListener('message', event => {
-    const data = String(event.data).split(':');
-    switch (data[0]) {
-        case 'speed':
-            updateSpeedtext(data[1]);
-            break;
-        case 'battery':
-            updateBatterytext(data[1]);
-            break;
-        case 'controll_request':
-            if (data[1] == 'accepted') controllRequest(true, null);
-            else controllRequest(false, data[1]);
-            break;
-        case 'controll_check':
-            send('controll_check');
-            checkReceived();
-            break;
-        default:
-            break;
-    }
-}, { passive: true });
+    socket.addEventListener('close', () => {
+        console.warn('Server has closed. Retrying...');
+        controllRequest(false, 'Warte auf Serverantwort...');
+        reconnect();
+    });
+
+    socket.addEventListener('message', event => {
+        const data = String(event.data).split(':');
+        switch (data[0]) {
+            case 'speed':
+                updateSpeedtext(data[1]);
+                break;
+            case 'battery':
+                updateBatterytext(data[1]);
+                break;
+            case 'controll_request':
+                controllRequest(data[1] == 'accepted', data[1]);
+                break;
+            case 'controll_check':
+                send('controll_check');
+                checkReceived();
+                break;
+            default:
+                break;
+        }
+    }, { passive: true });
+}
+
+function reconnect() {
+    fetch(`${location.protocol}//${location.host}`, { method: 'GET' })
+        .then(() => {
+            socket = new WebSocket(`ws://${location.host}`);
+            addSocketEvents();
+            console.log('Reconnected to Server.');
+        }).catch(() => {
+            setTimeout(() => {
+                reconnect();
+            }, 1000); // 1s
+        });
+}
 
 function send(message) {
     if (socket.readyState == WebSocket.OPEN) {
@@ -45,7 +66,7 @@ function logout() {
     open('/homepage', '_self');
 }
 
-window.addEventListener('beforeunload', event => {
+window.addEventListener('beforeunload', () => {
     send('remote_devicelogout');
 }, { passive: true });
 
@@ -88,7 +109,7 @@ waitingdiv.style.display = 'flex';
 function controllRequest(accepted, cause) {
     if (accepted) {
         waitingdiv.style.display = 'none';
-        waitingcause.textContent = 'Warte auf Serverantwort';
+        waitingcause.textContent = 'Warte auf Serverantwort...';
 
         checkRemoteConnection();
     } else {
