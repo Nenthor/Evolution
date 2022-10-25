@@ -205,6 +205,10 @@ if (!navigator.geolocation) {
     destinationButton.style.display = 'none';
 }
 
+if (!isLocal) {
+    destinationButton.style.display = 'flex';
+}
+
 function checkButtonStatus() {
     if (hasData && destinationText.textContent == 'Stopp') {
         destinationButton.style.backgroundColor = '#cd3232';

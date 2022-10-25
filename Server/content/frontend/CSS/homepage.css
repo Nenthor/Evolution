@@ -10,6 +10,7 @@
   background-image: url(/images/frontPage_backround.webp);
   background-size: cover;
   background-attachment: fixed;
+  background-position: center;
   box-shadow: inset 0 0 0 2000px #161616cf;
   display: flex;
   flex-direction: column;
