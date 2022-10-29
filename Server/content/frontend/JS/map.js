@@ -15,7 +15,7 @@ function addSocketEvents() {
     socket.addEventListener('open', () => {
         send('get_navigation');
         send('get_target');
-        if(!isLocal && document.hasFocus()) requestControll();
+        if (!isLocal && document.hasFocus()) requestControll();
     }, { passive: true });
 
     socket.addEventListener('close', () => {
@@ -62,12 +62,12 @@ function getWebsocket() {
 
 function reconnect() {
     setDestinationButton(false);
-    
+
     fetch(`${location.protocol}//${location.host}`, { method: 'GET' })
         .then(() => {
             socket = getWebsocket();
             addSocketEvents();
-            
+
             console.log('Reconnected to Server.');
         }).catch(() => {
             setTimeout(() => {
@@ -111,7 +111,7 @@ const mobileBackButton = document.getElementById('mobileBackButton');
 })
 
 function redirect(key) {
-    if(key != '-1'){
+    if (key != '-1') {
         sendStop = true;
         setTimeout(() => { sendStop = false; }, 5000);
     }
@@ -150,6 +150,7 @@ function controllRequest(accepted, cause) {
     } else {
         destinationButton.style.display = 'none';
         setDestinationButton(false);
+        clearGPSWatch();
         if (connectionCheck != null) {
             clearInterval(connectionCheck);
             connectionCheck = null;
@@ -158,10 +159,9 @@ function controllRequest(accepted, cause) {
 }
 
 function setDestinationButton(active) {
-    if (!navigator.geolocation || isLocal) {
-        //geolocation api is not available or is local
-        destinationButton.style.display = 'none';
-        return;
+    if (!navigator.geolocation || (isLocal && !hasTarget)) {
+        //geolocation api is not available or is local with no target
+        active = false;
     }
     destinationButton.style.display = active ? 'flex' : 'none';
 }
@@ -329,11 +329,14 @@ destinationButton.addEventListener('click', () => {
     if (gpsWatch != null) return;
     if (hasTarget) {
         //Stop-Button
+        send(`set_target:-1`);
+        clearGPSWatch();
         return;
     }
     getDestination();
 }, { passive: true });
 
+var accuracy = 0;
 function getDestination() {
     clearGPSWatch();
     gpsWatch = navigator.geolocation.watchPosition(position => {
@@ -345,7 +348,7 @@ function getDestination() {
                 gpsWatchTimeout = null;
                 clearGPSWatch();
                 onGPSError('Unable to get accurate position.')
-            }, 30000); // 30s
+            }, 45000); // 45s
         }
 
         if (position.coords.accuracy < 10) {
@@ -354,12 +357,13 @@ function getDestination() {
             clearGPSWatch();
             destinationText.textContent = `Berechnen...`;
         } else {
-            accuracy = Math.floor((10 / position.coords.accuracy) * 100);
+            const currentAccuracy = Math.floor((10 / position.coords.accuracy) * 100);
+            if (currentAccuracy > accuracy) accuracy = currentAccuracy;
             destinationText.textContent = `Lokalisieren: ${accuracy}%`;
         }
     }, err => {
         onGPSError(err.message)
-    }, { enableHighAccuracy: true, maximumAge: 500, timeout: 2000 });
+    }, { enableHighAccuracy: true, maximumAge: 100, timeout: 2000 });
 }
 
 function clearGPSWatch() {
@@ -367,15 +371,16 @@ function clearGPSWatch() {
         window.navigator.geolocation.clearWatch(gpsWatch);
         gpsWatch = null;
     }
-
     if (gpsWatchTimeout != null) {
         clearTimeout(gpsWatchTimeout);
         gpsWatchTimeout = null;
+
     }
     if (destinationText.textContent != 'Berechnen...') {
         destinationButton.style.backgroundColor = '#2f81df';
         destinationText.textContent = 'CallMyEkart';
     }
+    accuracy = 0;
 }
 
 function onGPSError(err) {
@@ -387,14 +392,17 @@ function onGPSError(err) {
 }
 
 function extractTargetMessage(message) {
-    clearGPSWatch();
     if (message == '-1') {
         targetX = 0;
         targetY = 0;
         hasTarget = false;
+        if (isLocal) setDestinationButton(true);
+        if (gpsWatch == null) {
+            destinationButton.style.backgroundColor = '#2f81df';
+            destinationText.textContent = 'CallMyEkart';
+        }
         return;
     }
-
     hasTarget = true;
     values = message.split(' ');
     targetX = parseInt(values[0]);
@@ -404,6 +412,13 @@ function extractTargetMessage(message) {
 }
 
 function drawTarget() {
+    //Change SetTargetButton behavior
+    if (destinationText.textContent != 'Stopp') {
+        destinationButton.style.backgroundColor = '#cd3232';
+        destinationText.textContent = 'Stopp';
+    }
+    if (isLocal) setDestinationButton(true);
+
     setTimeout(() => {
         const scale = window.devicePixelRatio;
         ctx.strokeStyle = '#323232';
@@ -415,9 +430,5 @@ function drawTarget() {
         ctx.lineTo(canvas.width / 2 + targetX * scale + 6 * scale, canvas.height / 2 - targetY * scale + 6 * scale);
         ctx.stroke()
         ctx.fillRect(canvas.width / 2 + targetX * scale, canvas.height / 2 - targetY * scale, 12 * scale, 12 * scale);
-
-        //Change SetTargetButton behavior
-        destinationButton.style.backgroundColor = '#cd3232';
-        destinationText.textContent = 'Stopp';
     }, 0);
 }

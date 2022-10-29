@@ -4,7 +4,7 @@ const stats = { pixelCount: -1, widthPixelLong: -1.0, widthPixelLat: -1.0, maxTa
 const geodata = [];
 
 var lat = Infinity, long = Infinity; //Unreachable default values
-var targetLat = Infinity, targetLong= Infinity;
+var targetLat = Infinity, targetLong = Infinity;
 var pixelX = 0, pixelY = 0;
 var targetPixelX = 0, targetPixelY = 0;
 var currentTile = null;
@@ -70,8 +70,8 @@ function getNavigation(client) {
 
 function calculateLocation(coords) {
     if (coords == 'Lokalisieren...') {
-        lat = -1;
-        long = -1;
+        lat = Infinity;
+        long = Infinity;
         return;
     }
 
@@ -81,7 +81,7 @@ function calculateLocation(coords) {
 }
 
 function getDMSCoords(lat, long) {
-    if (lat == -1 || long == -1)
+    if (lat == Infinity || long == Infinity)
         return 'Lokalisieren...';
     else
         return `${decimalToDMS(lat, true)} ${decimalToDMS(long, false)}`
@@ -147,19 +147,19 @@ function setTarget(value) {
         targetPixelY = 0;
         targetLat = Infinity;
         targetLong = Infinity;
-        return;
+    } else {
+        const values = value.split(' ');
+        targetLat = parseFloat(values[0]);
+        targetLong = parseFloat(values[1]);
     }
-
-    const values = value.split(' ');
-    targetLat = parseFloat(values[0]);
-    targetLong = parseFloat(values[1]);
 
     calculateTarget(targetLat, targetLong);
 }
 
 function getTarget(client) {
     var message;
-    if (targetPixelX == 0 && targetPixelY == 0)
+
+    if (targetLat == Infinity || targetLong == Infinity || lat == Infinity || long == Infinity)
         message = '-1';
     else
         message = `${targetPixelX} ${targetPixelY}`
@@ -168,13 +168,18 @@ function getTarget(client) {
 }
 
 function calculateTarget(targetLat, targetLong) {
-    if (lat == -1 || long == -1) return;
+    if (lat == Infinity || long == Infinity) return;
+    var message = '';
 
-    diffLat = targetLat - lat;
-    diffLong = targetLong - long
+    if (targetLat != Infinity && targetLong != Infinity) {
+        diffLat = targetLat - lat;
+        diffLong = targetLong - long
 
-    targetPixelX = Math.round(diffLong / Math.abs(stats.widthPixelLong));
-    targetPixelY = Math.round(diffLat / Math.abs(stats.widthPixelLat));
+        targetPixelX = Math.round(diffLong / Math.abs(stats.widthPixelLong));
+        targetPixelY = Math.round(diffLat / Math.abs(stats.widthPixelLat));
 
-    sendAllClients(`${outgoing.target}:${targetPixelX} ${targetPixelY}`, `Zielpunkt mit dem Wert "${targetPixelX} ${targetPixelY}" wird an alle Klienten gesendet.`, null, importance.LOW);
+        message = `${targetPixelX} ${targetPixelY}`;
+    } else message = '-1';
+
+    sendAllClients(`${outgoing.target}:${message}`, `Zielpunkt mit dem Wert "${targetPixelX} ${targetPixelY}" wird an alle Klienten gesendet.`, null, importance.LOW);
 }

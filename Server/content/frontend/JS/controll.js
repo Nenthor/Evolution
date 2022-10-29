@@ -84,7 +84,7 @@ mapButton.addEventListener('click', () => {
 });
 
 function redirect(key) {
-    if(key != '-1'){
+    if (key != '-1') {
         sendStop = true;
         setTimeout(() => { sendStop = false; }, 5000);
     }

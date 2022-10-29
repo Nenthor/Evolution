@@ -88,10 +88,12 @@ const wssSecure = new WebSocket.Server({ server: global.serverSecure });
                     navigation.getNavigation(ws);
                     break;
                 case incoming.set_navigation:
+                    if (!remoteControll.isController(ws) || !global.debug) break;
                     receiveMessages('Änderung des "Navigations"-Werts erhalten.', importance.MEDIUM);
                     navigation.setNavigation(message[1]);
                     break;
                 case incoming.set_target:
+                    if (!remoteControll.isController(ws) && !(req.socket.localAddress == req.socket.remoteAddress && message[1] == '-1')) break;
                     receiveMessages('Ziel Koordinaten erhalten.', importance.HIGH);
                     navigation.setTarget(message[1]);
                     break;
@@ -104,7 +106,7 @@ const wssSecure = new WebSocket.Server({ server: global.serverSecure });
                     remoteControll.hasRemoteConnection(ws);
                     break;
                 case incoming.set_music:
-                    if (req.socket.localAddress != req.socket.remoteAddress && !global.debug) return;
+                    if (req.socket.localAddress != req.socket.remoteAddress && !global.debug) break;
                     receiveMessages(`Änderung des "Musik"-Werts zu "${message[1]}" erhalten.`, importance.MEDIUM);
                     writeFile(message[1], 'music');
                     global.music = String(message[1]);
@@ -112,11 +114,12 @@ const wssSecure = new WebSocket.Server({ server: global.serverSecure });
                     sendAllClients(`${outgoing.music}:${global.music}`, `Änderung des "Musik"-Werts zu "${message[1]}" wird an alle Klienten gesendet.`, ws, importance.LOW);
                     break;
                 case incoming.set_remotedirection:
+                    if (!remoteControll.isController(ws)) break;
                     receiveMessages(`Fernsteuerung wird auf "${message[1]}" gesetzt.`, importance.MEDIUM);
                     hardware.sendData(null, `${incoming.set_remotedirection}:${message[1]}`);
                     break;
                 case incoming.set_settings:
-                    if (req.socket.localAddress != req.socket.remoteAddress && !global.debug) return;
+                    if (req.socket.localAddress != req.socket.remoteAddress && !global.debug) break;
                     receiveMessages(`Änderung der "Einstellungs"-Datei zu "${message[1]}" erhalten.`, importance.MEDIUM);
                     writeFile(message[1], 'settings');
                     global.settings = String(message[1]);
@@ -129,7 +132,7 @@ const wssSecure = new WebSocket.Server({ server: global.serverSecure });
                     currentImportance = parseInt(message[1]);
                     break;
                 case incoming.shutdown:
-                    if (req.socket.localAddress != req.socket.remoteAddress && !global.debug) return;
+                    if (req.socket.localAddress != req.socket.remoteAddress && !global.debug) break;
                     receiveMessages(`Anfrage auf "System-Shutdown" erhalten.`, importance.HIGH);
                     hardware.sendData(null, incoming.shutdown);
                     break;
@@ -147,8 +150,9 @@ const wssSecure = new WebSocket.Server({ server: global.serverSecure });
                     remoteControll.manageControllRequest(ws, message[1]);
                     break;
                 case incoming.controll_check:
+                    if (!remoteControll.isController(ws)) break;
                     receiveMessages(`Kontroll-Check erhalten.`, importance.LOW);
-                    if (remoteControll.isController(ws)) remoteControll.checkReceived();
+                    remoteControll.checkReceived();
                     break;
                 case incoming.remote_devicelogout:
                     receiveMessages(`"Fernsteuerungs-Klient" wurde ausgeloggt.`, importance.HIGH);
