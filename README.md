@@ -4,7 +4,7 @@ Node.js Server Projekt für das P-Seminar Mobilität. [ca. 300MB]
 ## Installationsanleitung für Windows
 
 **Schritt 1:**
-Lade die LTS Version von Node.js von dieser [Website](https://nodejs.org/dist/v16.17.1/node-v16.17.1-x64.msi) herunter und installiere das Programm.
+Lade die LTS Version von Node.js von dieser [Website](https://nodejs.org/dist/v18.12.0/node-v18.12.0-x64.msi) herunter und installiere das Programm.
 
 **Schritt 2:**
 Lade dieses Projekt [hier](https://github.com/TheDavido/Evolution/archive/refs/heads/main.zip) herunter.
