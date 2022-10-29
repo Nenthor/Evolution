@@ -1,12 +1,13 @@
 //Server data
 var socket = new WebSocket(`ws://${location.host}`);
+var sendStop = false;
 
 addSocketEvents();
 function addSocketEvents() {
     socket.addEventListener('open', () => {
         send('get_speed');
         send('get_battery');
-        if (document.hasFocus()) send('controll_request');
+        if (document.hasFocus()) requestControll();
     }, { passive: true });
 
     socket.addEventListener('close', () => {
@@ -31,6 +32,8 @@ function addSocketEvents() {
                 send('controll_check');
                 checkReceived();
                 break;
+            case 'controll_redirect':
+                redirect(data[1]);
             default:
                 break;
         }
@@ -51,31 +54,49 @@ function reconnect() {
 }
 
 function send(message) {
-    if (socket.readyState == WebSocket.OPEN) {
+    if (socket.readyState == WebSocket.OPEN && !sendStop) {
         socket.send(message);
     }
 }
 
-//BackButton
-const backbutton = document.getElementById('back_button');
-const mobilbackbutton = document.getElementById('mobil_back_button');
-backbutton.addEventListener('click', logout, { passive: true });
-mobilbackbutton.addEventListener('click', logout, { passive: true });
+//Controll authentication
+var key = new URLSearchParams(location.search).get('key');
+history.replaceState({}, null, location.pathname);
 
-function logout() {
-    open('/homepage', '_self');
+function requestControll() {
+    if (key) {
+        send(`controll_request:${key}`);
+        key = null;
+        return;
+    } else
+        send('controll_request');
 }
 
+//Onclose event
 window.addEventListener('beforeunload', () => {
     send('remote_devicelogout');
 }, { passive: true });
+
+//Redirect to map page
+const mapButton = document.getElementById('mapButton');
+mapButton.addEventListener('click', () => {
+    send('remote_redirect');
+});
+
+function redirect(key) {
+    if(key != '-1'){
+        sendStop = true;
+        setTimeout(() => { sendStop = false; }, 5000);
+    }
+
+    open(key == '-1' ? '/map' : `map?key=${key}`, '_self');
+}
 
 //Waiting-Animation
 const waitingtitle = document.getElementById('waitingtitle');
 const waitingdefaulttext = waitingtitle.textContent;
 var currentdotanimation = 0;
 setInterval(() => {
-
     switch (currentdotanimation) {
         case 0:
             waitingtitle.textContent = `${waitingdefaulttext}`
@@ -146,7 +167,7 @@ window.addEventListener('focus', onTurnOnScreen, { passive: true });
 window.addEventListener('blur', onTurnOffScreen, { passive: true });
 
 function onTurnOnScreen() {
-    send('controll_request');
+    requestControll();
 }
 
 function onTurnOffScreen() {

@@ -6,10 +6,12 @@ var send, sendAllClients, hardware;
 var controllClient = null;
 var connectionCheck = null;
 var checkreceived = false;
+var controllKey = null;
+var keyTimeout = null;
 
 const importance = { HIGH: 0, MEDIUM: 1, LOW: 2 }; //For debugging
 const outgoing = {  //Outgoing messages to web-clients
-    controll_request: 'controll_request', remote_controll: 'remote_controll', controll_check: 'controll_check', 
+    controll_request: 'controll_request', remote_controll: 'remote_controll', controll_check: 'controll_check', controll_redirect: 'controll_redirect'
 };
 
 module.exports = {
@@ -19,7 +21,8 @@ module.exports = {
     remoteDeviceLogout,
     hasRemoteConnection,
     isController,
-    checkReceived
+    checkReceived,
+    remoteRedirect
 }
 
 function setSendFunctions(singel, all, toHardware) {
@@ -28,11 +31,23 @@ function setSendFunctions(singel, all, toHardware) {
     hardware = toHardware;
 }
 
-function manageControllRequest(client) {
+function manageControllRequest(client, message) {
     if (global.settings[2] != '1') {
         send(client, `${outgoing.controll_request}:Fernsteuerung wurde deaktiviert.`, 'Anfrage auf "Fernsteuerungs-Kontrolle" abgelehnt: Fernsteuerung wurde deaktiviert.', importance.HIGH);
     } else if (controllClient != null) {
-        send(client, `${outgoing.controll_request}:Bereits mit anderem Gerät verbunden.`, 'Anfrage auf "Fernsteuerungs-Kontrolle" abgelehnt: Bereits mit anderem Gerät verbunden.', importance.HIGH);
+        if (message && controllKey && message == controllKey) {
+            if (keyTimeout) clearTimeout(keyTimeout);
+            if (connectionCheck) clearInterval(connectionCheck);
+            controllKey = null;
+            keyTimeout = null;
+
+            controllClient = client;
+            checkRemoteConnection();
+            acceptControllRequest(client);
+            return;
+        } else {
+            send(client, `${outgoing.controll_request}:Bereits mit anderem Gerät verbunden.`, 'Anfrage auf "Fernsteuerungs-Kontrolle" abgelehnt: Bereits mit anderem Gerät verbunden.', importance.HIGH);
+        }
     } else {
         controllClient = client;
         checkRemoteConnection();
@@ -73,6 +88,34 @@ function remoteDeviceLogout(client) {
             acceptControllRequest(controllClient);
         } else sendAllClients(`${outgoing.remote_controll}:off`, 'Fernsteuerung wird deaktiviert.', client, importance.HIGH);
     } else if (!controllqueue.isEmpty()) controllqueue.removeElement(client);
+}
+
+function remoteRedirect(client) {
+    var key = '-1';
+    if (client == controllClient) {
+        key = generateKey();
+        if (connectionCheck) clearInterval(connectionCheck);
+        setControllKey(key);
+    }
+    send(client, `${outgoing.controll_redirect}:${key}`, 'Kontroll-Schlüssel wird zum Klienten gesendet.', importance.LOW);
+}
+
+function generateKey() {
+    var key = '';
+    for (let count = 1; count <= 16; count++) {
+        //16^16 possibilities
+        key += Math.floor(Math.random() * 16).toString(16);
+    }
+    return key;
+}
+
+function setControllKey(newKey) {
+    controllKey = newKey;
+    if (keyTimeout) clearTimeout(keyTimeout);
+    keyTimeout = setTimeout(() => {
+        controllKey = null;
+        remoteDeviceLogout(controllClient);
+    }, 5000); // key is invalid after 5s
 }
 
 function checkRemoteConnection() {

@@ -26,24 +26,16 @@
       </div>
       <ul class="navbar_list">
         <li class="navbar_item">
-          <a class="navbar_link" id="back_button">Zurück</a>
+          <a href="/homepage" class="navbar_link">Zurück</a>
         </li>
       </ul>
     </nav>
     <div class="navbar_mobilmenu" id="mobilmenu">
       <ul class="navbar_mobillist">
         <li class="navbar_mobilitem">
-          <a class="navbar_mobillink" id="mobil_back_button">Zurück</a>
+          <a href="/homepage" class="navbar_mobillink">Zurück</a>
         </li>
       </ul>
-    </div>
-    <!--Waitingroom-->
-    <div class="waiting" id="waitingdiv">
-      <div class="waiting_titlebox">
-        <p class="waiting_title" id="waitingtitle">Warten</p>
-      </div>
-      <p class="waiting_refusetext">Das Ekart hat die Fernsteuerung vorerst abgelehnt. Begründung:</p>
-      <p class="waiting_cause" id="waitingcause">Warte auf Serverantwort...</p>
     </div>
     <!--Controll-->
     <div class="controll">
@@ -56,6 +48,14 @@
         </div>
       </div>
       <div class="controll_servicebox">
+        <!--Waitingroom-->
+        <div class="waiting" id="waitingdiv">
+          <div class="waiting_titlebox">
+            <p class="waiting_title" id="waitingtitle">Warten</p>
+          </div>
+          <p class="waiting_refusetext">Das Ekart hat die Fernsteuerung vorerst abgelehnt. Begründung:</p>
+          <p class="waiting_cause" id="waitingcause">Warte auf Serverantwort...</p>
+        </div>
         <div class="controll_controllerbox">
           <div class="controll_controllerbutton">
             <div class="controll_controllerarrow"></div>
@@ -71,7 +71,9 @@
           </div>
         </div>
       </div>
-      <div class="controll_settings"></div>
+      <div class="controll_settings">
+        <div class="controll_settingsRedirect" id="mapButton">Autonomes Fahren</div>
+      </div>
     </div>
   </body>
 </html>

@@ -3,6 +3,7 @@ var socket = getWebsocket();
 const imageWidth = 2816;
 const images = [];
 var isLocal = location.protocol == 'http:';
+var sendStop = false;
 var currentX = 0, currentY = 0;
 var pixelX = 0, pixelY = 0;
 var targetX = 0, targetY = 0;
@@ -14,6 +15,7 @@ function addSocketEvents() {
     socket.addEventListener('open', () => {
         send('get_navigation');
         send('get_target');
+        if(!isLocal && document.hasFocus()) requestControll();
     }, { passive: true });
 
     socket.addEventListener('close', () => {
@@ -38,15 +40,19 @@ function addSocketEvents() {
                 else if (hasData)
                     displayMap();
                 break;
+            case 'controll_request':
+                controllRequest(data[1] == 'accepted', data[1]);
+                break;
+            case 'controll_check':
+                send('controll_check');
+                checkReceived();
+                break;
+            case 'controll_redirect':
+                redirect(data[1]);
             default:
                 break;
         }
     }, { passive: true });
-}
-function send(message) {
-    if (socket.readyState == WebSocket.OPEN) {
-        socket.send(message);
-    }
 }
 
 function getWebsocket() {
@@ -55,16 +61,62 @@ function getWebsocket() {
 }
 
 function reconnect() {
+    setDestinationButton(false);
+    
     fetch(`${location.protocol}//${location.host}`, { method: 'GET' })
         .then(() => {
             socket = getWebsocket();
             addSocketEvents();
+            
             console.log('Reconnected to Server.');
         }).catch(() => {
             setTimeout(() => {
                 reconnect();
             }, 1000); // 1s
         });
+}
+
+function send(message) {
+    if (socket.readyState == WebSocket.OPEN && !sendStop) {
+        socket.send(message);
+    }
+}
+
+//Controll authentication
+var key = new URLSearchParams(location.search).get('key');
+history.replaceState({}, null, location.pathname);
+
+function requestControll() {
+    if (key) {
+        send(`controll_request:${key}`);
+        key = null;
+        return;
+    } else
+        send('controll_request');
+}
+
+//Onclose event
+window.addEventListener('beforeunload', () => {
+    send('remote_devicelogout');
+}, { passive: true });
+
+//BackButton: Redirect to controll page
+const backButton = document.getElementById('backButton');
+const mobileBackButton = document.getElementById('mobileBackButton');
+
+[backButton, mobileBackButton].forEach(button => {
+    button.addEventListener('click', () => {
+        send('remote_redirect');
+    });
+})
+
+function redirect(key) {
+    if(key != '-1'){
+        sendStop = true;
+        setTimeout(() => { sendStop = false; }, 5000);
+    }
+
+    open(key == '-1' ? '/controll' : `controll?key=${key}`, '_self');
 }
 
 //Waiting room
@@ -89,6 +141,63 @@ function deactivateWaitingRoom() {
     waitingdiv.style.display = 'none';
     if (waitingAnimation != null) clearInterval(waitingAnimation);
 }
+
+//Manage controll request
+function controllRequest(accepted, cause) {
+    if (accepted) {
+        setDestinationButton(true);
+        checkRemoteConnection();
+    } else {
+        destinationButton.style.display = 'none';
+        setDestinationButton(false);
+        if (connectionCheck != null) {
+            clearInterval(connectionCheck);
+            connectionCheck = null;
+        }
+    }
+}
+
+function setDestinationButton(active) {
+    if (!navigator.geolocation || isLocal) {
+        //geolocation api is not available or is local
+        destinationButton.style.display = 'none';
+        return;
+    }
+    destinationButton.style.display = active ? 'flex' : 'none';
+}
+
+//Check remote Connection
+var checkreceived = false;
+var connectionCheck = null;
+
+function checkRemoteConnection() {
+    checkReceived();
+    connectionCheck = setInterval(() => {
+        if (checkreceived) {
+            checkreceived = false;
+        } else {
+            send('remote_devicelogout');
+            controllRequest(false, 'Reaktionszeit ist zu groß. Webseite muss neu geladen werden.');
+        }
+    }, 4000); //Ask if check was received every 2s
+}
+
+function checkReceived() {
+    checkreceived = true;
+}
+
+window.addEventListener('focus', onTurnOnScreen, { passive: true });
+window.addEventListener('blur', onTurnOffScreen, { passive: true });
+
+function onTurnOnScreen() {
+    requestControll();
+}
+
+function onTurnOffScreen() {
+    send('remote_devicelogout');
+    controllRequest(false, 'Webseite ist nicht im Vordergrund.');
+}
+
 
 //map canvas
 const canvas = document.getElementById('canvas');
@@ -197,17 +306,9 @@ const errorMessage = document.getElementById('errorMessage');
 
 destinationButton.style.backgroundColor = '#444';
 destinationButton.style.cursor = 'default';
+destinationButton.style.display = 'none';
 errorMessage.style.display = 'none';
 var destination = null;
-
-if (!navigator.geolocation) {
-    //geolocation api is not available
-    destinationButton.style.display = 'none';
-}
-
-if (!isLocal) {
-    destinationButton.style.display = 'flex';
-}
 
 function checkButtonStatus() {
     if (hasData && destinationText.textContent == 'Stopp') {
