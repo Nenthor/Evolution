@@ -1,32 +1,46 @@
 //Mobile menu
+const menu = document.getElementById('menu');
 const navbar_toggle = document.getElementById('navbar_toggle');
 const navbar_bar = document.getElementsByClassName('navbar_bar');
-const mobilmenu = document.getElementById('mobilmenu');
-mobilmenu.style.display = 'none';
+
+var isOpen = false;
+
 navbar_toggle.addEventListener('click', () => {
-    if (mobilmenu.style.display == 'none') {
-        mobilmenu.style.display = 'inline';
-
-        navbar_bar[0].style.transform = "rotate(-45deg) translate(-6px, 6px)";
-        navbar_bar[1].style.opacity = 0;
-        navbar_bar[2].style.transform = "rotate(45deg) translate(-9px, -9px)";
+    changeMenu(!isOpen);
+    if (isOpen) {
+        rotateBar(0, 0, 1);
+        rotateBar(1, 0, 1);
+        rotateBar(2, 0, 1);
     } else {
-        mobilmenu.style.display = 'none';
-
-        navbar_bar[0].style.transform = "rotate(0) translate(0, 0)";
-        navbar_bar[1].style.opacity = 1;
-        navbar_bar[2].style.transform = "rotate(0) translate(0, 0)";
+        rotateBar(0, 1, 1);
+        rotateBar(1, 0, 0);
+        rotateBar(2, -1, 1);
     }
+    isOpen = !isOpen;
 }, { passive: true });
 
-window.addEventListener('resize', function (event) {
-    if (event.target.innerWidth > 700) {
-        if (mobilmenu.style.display = 'inline') {
-            mobilmenu.style.display = 'none';
+function rotateBar(index, factor, opacity) {
+    const deg = 45 * factor, y = 11 * factor;
 
-            navbar_bar[0].style.transform = "rotate(0) translate(0, 0)";
-            navbar_bar[1].style.opacity = 1;
-            navbar_bar[2].style.transform = "rotate(0) translate(0, 0)";
-        }
+    navbar_bar[index].style.opacity = `${opacity}`;
+    navbar_bar[index].style.transform =
+        `translateY(${y}px) rotate(${deg}deg) `
+}
+
+function changeMenu(visible) {
+    //Reset Animation
+    menu.style.animation = 'none';
+    menu.offsetHeight;
+    menu.style.animation = null; 
+
+    //Play Animation
+    if (visible) {
+        menu.style.display = 'block';
+        menu.style.animation = 'mobileMenu 0.6s ease-in-out 0s 1 reverse forwards';
+    } else {
+        menu.style.animation = 'mobileMenu 0.6s ease-in-out 0s 1 normal forwards';
+        setTimeout(() => {
+            menu.style.display = 'none';
+        }, 600);
     }
-}, { passive: true });
+}

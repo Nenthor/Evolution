@@ -63,6 +63,10 @@ body {
   transform: translateY(calc(-17%));
 }
 
+.navbar_menu {
+  animation: none;
+}
+
 .navbar_list {
   height: 100%;
   display: flex;
@@ -82,7 +86,7 @@ body {
 
 .navbar_link {
   display: inline-block;
-  line-height: max(10vh, 75px);
+  line-height: 75px;
   color: #161616;
   font-weight: bold;
   text-decoration: none;
@@ -101,68 +105,73 @@ body {
   display: block;
   width: 35px;
   height: 5px;
-  background-color: black;
+  background-color: #161616;
   margin: 6px 0;
   border-radius: 25px;
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
 }
 
-.navbar_mobilmenu {
-  display: none;
-  position: fixed;
-  top: 75px;
-  z-index: 99;
-}
-
-.navbar_mobillist {
-  background-color: #333;
-  width: 100vw;
-  max-width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  list-style-type: none;
-}
-
-.navbar_mobilitem {
-  width: 100%;
-  transition: all 0.3s ease;
-}
-
-.navbar_mobillink {
-  display: inline-block;
-  width: 100%;
-  padding: 15px 0px;
-  color: white;
-  font-weight: bold;
-  text-decoration: none;
-  text-align: center;
-  cursor: pointer;
-  font-size: 1.25rem;
+@keyframes mobileMenu {
+  from{
+    transform: translateY(-0px);
+    opacity: 1;
+  }
+  to{
+    transform: translateY(calc(-100% - 75px));
+    opacity: 0;
+  }
 }
 
 @media (pointer: fine) {
-  .navbar_item:hover {
-    margin-top: 2vh;
-    transition: all 0.3s ease;
-  }
-
   .navbar_link:hover {
     color: #3268cd;
     transition: all 0.3s ease;
   }
+}
 
-  .navbar_mobillink:hover {
-    color: #3268cd;
+@media (pointer: fine) and (min-width: 701px) {
+  .navbar_item:hover {
+    margin-top: 2vh;
     transition: all 0.3s ease;
   }
 }
 
 @media screen and (max-width: 700px) {
   .navbar_toggle {
-    display: inline;
+    display: inline-block;
+  }
+
+  .navbar_menu {
+    display: none;
+    position: fixed;
+    top: 75px;
+    background-color: #333;
+    width: 100vw;
+    animation: none;
   }
 
   .navbar_list {
-    display: none;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .navbar_item {
+    width: 100%;
+    height: fit-content;
+    margin-right: 0;
+    margin-bottom: 25px;
+  }
+
+  .navbar_item:first-child {
+    margin-top: 15px;
+  }
+
+  .navbar_item:last-child {
+    margin-bottom: 15px;
+  }
+
+  .navbar_link {
+    color: white;
+    line-height: 1.5rem;
   }
 }

@@ -102,13 +102,10 @@ window.addEventListener('beforeunload', () => {
 
 //BackButton: Redirect to controll page
 const backButton = document.getElementById('backButton');
-const mobileBackButton = document.getElementById('mobileBackButton');
 
-[backButton, mobileBackButton].forEach(button => {
-    button.addEventListener('click', () => {
-        send('remote_redirect');
-    });
-})
+backButton.addEventListener('click', () => {
+    send('remote_redirect');
+});
 
 function redirect(key) {
     if (key != '-1') {
