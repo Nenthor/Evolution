@@ -40,7 +40,7 @@ function changeMenu(visible) {
     } else {
         menu.style.animation = 'mobileMenu 0.6s ease-in-out 0s 1 normal forwards';
         setTimeout(() => {
-            menu.style.display = 'none';
+            menu.style = null;
         }, 600);
     }
 }
