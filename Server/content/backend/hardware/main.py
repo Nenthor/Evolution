@@ -1,38 +1,67 @@
 from time import sleep
+import signal
 import server
 import sensors
 import camera
 import location
 import engine_high as engine
+import speed_battery_sensors as sb_sensors
 
 sensor1 = 500
 sensor2 = 500
 sensor3 = 500
 
-server.start()
-# location.start()  # TODO: Enable this line
-# sensors.start()   # TODO: Enable this line
+signals = [
+    signal.SIGTERM,
+    signal.SIGSEGV,
+    signal.SIGPIPE,
+    signal.SIGINT,
+    signal.SIGILL,
+    signal.SIGHUP,
+    signal.SIGBUS,
+]
 
+
+def signalClose(sig, frame):
+    close()
+
+
+def close():
+    server.stop()
+    engine.stop()
+    sensors.stop()
+    location.stop()
+    sb_sensors.stop()
+    print("Server is closed.")
+    exit()
+
+
+for s in signals:
+    signal.signal(s, signalClose)
+
+server.start()
+# location.start()   # TODO: Enable this line
+# sensors.start()    # TODO: Enable this line
+# sb_sensors.start() # TODO: Enable this line
 
 def onMessage(message: str):
-    msg = message.split(':')
-    if msg[0] == 'get_camera':
+    msg = message.split(":")
+    if msg[0] == "get_camera":
         camera.forceUpdate()
-    elif msg[0] == 'get_coords':
-        location.forceUpdate('coords')
-    elif msg[0] == 'get_compass':
-        location.forceUpdate('compass')
-    elif msg[0] == 'get_battery':
+    elif msg[0] == "get_coords":
+        location.forceUpdate("coords")
+    elif msg[0] == "get_compass":
+        location.forceUpdate("compass")
+    elif msg[0] == "get_battery":
         pass  # TODO: Do some coding
-    elif msg[0] == 'get_speed':
+    elif msg[0] == "get_speed":
         pass  # TODO: Do some coding
-    elif msg[0] == 'remotedirection':
+    elif msg[0] == "remotedirection":
         engine.onRemotedirection(msg[1])
-    elif msg[0] == 'remote_controll':
-        if msg[1] == 'on': engine.onRemoteControll(True)
-        else: engine.onRemoteControll(False)
+    elif msg[0] == "remote_controll":
+        engine.onRemoteControll(msg[1] == "on")
     else:
-        print(f'{msg[0]} is not available.')
+        print(f"{msg[0]} is not available.")
 
 
 def onSensorData(sensor, distance):
@@ -55,13 +84,14 @@ sensors.onData = onSensorData
 camera.sendToServer = server.send
 location.sendToServer = server.send
 engine.sendToServer = server.send
+sb_sensors.sendToServer = server.send
 
 try:
     while True:
-        sleep(1)
+        sleep(3)
 except KeyboardInterrupt:
-    sensors.stop()
-    location.stop()
+    pass
 except Exception as e:
-    sensors.stop()
     print(e)
+
+close()

@@ -57,7 +57,7 @@ def __sendToServer(message):
         msg = message.encode(__FORMAT)
         msg_length = len(msg)
         send_length = str(msg_length).encode(__FORMAT)
-        send_length += b' ' * (__HEADER - len(send_length))
+        send_length += b" " * (__HEADER - len(send_length))
         __client.send(send_length)
         __client.send(msg)
 

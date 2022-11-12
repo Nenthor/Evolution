@@ -1,5 +1,6 @@
 import sys as __sys
-__sys.path.append('/home/pi/quick2wire')
+
+__sys.path.append("/home/pi/quick2wire")
 del __sys
 
 from i2clibraries import i2c_hmc5883l as __i2c_hmc5883l
@@ -22,13 +23,13 @@ def __checkForLocation():
     try:
         while __isActive:
             report = __session.next()
-            if report['class'] == 'TPV':
-                lat = float(getattr(report, 'lat', '0.0'))
-                long = float(getattr(report, 'lon', '0.0'))
+            if report["class"] == "TPV":
+                lat = float(getattr(report, "lat", "0.0"))
+                long = float(getattr(report, "lon", "0.0"))
                 __onLocationUpdate(lat, long)
                 __time.sleep(0.75)
     except (KeyboardInterrupt, SystemExit):
-        print('Stopping search for location')
+        print("Stopping search for location")
     except Exception as e:
         print(e)
 
@@ -41,7 +42,7 @@ def __checkForDegree():
             __onDegreeUpdate(degree)
             __time.sleep(0.75)
     except (KeyboardInterrupt, SystemExit):
-        print('Stopping search for new degree')
+        print("Stopping search for new degree")
     except Exception as e:
         print(e)
 
@@ -80,9 +81,9 @@ def __onLocationUpdate(newLat, newLong):
             __lat = newLat
             __long = newLong
         if __lat == 0.0 or __long == 0.0:
-            sendToServer('coords:Lokalisieren...')
+            sendToServer("coords:Lokalisieren...")
         else:
-            sendToServer(f'coords:{__lat} {__long}')
+            sendToServer(f"coords:{__lat} {__long}")
 
 
 def __onDegreeUpdate(newDegree):
@@ -91,7 +92,7 @@ def __onDegreeUpdate(newDegree):
         with __lock:
             __degree = newDegree
         if __degree >= 0 and __degree < 360:
-            sendToServer(f'compass:{__degree}')
+            sendToServer(f"compass:{__degree}")
 
 
 def sendToServer(message):
@@ -100,12 +101,12 @@ def sendToServer(message):
 
 
 def forceUpdate(type):
-    if type == 'coords':
+    if type == "coords":
         global __lat, __long
         if __lat == 0.0 or __long == 0.0:
-            sendToServer('coords:Lokalisieren...')
+            sendToServer("coords:Lokalisieren...")
         else:
-            sendToServer(f'coords:{__lat} {__long}')
-    elif type == 'compass':
+            sendToServer(f"coords:{__lat} {__long}")
+    elif type == "compass":
         if __degree >= 0 and __degree < 360:
-            sendToServer(f'compass:{__degree}')
+            sendToServer(f"compass:{__degree}")

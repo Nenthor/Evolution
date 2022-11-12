@@ -24,7 +24,7 @@ def setmode(mode):
     if mode == BOARD or mode == BCM:
         __GPIO.setmode(mode)
     else:
-        print('Unknown __GPIO mode.')
+        print("Unknown __GPIO mode.")
 
 
 def getmode():
@@ -37,13 +37,13 @@ def setwarnings(isActive: bool):
 
 def setup(channel: int, mode, initial=None, pull_up_down=None):
     if mode != IN and mode != OUT:
-        print('Unknown channel setup mode.')
+        print("Unknown channel setup mode.")
         return
     if initial != None and initial != LOW and initial != HIGH:
-        print('Unknown channel setup initial state.')
+        print("Unknown channel setup initial state.")
         return
     if pull_up_down != None and pull_up_down != PUD_DOWN and pull_up_down != PUD_UP:
-        print('Unknown channel setup pull_up_down configuration.')
+        print("Unknown channel setup pull_up_down configuration.")
         return
 
     if mode == IN:
@@ -66,11 +66,11 @@ def output(channel: int, state):
     if state == LOW or state == HIGH:
         __GPIO.output(channel, state)
     else:
-        print('Unknown channel output configuration.')
+        print("Unknown channel output configuration.")
 
 
 def cleanup(channel=None):
-    if (channel == None):
+    if channel == None:
         __GPIO.cleanup()
     else:
         __GPIO.cleanup(channel)
@@ -79,7 +79,7 @@ def cleanup(channel=None):
 def wait_for_edge(channel: int, event, timeout=None):
     """Timeout in milliseconds"""
     if event != FALLING and event != RISING and event != BOTH:
-        print('Unknown edge event.')
+        print("Unknown edge event.")
         return None
     if timeout == None:
         return __GPIO.wait_for_edge(channel, event)
@@ -90,7 +90,7 @@ def wait_for_edge(channel: int, event, timeout=None):
 def add_event_detect(channel: int, event, callback=None, bouncetime=None):
     """Bouncetime in milliseconds"""
     if event != FALLING and event != RISING and event != BOTH:
-        print('Unknown event.')
+        print("Unknown event.")
         return
     if callback == None:
         if bouncetime == None:
@@ -101,8 +101,7 @@ def add_event_detect(channel: int, event, callback=None, bouncetime=None):
         if bouncetime == None:
             __GPIO.add_event_detect(channel, event, callback=callback)
         else:
-            __GPIO.add_event_detect(
-                channel, event, callback=callback, bouncetime=bouncetime)
+            __GPIO.add_event_detect(channel, event, callback=callback, bouncetime=bouncetime)
 
 
 def add_event_callback(channel: int, callback):
@@ -123,10 +122,11 @@ def GPIO_function(pin: int):
 
 class PWM:
     import RPi.GPIO as gpio
+
     def __init__(self, channel: int, frequency: int):
-        self.gpio.setmode(11) # 11 = BCM
-        self.gpio.setwarnings(False)
-        self.gpio.setup(channel, 0) # 0 = OUT ; 1 = IN
+        self.gpio.setmode(11)  # 11 = BCM
+        self.gpio.setwarnings(True)
+        self.gpio.setup(channel, 0)  # 0 = OUT ; 1 = IN
         self.channel = channel
         self.PWM = self.gpio.PWM(channel, frequency)
         self.PWM.start(0)
@@ -139,8 +139,8 @@ class PWM:
             self.PWM.ChangeDutyCycle(dc)
         else:
             self.PWM.ChangeDutyCycle(0)
-            print('{dc} is not a valid input for duty cycle.')
+            print("{dc} is not a valid input for duty cycle.")
 
     def stop(self):
         self.PWM.stop()
-        cleanup(self.channel)
+        self.gpio.cleanup(self.channel)

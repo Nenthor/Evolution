@@ -30,7 +30,7 @@ def __startLoop():
             __time.sleep(0.010)
             __sendSignal(__GPIO_TRIGGER_3)
             __time.sleep(0.060)
-    except KeyboardInterrupt:
+    except Exception:
         stop()
 
 
@@ -79,7 +79,7 @@ def __onEdgeEvent(channel):
             else:
                 onData(SENSOR_3, 500)
     else:
-        print('channel is not defined.')
+        print("channel is not defined.")
 
 
 def onData(sensor, distance):
@@ -93,7 +93,6 @@ def stop():
     with __lock:
         __isActive = False
     __time.sleep(0.1)
-    print('Deactivating gpio connection.')
     __gpio.setwarnings(False)
     __gpio.cleanup()
 
@@ -109,18 +108,15 @@ def start():
     if __GPIO_TRIGGER_1 != None and __GPIO_ECHO_1 != None:
         __gpio.setup(__GPIO_TRIGGER_1, __gpio.OUT, initial=__gpio.LOW)
         __gpio.setup(__GPIO_ECHO_1, __gpio.IN)
-        __gpio.add_event_detect(
-            __GPIO_ECHO_1, __gpio.BOTH, callback=__onEdgeEvent)
+        __gpio.add_event_detect(__GPIO_ECHO_1, __gpio.BOTH, callback=__onEdgeEvent)
     if __GPIO_TRIGGER_2 != None and __GPIO_ECHO_2 != None:
         __gpio.setup(__GPIO_TRIGGER_2, __gpio.OUT, initial=__gpio.LOW)
         __gpio.setup(__GPIO_ECHO_2, __gpio.IN)
-        __gpio.add_event_detect(
-            __GPIO_ECHO_2, __gpio.BOTH, callback=__onEdgeEvent)
+        __gpio.add_event_detect(__GPIO_ECHO_2, __gpio.BOTH, callback=__onEdgeEvent)
     if __GPIO_TRIGGER_3 != None and __GPIO_ECHO_3 != None:
         __gpio.setup(__GPIO_TRIGGER_3, __gpio.OUT, initial=__gpio.LOW)
         __gpio.setup(__GPIO_ECHO_3, __gpio.IN)
-        __gpio.add_event_detect(
-            __GPIO_ECHO_3, __gpio.BOTH, callback=__onEdgeEvent)
+        __gpio.add_event_detect(__GPIO_ECHO_3, __gpio.BOTH, callback=__onEdgeEvent)
 
     thread = __threading.Thread(target=__startLoop, daemon=True)
     thread.start()

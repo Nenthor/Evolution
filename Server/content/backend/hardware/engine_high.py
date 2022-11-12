@@ -1,6 +1,6 @@
 import time as __time
 import threading as __threading
-import engine_low as __engine
+from engine_low import Engine as __Engine
 
 # min_boot_percentage = 73
 # min_normal_percantage = 33
@@ -8,28 +8,30 @@ import engine_low as __engine
 __isActive = False
 __lock = __threading.Lock()
 
-engine: __engine.Engine = None
+engine: __Engine
 speed = 0
 
 
 def start():
     """Activate engine speed."""
     global __isActive, engine
+    if __isActive:
+        return
     with __lock:
         __isActive = True
-        engine = __engine.Engine()
+        engine = __Engine()
 
 
 def stop():
     """Deactivate engine speed."""
     global __isActive, engine, speed
+    if not __isActive:
+        return
     with __lock:
         __isActive = False
         speed = 0
-        if engine is not None:
-            engine.setSpeed(speed)
-            engine.stop()
-            engine = None
+        engine.setSpeed(speed)
+        engine.stop()
 
 
 def sendToServer(message):
@@ -38,36 +40,41 @@ def sendToServer(message):
 
 
 def onRemoteControll(enabled):
-    if enabled: start()
-    else: stop()
+    if enabled:
+        start()
+    else:
+        stop()
 
 
 def onRemotedirection(direction):
     global __isActive, engine
 
-    if not __isActive: return
+    if not __isActive:
+        return
 
-    if direction == 'STANDBY':
+    if direction == "STANDBY":
         engine.setReverseState(False)
         __setSpeed(0)
-    elif direction == 'FORWARD':
+    elif direction == "FORWARD":
         engine.setReverseState(False)
-        __setSpeed(100)
-        __time.sleep(0.33)
-        __setSpeed(50)
-    elif direction == 'BACKWARD':
+        __setSpeed(80)
+        __time.sleep(0.25)
+        __setSpeed(40)
+    elif direction == "BACKWARD":
         engine.setReverseState(True)
-        __setSpeed(100)
-        __time.sleep(0.33)
-        __setSpeed(50)
-    elif direction == 'LEFT':
+        __setSpeed(80)
+        __time.sleep(0.25)
+        __setSpeed(40)
+    elif direction == "LEFT":
         pass
-    elif direction == 'RIGHT':
+    elif direction == "RIGHT":
         pass
 
 
 def __setSpeed(newSpeed):
     global speed, engine
+    if not __isActive:
+        return
     with __lock:
         speed = newSpeed
     engine.setSpeed(speed)
