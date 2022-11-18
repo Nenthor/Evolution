@@ -3,7 +3,7 @@ class Engine:
 
     __gpio_AUTONOMOUS_SWITCH = 4  # OUT -> HIGH = on : LOW = off
     __gpio_REVERSE_GEAR = 5  # OUT -> HIGH = on : LOW = off
-    __gpio_SPEED_CONTROLL = 21  # OUT -> PWM: 100% = FULL_SPEED : 0% = 0 km/h
+    __gpio_SPEED_CONTROLL = 20  # OUT -> PWM: 100% = FULL_SPEED : 0% = 0 km/h
 
     __SPEED_FREQUENCY = 30  # in Hz
 

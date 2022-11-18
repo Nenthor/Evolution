@@ -44,6 +44,7 @@ server.start()
 # sensors.start()    # TODO: Enable this line
 # sb_sensors.start() # TODO: Enable this line
 
+
 def onMessage(message: str):
     msg = message.split(":")
     if msg[0] == "get_camera":

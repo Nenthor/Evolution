@@ -57,14 +57,15 @@ def onRemotedirection(direction):
         __setSpeed(0)
     elif direction == "FORWARD":
         engine.setReverseState(False)
-        __setSpeed(80)
-        __time.sleep(0.25)
-        __setSpeed(40)
+        __setSpeed(100)
+        __time.sleep(0.5)
+        __setSpeed(60)
     elif direction == "BACKWARD":
         engine.setReverseState(True)
-        __setSpeed(80)
-        __time.sleep(0.25)
-        __setSpeed(40)
+        __time.sleep(0.1)
+        __setSpeed(100)
+        __time.sleep(0.5)
+        __setSpeed(60)
     elif direction == "LEFT":
         pass
     elif direction == "RIGHT":

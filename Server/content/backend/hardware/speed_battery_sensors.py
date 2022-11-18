@@ -5,8 +5,9 @@ from time import sleep
 __ADRESS_SPEED = 0x40
 __ADRESS_BATTERY = 0x41  # TODO: Check with sudo "i2cdetect -y 1" to get address
 __MAX_SPEED_VOLTAGE = 42
-__MAX_BATTERY_VOLTAGE = 42
 __MAX_SPEED_VALUE = 47.7  # Without air resistance
+__MAX_BATTERY_VOLTAGE = 84
+__MIN_BATTERY_VOLTAGE = 60  # TODO: Check value
 __R1_SPEED = 27
 __R2_SPEED = 10
 __R1_BATTERY = 10
@@ -19,10 +20,11 @@ __isActive = False
 __speed = 0
 __battery = 0
 
+
 def start():
     global __isActive, __ina_speed, __ina_battery
-    __ina_speed = INA219(shunt_ohms=0.1, max_expected_amps=0.2, address=__ADRESS_SPEED)
-    __ina_battery = INA219(shunt_ohms=0.1, max_expected_amps=0.2, address=__ADRESS_BATTERY)
+    __ina_speed = INA219(shunt_ohms=0.1, max_expected_amps=0.002, address=__ADRESS_SPEED)
+    __ina_battery = INA219(shunt_ohms=0.1, max_expected_amps=0.002, address=__ADRESS_BATTERY)
     __ina_speed.configure(
         voltage_range=__ina_speed.RANGE_32V, gain=__ina_speed.GAIN_AUTO, bus_adc=__ina_speed.ADC_128SAMP, shunt_adc=__ina_speed.ADC_128SAMP
     )
@@ -37,10 +39,12 @@ def start():
 
 def stop():
     global __isActive, __lock
-    with __lock:
-        __isActive = False
-        __ina_speed.reset()
-        __ina_battery.reset()
+
+    if __isActive:
+        with __lock:
+            __isActive = False
+            __ina_speed.reset()
+            __ina_battery.reset()
 
 
 def sendToServer(message):
@@ -51,7 +55,7 @@ def sendToServer(message):
 def __checkSpeed():
     global __isActive, __lock, __ina_speed, __speed
     while __isActive:
-        sleep(0.50) # 0.5s timeout
+        sleep(0.50)  # 0.5s timeout
         while not __ina_battery.is_conversion_ready() and __isActive:
             sleep(0.1)
         speed = __calculate_speed(__ina_speed.voltage(), __R1_SPEED, __R2_SPEED)
@@ -61,11 +65,12 @@ def __checkSpeed():
                 __speed = speed
                 sendToServer(f"speed:{__speed}")
 
+
 def __checkBattery():
     global __isActive, __lock, __ina_battery, __battery
     while __isActive:
         __ina_battery.sleep()
-        sleep(30) # 30s timeout
+        sleep(30)  # 30s timeout
         __ina_battery.wake()
         while not __ina_battery.is_conversion_ready() and __isActive:
             sleep(0.1)
@@ -76,18 +81,25 @@ def __checkBattery():
                 __battery = battery
                 sendToServer(f"battery:{__battery}")
 
+
 def __calculate_speed(vOut, r1, r2):
     # Vout = (Vin * R2) / (R1 + R2) -> Vin = (Vout * (R1 + R2)) / R2
     vIn = (vOut * (r1 + r2)) / r2
     speed = (vIn / __MAX_SPEED_VOLTAGE) * __MAX_SPEED_VALUE
-    if speed > __MAX_SPEED_VALUE: speed = __MAX_SPEED_VALUE
-    elif speed < 0: speed = 0
+    if speed > __MAX_SPEED_VALUE:
+        speed = __MAX_SPEED_VALUE
+    elif speed < 0:
+        speed = 0
     return round(speed)
+
 
 def __calculate_battery(vOut, r1, r2):
     # Vout = (Vin * R2) / (R1 + R2) -> Vin = (Vout * (R1 + R2)) / R2
     vIn = (vOut * (r1 + r2)) / r2
-    battery = (vIn / __MAX_BATTERY_VOLTAGE) * 100
-    if battery > 100: battery = 100
-    elif battery < 0: battery = 0
+    # battery = (current_difference / max_differenz) * 100
+    battery = ((vIn - __MIN_BATTERY_VOLTAGE) / (__MAX_BATTERY_VOLTAGE - __MIN_BATTERY_VOLTAGE)) * 100
+    if battery > 100:
+        battery = 100
+    elif battery < 0:
+        battery = 0
     return round(battery)
