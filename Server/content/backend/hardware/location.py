@@ -8,7 +8,6 @@ import time as __time
 import threading as __threading
 import gps as __gps
 
-
 __lock = __threading.Lock()
 __session = None
 __compass = None
@@ -75,7 +74,7 @@ def stop():
 
 
 def __onLocationUpdate(newLat, newLong):
-    global __lat, __long
+    global __lock, __lat, __long
     if newLat != __lat or newLong != __long:
         with __lock:
             __lat = newLat
@@ -87,7 +86,7 @@ def __onLocationUpdate(newLat, newLong):
 
 
 def __onDegreeUpdate(newDegree):
-    global __degree
+    global __lock, __degree
     if newDegree != __degree:
         with __lock:
             __degree = newDegree

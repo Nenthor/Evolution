@@ -4,12 +4,14 @@ import server
 import sensors
 import camera
 import location
-import engine_high as engine
+import engine_high
 import speed_battery_sensors as sb_sensors
 
 sensor1 = 500
 sensor2 = 500
 sensor3 = 500
+
+engine:engine_high.Engine
 
 signals = [
     signal.SIGTERM,

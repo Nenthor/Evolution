@@ -4,7 +4,7 @@ const client = new net.Socket();
 
 const HOST = '127.0.0.1';
 const PORT = 5050;
-const HEADER = 16;
+const HEADER = 2;
 const FORMAT = 'utf-8';
 const DISCONNECT_MESSAGE = '!DISCONNECT';
 const MAX_RETRYCOUNT = 300; //5min

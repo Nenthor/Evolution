@@ -5,7 +5,7 @@ import atexit as __atexit
 
 __HOST = "127.0.0.1"
 __PORT = 5050
-__HEADER = 64
+__HEADER = 2
 __FORMAT = "utf-8"
 __DISCONNECT_MESSAGE = "!DISCONNECT"
 

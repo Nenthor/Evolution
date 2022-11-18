@@ -89,7 +89,7 @@ def onData(sensor, distance):
 
 def stop():
     """Deactivate sensors."""
-    global __isActive
+    global __lock, __isActive
     with __lock:
         __isActive = False
     __time.sleep(0.1)
@@ -99,7 +99,7 @@ def stop():
 
 def start():
     """Activate sensors."""
-    global __isActive
+    global __lock, __isActive
     with __lock:
         __isActive = True
     __gpio.setmode(__gpio.BCM)

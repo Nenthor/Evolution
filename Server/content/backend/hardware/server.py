@@ -10,7 +10,7 @@ from threading import Thread as __Thread, Lock as __Lock
 
 __HOST = "127.0.0.1"
 __PORT = 5050
-__HEADER = 16
+__HEADER = 2
 __FORMAT = "utf-8"
 __DISCONNECT_MESSAGE = "!DISCONNECT"
 
@@ -34,7 +34,7 @@ def stop():
 
 
 def __bootServer():
-    global __server
+    global __server, __lock
     __server = __socket(__AF_INET, __SOCK_STREAM)
     __server.setsockopt(__SOL_SOCKET, __SO_REUSEADDR, 1)
     __server.bind((__HOST, __PORT))
@@ -51,6 +51,8 @@ def __bootServer():
 
 
 def __handleClient(conn: __socket, addr):
+    global __lock
+
     print("Client has connected.")
     while True:
         try:

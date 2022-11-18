@@ -1,81 +1,44 @@
-import time as __time
-import threading as __threading
-from engine_low import Engine as __Engine
+class Engine:
+    import engine_low
 
-# min_boot_percentage = 73
-# min_normal_percantage = 33
+    def __init__(self):
+        """First Engine activation."""
+        self.isActive = False
+        self.engine: self.engine_low.Engine
 
-__isActive = False
-__lock = __threading.Lock()
+    def start(self):
+        """Activate engine."""
+        if not self.isActive:
+            self.engine = self.engine_low.Engine()
+            self.isActive = True
 
-engine: __Engine
-speed = 0
+    def stop(self):
+        """Deactivate engine."""
+        if self.isActive:
+            self.engine.stop()
+            self.isActive = False
 
-
-def start():
-    """Activate engine speed."""
-    global __isActive, engine
-    if __isActive:
-        return
-    with __lock:
-        __isActive = True
-        engine = __Engine()
-
-
-def stop():
-    """Deactivate engine speed."""
-    global __isActive, engine, speed
-    if not __isActive:
-        return
-    with __lock:
-        __isActive = False
-        speed = 0
-        engine.setSpeed(speed)
-        engine.stop()
-
-
-def sendToServer(message):
-    """Send messages to the server if engine is updated."""
-    pass
-
-
-def onRemoteControll(enabled):
-    if enabled:
-        start()
-    else:
-        stop()
-
-
-def onRemotedirection(direction):
-    global __isActive, engine
-
-    if not __isActive:
-        return
-
-    if direction == "STANDBY":
-        engine.setReverseState(False)
-        __setSpeed(0)
-    elif direction == "FORWARD":
-        engine.setReverseState(False)
-        __setSpeed(100)
-        __time.sleep(0.5)
-        __setSpeed(60)
-    elif direction == "BACKWARD":
-        engine.setReverseState(True)
-        __time.sleep(0.1)
-        __setSpeed(100)
-        __time.sleep(0.5)
-        __setSpeed(60)
-    elif direction == "LEFT":
-        pass
-    elif direction == "RIGHT":
+    def sendToServer(self, message):
+        """Send messages to the server if engine is updated."""
         pass
 
+    def onRemoteControll(self, enabled):
+        if enabled:
+            self.start()
+        else:
+            self.stop()
 
-def __setSpeed(newSpeed):
-    global speed, engine
-    if not __isActive:
-        return
-    with __lock:
-        speed = newSpeed
-    engine.setSpeed(speed)
+    def onRemotedirection(self, direction):
+        if not self.isActive:
+            return
+
+        if direction == "STANDBY":
+            self.engine.setDirection(speed=0, reverseState=False)
+        elif direction == "FORWARD":
+            self.engine.setDirection(speed=60, reverseState=False)
+        elif direction == "BACKWARD":
+            self.engine.setDirection(speed=60, reverseState=True)
+        elif direction == "LEFT":
+            pass
+        elif direction == "RIGHT":
+            pass
