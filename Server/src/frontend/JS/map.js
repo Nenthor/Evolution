@@ -7,7 +7,7 @@ var sendStop = false;
 var currentX = 0, currentY = 0;
 var pixelX = 0, pixelY = 0;
 var targetX = 0, targetY = 0;
-var hasData = false, hasTarget = false, hasLoaded = 0;
+var hasData = false, hasTarget = false, hasLoaded = 0, hasControll = false;
 var gpsWatch = null, gpsWatchTimeout = null;
 
 addSocketEvents();
@@ -30,15 +30,12 @@ function addSocketEvents() {
                 extractNavigationMessage(data[1]);
                 if (hasData) displayMap();
                 checkButtonStatus();
-                checkMapImages()
+                checkMapImages();
                 break;
             case 'target':
-                const firstTarget = !hasTarget
                 extractTargetMessage(data[1]);
-                if (firstTarget && hasTarget && hasData && hasLoaded == 3)
+                if (hasTarget && hasData && hasLoaded >= 3)
                     drawTarget()
-                else if (hasData)
-                    displayMap();
                 break;
             case 'controll_request':
                 controllRequest(data[1] == 'accepted', data[1]);
@@ -61,7 +58,7 @@ function getWebsocket() {
 }
 
 function reconnect() {
-    setDestinationButton(false);
+    setDestinationButtons(false, false);
 
     fetch(`${location.protocol}//${location.host}`, { method: 'GET' })
         .then(() => {
@@ -98,6 +95,7 @@ function requestControll() {
 //Onclose event
 window.addEventListener('beforeunload', () => {
     send('remote_devicelogout');
+    setDestinationButtons(false, false);
 }, { passive: true });
 
 //BackButton: Redirect to controll page
@@ -126,6 +124,7 @@ waitingdiv.style.display = 'flex';
 function activateWaitingRoom() {
     waitingdiv.style.display = 'flex';
     if (waitingAnimation != null) return;
+
     waitingAnimation = setInterval(() => {
         if (waitingtitle.textContent.endsWith('...'))
             waitingtitle.textContent = waitingtitle.textContent.substring(0, waitingtitle.textContent.length - 3);
@@ -141,28 +140,39 @@ function deactivateWaitingRoom() {
 
 //Manage controll request
 function controllRequest(accepted, cause) {
+    hasControll = accepted;
     if (accepted) {
-        setDestinationButton(true);
+        if (hasData)
+            setDestinationButtons(true, callText.textContent != "Stopp");
+        else
+            setDestinationButtons(false, false);
         checkRemoteConnection();
     } else {
-        callButton.style.display = 'none';
-        setButton.style.display = 'none';
-        setDestinationButton(false);
         clearGPSWatch();
         if (connectionCheck != null) {
             clearInterval(connectionCheck);
             connectionCheck = null;
         }
+        setDestinationButtons(false, false);
     }
 }
 
-function setDestinationButton(active) {
-    if (!navigator.geolocation || (isLocal && !hasTarget)) {
+function setDestinationButtons(call, set) {
+    if (!navigator.geolocation || (isLocal && !hasTarget) || (!isLocal && !hasControll)) {
         //geolocation api is not available or is local with no target
-        active = false;
+        call = false;
+        set = false;
+    } else if (gpsWatch != null) {
+        set = false;
     }
-    callButton.style.display = active ? 'flex' : 'none';
-    setButton.style.display = active ? 'flex' : 'none';
+    if (callButton.style.display != (call ? 'block' : 'none') || setButton.style.display != (set ? 'block' : 'none')) {
+        callButton.style.display = call ? 'block' : 'none';
+        setButton.style.display = set ? 'block' : 'none';
+
+        if (!hasData) return;
+        fix_dpi();
+        displayMap();
+    }
 }
 
 //Check remote Connection
@@ -196,7 +206,6 @@ function onTurnOffScreen() {
     send('remote_devicelogout');
     controllRequest(false, 'Webseite ist nicht im Vordergrund.');
 }
-
 
 //map canvas
 const canvas = document.getElementById('canvas');
@@ -234,29 +243,48 @@ function extractNavigationMessage(message) {
 }
 
 function displayMap() {
+    if (!hasData) return;
+
     hasLoaded = 0;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    getChachedImage(currentX, currentY);
 
     var x = pixelX > imageWidth / 2 ? 1 : -1;
     var y = pixelY > imageWidth / 2 ? 1 : -1;
 
-    getChachedImage(currentX, currentY + y);
-    getChachedImage(currentX + x, currentY);
-    getChachedImage(currentX + x, currentY + y);
-}
+    var searches = [
+        { x: currentX, y: currentY },
+        { x: currentX, y: currentY + y },
+        { x: currentX + x, y: currentY },
+        { x: currentX + x, y: currentY + y }
+    ];
 
-function getChachedImage(x, y) {
-    if (x == -1 || x == 26 || y == -1 || y == 26) return;
-    for (const index in images) {
-        const image = images[index];
-        if (image.x == x && image.y == y) {
-            drawImage(image.image, x - currentX, y - currentY);
-            return;
+    //Search for out of range index
+    for (let searchIndex in searches) {
+        var search = searches[searchIndex]
+
+        if (search.x == -1 || search.x == 26 || search.y == -1 || search.y == 26) {
+            searches.splice(searchIndex, 1);
         }
     }
-    loadGeoDataImage(x, y);
+
+    //Search for cached images
+    for (let imageIndex in images) {
+        if (searches.length == 0) break;
+        var image = images[imageIndex];
+        for (let searchIndex in searches) {
+            var search = searches[searchIndex]
+            if (image.x == search.x && image.y == search.y) {
+                drawImage(image.image, image.x - currentX, image.y - currentY);
+                searches.splice(searchIndex, 1);
+                break;
+            }
+        }
+    }
+
+    //Download non-cached images
+    for (let searchIndex in searches) {
+        loadGeoDataImage(searches[searchIndex].x, searches[searchIndex].y);
+    }
 }
 
 function checkMapImages() {
@@ -272,24 +300,28 @@ function loadGeoDataImage(x, y) {
     const image = new Image();
     image.src = `/images/navigation/geodata_${x}_${y}.webp`;
 
-    image.onerror = () => console.log(`Could not load geodata_${x}_${y}.webp.`);
+    image.onerror = () => console.warn(`Could not load geodata_${x}_${y}.webp.`);
     image.onload = () => {
-        if (x - currentX == 0 && y - currentY == 0)
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
         drawImage(image, x - currentX, y - currentY);
+        for (const index in images) {
+            const image = images[index];
+            if (image.x == x && image.y == y) return;
+        }
+        images.push({ x: x, y: y, image: image });
     };
-    images.push({ x: x, y: y, image: image });
 }
 
 function drawImage(image, x, y) {
     //drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)   pixelX=1455;pixelY=1355
-    const scale = window.devicePixelRatio * 0.75;
+    const scale = window.devicePixelRatio * (2 / 3);
 
-    ctx.drawImage(image, 0, 0, image.width, image.height, x * image.width * scale - pixelX * scale + canvas.width / 2, y * image.width * scale - pixelY * scale + canvas.height / 2, image.width * scale, image.height * scale);
+    var dx = x * image.width * scale - pixelX * scale + canvas.width / 2;
+    var dy = y * image.width * scale - pixelY * scale + canvas.height / 2;
+
+    ctx.drawImage(image, 0, 0, image.width, image.width, dx, dy, image.width * scale, image.height * scale);
 
     hasLoaded++;
-    if (hasTarget && hasLoaded == 3) drawTarget()
+    if (hasTarget && hasLoaded == 3) drawTarget();
 }
 
 window.addEventListener('resize', () => {
@@ -305,44 +337,45 @@ const callText = document.getElementById('callText');
 const setText = document.getElementById('setText');
 const errorMessage = document.getElementById('errorMessage');
 
-callButton.style.backgroundColor = '#444';
-callButton.style.cursor = 'default';
+[callButton, setButton].forEach(button => {
+    //Adding hover effect
+    button.addEventListener('mouseenter', () => {
+        if (button.style.backgroundColor == 'rgb(205, 50, 50)')
+            button.style.backgroundColor = '#cd1616';
+        else
+            button.style.backgroundColor = '#216fc9';
+    }, { passive: true });
+
+    button.addEventListener('mouseleave', () => {
+        if (button.style.backgroundColor == 'rgb(205, 22, 22)')
+            button.style.backgroundColor = '#cd3232';
+        else
+            button.style.backgroundColor = null;
+    }, { passive: true });
+});
+
 callButton.style.display = 'none';
-setButton.style.backgroundColor = '#444';
-setButton.style.cursor = 'default';
 setButton.style.display = 'none';
 errorMessage.style.display = 'none';
 var destination = null;
 
 function checkButtonStatus() {
     if (hasData && callText.textContent == 'Stopp') {
-        callButton.style.backgroundColor = '#cd3232';
-        callButton.style.cursor = 'pointer';
-        callButton.style.display = 'block';
-        setButton.style.display = 'none';
-    } else if (hasData) {
-        callButton.style.backgroundColor = '#2f81df';
-        callButton.style.cursor = 'pointer';
-        callButton.style.display = 'block';
-        setButton.style.backgroundColor = '#2f81df';
-        setButton.style.cursor = 'pointer';
-        setButton.style.display = 'block';
-    } else {
-        callButton.style.backgroundColor = '#444';
-        callButton.style.cursor = 'default';
-        callButton.style.display = 'block';
-        setButton.style.backgroundColor = '#444';
-        setButton.style.cursor = 'default';
-        setButton.style.display = 'block';
-    }
+        if (callButton.style.backgroundColor != 'rgb(205, 22, 22)')
+            callButton.style.backgroundColor = '#cd3232';
+        setDestinationButtons(true, false)
+    } else if (hasData)
+        setDestinationButtons(true, true)
+    else
+        setDestinationButtons(false, false)
 }
 
 callButton.addEventListener('click', () => {
     if (!hasData) return;
-    if (callText.textContent == 'Berechnen...') return;
     if (gpsWatch != null) return;
     if (hasTarget) {
         //Stop-Button
+        hasTarget = false;
         send(`set_target:-1`);
         clearGPSWatch();
         return;
@@ -353,6 +386,8 @@ callButton.addEventListener('click', () => {
 var accuracy = 0;
 function getDestination() {
     clearGPSWatch();
+    if (!hasControll) return;
+
     gpsWatch = navigator.geolocation.watchPosition(position => {
         const lat = position.coords.latitude;
         const long = position.coords.longitude;
@@ -361,7 +396,7 @@ function getDestination() {
             gpsWatchTimeout = setTimeout(() => {
                 gpsWatchTimeout = null;
                 clearGPSWatch();
-                onGPSError('Unable to get accurate position.')
+                onGPSError('Position konnte nicht bestimmt werden.')
             }, 45000); // 45s
         }
 
@@ -369,11 +404,13 @@ function getDestination() {
             //Accuracy is less than 10 meters
             send(`set_target:${lat} ${long}`);
             clearGPSWatch();
-            callText.textContent = `Berechnen...`;
+            callText.textContent = `Lokalisieren: 100%`;
+            setDestinationButtons(true, false);
         } else {
             const currentAccuracy = Math.floor((10 / position.coords.accuracy) * 100);
             if (currentAccuracy > accuracy) accuracy = currentAccuracy;
             callText.textContent = `Lokalisieren: ${accuracy}%`;
+            setDestinationButtons(true, false);
         }
     }, err => {
         onGPSError(err.message)
@@ -388,13 +425,11 @@ function clearGPSWatch() {
     if (gpsWatchTimeout != null) {
         clearTimeout(gpsWatchTimeout);
         gpsWatchTimeout = null;
-
     }
-    if (callText.textContent != 'Berechnen...') {
-        callButton.style.backgroundColor = '#2f81df';
-        callText.textContent = 'CallMyEkart';
-    }
+    callButton.style.backgroundColor = '#2f81df';
+    callText.textContent = 'CallMyEkart';
     accuracy = 0;
+    setDestinationButtons(true, true);
 }
 
 function onGPSError(err) {
@@ -410,30 +445,32 @@ function extractTargetMessage(message) {
         targetX = 0;
         targetY = 0;
         hasTarget = false;
-        if (isLocal) setDestinationButton(true);
+        if (isLocal) setDestinationButtons(false, false);
         if (gpsWatch == null) {
             callButton.style.backgroundColor = '#2f81df';
             callText.textContent = 'CallMyEkart';
-            setButton.style.display = 'block';
+            setDestinationButtons(true, true);
         }
         return;
     }
+
     hasTarget = true;
     values = message.split(' ');
     targetX = parseInt(values[0]);
     targetY = parseInt(values[1]);
 
-    callText.textContent = 'Berechnen...';
+    displayMap();
 }
 
 function drawTarget() {
     //Change SetTargetButton behavior
     if (callText.textContent != 'Stopp') {
-        callButton.style.backgroundColor = '#cd3232';
+        if (callButton.style.backgroundColor != 'rgb(205, 22, 22)')
+            callButton.style.backgroundColor = '#cd3232';
         callText.textContent = 'Stopp';
-        setButton.style.display = 'none';
+        setDestinationButtons(true, false);
     }
-    if (isLocal) setDestinationButton(true);
+    if (isLocal) setDestinationButtons(true, false);
 
     setTimeout(() => {
         const scale = window.devicePixelRatio;

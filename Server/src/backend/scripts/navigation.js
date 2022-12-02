@@ -174,7 +174,7 @@ function calculateTarget(targetLat, targetLong) {
     if (targetLat != Infinity && targetLong != Infinity) {
         diffLat = targetLat - lat;
         diffLong = targetLong - long
-
+    
         targetPixelX = Math.round(diffLong / Math.abs(stats.widthPixelLong));
         targetPixelY = Math.round(diffLat / Math.abs(stats.widthPixelLat));
 

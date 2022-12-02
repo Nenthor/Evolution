@@ -124,7 +124,7 @@ body {
   background-color: #555;
   width: 90%;
   padding: 0 5%;
-  height: fit-content;
+  max-height: 150px;
 }
 
 .display_settingsList{
@@ -137,8 +137,8 @@ body {
 }
 
 .display_destination {
-  display: inline-block;
-  background-color: #444;
+  display: none;
+  background-color: #2f81df;
   padding: 10px 20px;
   margin: 5px 0;
   min-width: 33.3vw;

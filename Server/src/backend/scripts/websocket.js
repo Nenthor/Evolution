@@ -88,7 +88,7 @@ const wssSecure = new WebSocket.Server({ server: global.serverSecure });
                     navigation.getNavigation(ws);
                     break;
                 case incoming.set_navigation:
-                    if (!remoteControll.isController(ws) || !global.debug) break;
+                    if (!remoteControll.isController(ws) && !global.debug) break;
                     receiveMessages('Änderung des "Navigations"-Werts erhalten.', importance.MEDIUM);
                     navigation.setNavigation(message[1]);
                     break;
