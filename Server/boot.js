@@ -7,4 +7,4 @@ global.compass = '0';
 global.debug = true;
 
 //Setup webserver
-require('./content/backend/scripts/website');
+require('./src/backend/scripts/website');

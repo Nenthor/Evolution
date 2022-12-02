@@ -145,7 +145,8 @@ function controllRequest(accepted, cause) {
         setDestinationButton(true);
         checkRemoteConnection();
     } else {
-        destinationButton.style.display = 'none';
+        callButton.style.display = 'none';
+        setButton.style.display = 'none';
         setDestinationButton(false);
         clearGPSWatch();
         if (connectionCheck != null) {
@@ -160,7 +161,8 @@ function setDestinationButton(active) {
         //geolocation api is not available or is local with no target
         active = false;
     }
-    destinationButton.style.display = active ? 'flex' : 'none';
+    callButton.style.display = active ? 'flex' : 'none';
+    setButton.style.display = active ? 'flex' : 'none';
 }
 
 //Check remote Connection
@@ -297,32 +299,47 @@ window.addEventListener('resize', () => {
 }, { passive: true });
 
 //Call Ekart button
-const destinationButton = document.getElementById('destinationButton');
-const destinationText = document.getElementById('destinationText');
+const callButton = document.getElementById('callButton');
+const setButton = document.getElementById('setButton');
+const callText = document.getElementById('callText');
+const setText = document.getElementById('setText');
 const errorMessage = document.getElementById('errorMessage');
 
-destinationButton.style.backgroundColor = '#444';
-destinationButton.style.cursor = 'default';
-destinationButton.style.display = 'none';
+callButton.style.backgroundColor = '#444';
+callButton.style.cursor = 'default';
+callButton.style.display = 'none';
+setButton.style.backgroundColor = '#444';
+setButton.style.cursor = 'default';
+setButton.style.display = 'none';
 errorMessage.style.display = 'none';
 var destination = null;
 
 function checkButtonStatus() {
-    if (hasData && destinationText.textContent == 'Stopp') {
-        destinationButton.style.backgroundColor = '#cd3232';
-        destinationButton.style.cursor = 'pointer';
+    if (hasData && callText.textContent == 'Stopp') {
+        callButton.style.backgroundColor = '#cd3232';
+        callButton.style.cursor = 'pointer';
+        callButton.style.display = 'block';
+        setButton.style.display = 'none';
     } else if (hasData) {
-        destinationButton.style.backgroundColor = '#2f81df';
-        destinationButton.style.cursor = 'pointer';
+        callButton.style.backgroundColor = '#2f81df';
+        callButton.style.cursor = 'pointer';
+        callButton.style.display = 'block';
+        setButton.style.backgroundColor = '#2f81df';
+        setButton.style.cursor = 'pointer';
+        setButton.style.display = 'block';
     } else {
-        destinationButton.style.backgroundColor = '#444';
-        destinationButton.style.cursor = 'default';
+        callButton.style.backgroundColor = '#444';
+        callButton.style.cursor = 'default';
+        callButton.style.display = 'block';
+        setButton.style.backgroundColor = '#444';
+        setButton.style.cursor = 'default';
+        setButton.style.display = 'block';
     }
 }
 
-destinationButton.addEventListener('click', () => {
+callButton.addEventListener('click', () => {
     if (!hasData) return;
-    if (destinationText.textContent == 'Berechnen...') return;
+    if (callText.textContent == 'Berechnen...') return;
     if (gpsWatch != null) return;
     if (hasTarget) {
         //Stop-Button
@@ -352,11 +369,11 @@ function getDestination() {
             //Accuracy is less than 10 meters
             send(`set_target:${lat} ${long}`);
             clearGPSWatch();
-            destinationText.textContent = `Berechnen...`;
+            callText.textContent = `Berechnen...`;
         } else {
             const currentAccuracy = Math.floor((10 / position.coords.accuracy) * 100);
             if (currentAccuracy > accuracy) accuracy = currentAccuracy;
-            destinationText.textContent = `Lokalisieren: ${accuracy}%`;
+            callText.textContent = `Lokalisieren: ${accuracy}%`;
         }
     }, err => {
         onGPSError(err.message)
@@ -373,9 +390,9 @@ function clearGPSWatch() {
         gpsWatchTimeout = null;
 
     }
-    if (destinationText.textContent != 'Berechnen...') {
-        destinationButton.style.backgroundColor = '#2f81df';
-        destinationText.textContent = 'CallMyEkart';
+    if (callText.textContent != 'Berechnen...') {
+        callButton.style.backgroundColor = '#2f81df';
+        callText.textContent = 'CallMyEkart';
     }
     accuracy = 0;
 }
@@ -395,8 +412,9 @@ function extractTargetMessage(message) {
         hasTarget = false;
         if (isLocal) setDestinationButton(true);
         if (gpsWatch == null) {
-            destinationButton.style.backgroundColor = '#2f81df';
-            destinationText.textContent = 'CallMyEkart';
+            callButton.style.backgroundColor = '#2f81df';
+            callText.textContent = 'CallMyEkart';
+            setButton.style.display = 'block';
         }
         return;
     }
@@ -405,14 +423,15 @@ function extractTargetMessage(message) {
     targetX = parseInt(values[0]);
     targetY = parseInt(values[1]);
 
-    destinationText.textContent = 'Berechnen...';
+    callText.textContent = 'Berechnen...';
 }
 
 function drawTarget() {
     //Change SetTargetButton behavior
-    if (destinationText.textContent != 'Stopp') {
-        destinationButton.style.backgroundColor = '#cd3232';
-        destinationText.textContent = 'Stopp';
+    if (callText.textContent != 'Stopp') {
+        callButton.style.backgroundColor = '#cd3232';
+        callText.textContent = 'Stopp';
+        setButton.style.display = 'none';
     }
     if (isLocal) setDestinationButton(true);
 

@@ -31,7 +31,7 @@ function setSendFunctions(single, all) {
 //Load navigation data
 readNavigationFile();
 function readNavigationFile() {
-    fs.readFile(`${global.path}/content/backend/data/navigation.json`, (error, data) => {
+    fs.readFile(`${global.path}/src/backend/data/navigation.json`, (error, data) => {
         if (error) { console.log(`Navigationdata could not be loaded: ${error}`); return }
         const jsonData = JSON.parse(data);
 

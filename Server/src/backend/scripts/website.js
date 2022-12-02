@@ -17,17 +17,17 @@ const portSecure = os.type() == 'Linux' ? 443 : 8443;
 
 //Get SSL-Certificate
 const ssl = {
-    key: fs.readFileSync(`${global.path}/content/backend/data/ssl/key.pem`),
-    cert: fs.readFileSync(`${global.path}/content/backend/data/ssl/cert.pem`)
+    key: fs.readFileSync(`${global.path}/src/backend/data/ssl/key.pem`),
+    cert: fs.readFileSync(`${global.path}/src/backend/data/ssl/cert.pem`)
 };
 
 //Allow everyone to get CSS/fonts/images/JS files && Enable CORS-Policy
 [app, appSecure].forEach(element => {
     element.use(cors());
-    element.use('/CSS', express.static(path.join(global.path, 'content/frontend/CSS')));
-    element.use('/fonts', express.static(path.join(global.path, 'content/frontend/fonts')));
-    element.use('/images', express.static(path.join(global.path, 'content/frontend/images')));
-    element.use('/JS', express.static(path.join(global.path, 'content/frontend/JS')));
+    element.use('/CSS', express.static(path.join(global.path, 'src/frontend/CSS')));
+    element.use('/fonts', express.static(path.join(global.path, 'src/frontend/fonts')));
+    element.use('/images', express.static(path.join(global.path, 'src/frontend/images')));
+    element.use('/JS', express.static(path.join(global.path, 'src/frontend/JS')));
 });
 
 //Manage paths
@@ -52,7 +52,7 @@ appSecure.get('/map', (req, res) => {
         return;
     }
 
-    fs.readFile(path.join(global.path, `content/frontend/html/map.html`), (error, data) => {
+    fs.readFile(path.join(global.path, `src/frontend/html/map.html`), (error, data) => {
         if (error) res.status(500);
         else res.write(data); //Sending file
         res.end();
@@ -96,7 +96,7 @@ function setPageAccess(req, res) {
             return;
         }
 
-        fs.readFile(path.join(global.path, `content/frontend/html/${fileRequested}.html`), (error, data) => {
+        fs.readFile(path.join(global.path, `src/frontend/html/${fileRequested}.html`), (error, data) => {
             if (error) res.status(500);
             else res.write(data); //Sending file
             res.end();

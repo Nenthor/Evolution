@@ -68,7 +68,6 @@ body {
     background-color: #2a5cb9;
     padding: 10px 7.5%;
     border-radius: 50px;
-    box-shadow: 0 0 20px 1px #161616;
   }
 
   .display_destinationText:hover {
@@ -80,10 +79,10 @@ body {
 /*--Waitingroom--*/
 .waiting {
   background-color: #161616;
-  position: fixed;
-  top: calc(75px + 7.5px);
+  position: absolute;
   width: calc(100% - 15px);
-  bottom: calc(7.5px + 50px);
+  height: calc(100% - 15px);
+  transform: translateY(calc(-100% - 4px));
   z-index: 98;
   display: flex;
   justify-content: center;
@@ -123,21 +122,27 @@ body {
 
 .display_settings {
   background-color: #555;
+  width: 90%;
+  padding: 0 5%;
+  height: fit-content;
+}
+
+.display_settingsList{
   width: 100%;
-  min-height: 50px;
-  bottom: 0px;
+  height: 100%;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-evenly;
+  flex-direction: row;
 }
 
 .display_destination {
-  display: none;
+  display: inline-block;
   background-color: #444;
   padding: 10px 20px;
+  margin: 5px 0;
   min-width: 33.3vw;
   border-radius: 50px;
-  box-shadow: 0 0 20px 1px #161616;
   cursor: pointer;
   justify-content: center;
   align-items: center;
@@ -150,4 +155,20 @@ body {
 .display_destinationText {
   font-weight: bold;
   color: white;
+  text-align: center;
+}
+
+@media (max-width: 500px) {
+  .display_settingsList{
+    flex-direction: column;
+  }
+
+  .display_settings {
+    height: fit-content;
+  }
+
+  .display_destination {
+    padding: 10px 20px;
+    min-width: 66.6vw;
+  }
 }

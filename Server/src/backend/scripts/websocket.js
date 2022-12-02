@@ -177,13 +177,13 @@ global.settings = readFile('settings', '000');
 navigation.setNavigation(hardware.sendData(null, outgoing.coords)); //Send data to navigation script
 
 function readFile(file, fallback) {
-    const data = fs.readFileSync(`${global.path}/content/backend/data/${file}.txt`, 'utf8');
+    const data = fs.readFileSync(`${global.path}/src/backend/data/${file}.txt`, 'utf8');
     if (data == null) return fallback
     return data;
 }
 
 function writeFile(data, file) {
-    fs.writeFile(`${global.path}/content/backend/data/${file}.txt`, String(data), error => {
+    fs.writeFile(`${global.path}/src/backend/data/${file}.txt`, String(data), error => {
         if (error) {
             console.warn(`${file}.txt konnte nicht geändert werden: ${error}`);
         }

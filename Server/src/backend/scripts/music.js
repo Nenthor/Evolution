@@ -42,7 +42,7 @@ function playMusic(musicIndex) {
 }
 
 function playMusicFile(file) {
-    return sound.play(path.join(global.path, `content/backend/sound/${file}`), { mplayer: ['-loop', 0] }, (err) => {
+    return sound.play(path.join(global.path, `src/backend/sound/${file}`), { mplayer: ['-loop', 0] }, (err) => {
         if (err && err != 1) console.log(`Error while trying to play ${file}.`);
     });
 }

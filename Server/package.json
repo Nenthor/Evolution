@@ -1,5 +1,5 @@
 {
-  "name": "server",
+  "name": "webserver",
   "version": "1.0.0",
   "description": "Communication between Raspberry PI and Users",
   "main": "boot.js",
@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "P-Seminar Evolution",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
