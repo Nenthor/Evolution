@@ -172,9 +172,12 @@ const wssSecure = new WebSocket.Server({ server: global.serverSecure });
     });
 });
 
+//TODO: Remove test coordinates
+/*
 setTimeout(() => {
     navigation.setNavigation('48.06624 11.67496');
 }, 250);
+*/
 
 //GetData on boot
 global.music = readFile('music', '0');
