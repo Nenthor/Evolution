@@ -94,8 +94,10 @@ const wssSecure = new WebSocket.Server({ server: global.serverSecure });
                     break;
                 case incoming.set_target:
                     if (!remoteControll.isController(ws) && !(req.socket.localAddress == req.socket.remoteAddress && message[1] == '-1')) break;
-                    receiveMessages('Ziel Koordinaten erhalten.', importance.HIGH);
-                    navigation.setTarget(message[1]);
+                    if (message[1] == 'deg' || message[1] == 'px') {
+                        navigation.setTarget(message[1] == 'deg', message[2]);
+                        receiveMessages('Ziel Koordinaten erhalten.', importance.HIGH);
+                    }
                     break;
                 case incoming.get_target:
                     receiveMessages('Ziel Koordinaten erhalten.', importance.HIGH);
@@ -169,6 +171,10 @@ const wssSecure = new WebSocket.Server({ server: global.serverSecure });
         });
     });
 });
+
+setTimeout(() => {
+    navigation.setNavigation('48.06624 11.67496');
+}, 250);
 
 //GetData on boot
 global.music = readFile('music', '0');

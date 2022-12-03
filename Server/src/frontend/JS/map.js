@@ -8,6 +8,7 @@ var currentX = 0, currentY = 0;
 var pixelX = 0, pixelY = 0;
 var targetX = 0, targetY = 0;
 var hasData = false, hasTarget = false, hasLoaded = 0, hasControll = false;
+var onSetWaiting = false;
 var gpsWatch = null, gpsWatchTimeout = null;
 
 addSocketEvents();
@@ -164,6 +165,9 @@ function setDestinationButtons(call, set) {
         set = false;
     } else if (gpsWatch != null) {
         set = false;
+    } else if (onSetWaiting) {
+        call = false;
+        set = true;
     }
     if (callButton.style.display != (call ? 'block' : 'none') || setButton.style.display != (set ? 'block' : 'none')) {
         callButton.style.display = call ? 'block' : 'none';
@@ -205,6 +209,7 @@ function onTurnOnScreen() {
 function onTurnOffScreen() {
     send('remote_devicelogout');
     controllRequest(false, 'Webseite ist nicht im Vordergrund.');
+    setWaitingForInput(false);
 }
 
 //map canvas
@@ -335,6 +340,8 @@ const callButton = document.getElementById('callButton');
 const setButton = document.getElementById('setButton');
 const callText = document.getElementById('callText');
 const setText = document.getElementById('setText');
+const displayFrame = document.getElementById('displayFrame');
+const setInfo = document.getElementById('setInfo');
 const errorMessage = document.getElementById('errorMessage');
 
 [callButton, setButton].forEach(button => {
@@ -370,13 +377,14 @@ function checkButtonStatus() {
         setDestinationButtons(false, false)
 }
 
+//GPS-CallMyEkart
 callButton.addEventListener('click', () => {
     if (!hasData) return;
     if (gpsWatch != null) return;
     if (hasTarget) {
         //Stop-Button
         hasTarget = false;
-        send(`set_target:-1`);
+        send(`set_target:deg:-1`);
         clearGPSWatch();
         return;
     }
@@ -402,7 +410,7 @@ function getDestination() {
 
         if (position.coords.accuracy < 10) {
             //Accuracy is less than 10 meters
-            send(`set_target:${lat} ${long}`);
+            send(`set_target:deg:${lat} ${long}`);
             clearGPSWatch();
             callText.textContent = `Lokalisieren: 100%`;
             setDestinationButtons(true, false);
@@ -440,6 +448,51 @@ function onGPSError(err) {
     }, 5000); // 5s
 }
 
+//Set Target
+setButton.addEventListener('click', () => { setWaitingForInput(!onSetWaiting) }, { passive: true });
+
+function setWaitingForInput(waiting) {
+    if (waiting == onSetWaiting) return;
+    if (waiting) {
+        onSetWaiting = true;
+        setText.textContent = 'Abbrechen';
+        setDestinationButtons(false, true);
+        displayFrame.style.backgroundImage = 'linear-gradient(to bottom right, #dfa22f, #b9472a)'
+        setInfo.style.display = 'block';
+        canvas.style.cursor = 'crosshair';
+    } else {
+        onSetWaiting = false;
+        setText.textContent = 'Ziel setzen';
+        setDestinationButtons(true, true);
+        displayFrame.style.backgroundImage = null;
+        setInfo.style.display = null;
+        canvas.style.cursor = null;
+    }
+}
+
+['click', 'touchstart'].forEach(event => {
+    canvas.addEventListener(event, e => {
+        if (!onSetWaiting) return;
+        if (event == 'touchstart') e = e.touches[0]
+
+        var pos = getMousePosition(e);
+        send(`set_target:px:${pos.x} ${pos.y}`);
+
+        setWaitingForInput(false);
+    }, { passive: true });
+})
+
+function getMousePosition(event) {
+    const scale = window.devicePixelRatio;
+    var rect = canvas.getBoundingClientRect();
+
+    return {
+        x: Math.round(((event.clientX - rect.left) / (rect.right - rect.left) * canvas.width / scale) - canvas.width / (2 * scale)),
+        y: -Math.round(((event.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height / scale) - canvas.height / (2 * scale))
+    };
+}
+
+//Draw Target
 function extractTargetMessage(message) {
     if (message == '-1') {
         targetX = 0;
@@ -480,8 +533,8 @@ function drawTarget() {
 
         ctx.beginPath();
         ctx.moveTo(canvas.width / 2, canvas.height / 2);
-        ctx.lineTo(canvas.width / 2 + targetX * scale + 6 * scale, canvas.height / 2 - targetY * scale + 6 * scale);
+        ctx.lineTo(canvas.width / 2 + targetX * scale, canvas.height / 2 - targetY * scale);
         ctx.stroke()
-        ctx.fillRect(canvas.width / 2 + targetX * scale, canvas.height / 2 - targetY * scale, 12 * scale, 12 * scale);
+        ctx.fillRect(canvas.width / 2 + targetX * scale - 6 * scale, canvas.height / 2 - targetY * scale - 6 * scale, 12 * scale, 12 * scale);
     }, 0);
 }

@@ -44,6 +44,7 @@ body {
   text-shadow: 0px 0px 10px #fff;
   font-family: robotoMono;
   font-size: min(1rem, 3vw);
+  pointer-events: none;
 }
 
 .display_mapBox {
@@ -118,6 +119,25 @@ body {
   line-height: calc(min(4vw, 1rem) + 5px);
   text-shadow: 0 0 5px #161616;
   color: #c33;
+  pointer-events: none;
+}
+
+.display_setInfo{
+  position: absolute;
+  display: none;
+  width: calc(25% - 15px);
+  min-width: fit-content;
+  border-radius: 15px;
+  top: 15px;
+  padding: 5px 5vw;
+  background-color: #16161699;
+  text-align: center;
+  font-size: min(4vw, 1rem);
+  font-weight: bold;
+  line-height: calc(min(4vw, 1rem) + 5px);
+  text-shadow: 0 0 5px #161616;
+  color: #cc752d;
+  pointer-events: none;
 }
 
 .display_settings {

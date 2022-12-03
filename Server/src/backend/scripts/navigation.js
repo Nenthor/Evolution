@@ -141,16 +141,22 @@ function getLocationIndex() {
 }
 
 // Call-Ekart functions
-function setTarget(value) {
+function setTarget(isDeg, value) {
     if (value == '-1') {
         targetPixelX = 0;
         targetPixelY = 0;
         targetLat = Infinity;
         targetLong = Infinity;
-    } else {
+    } else if (isDeg) {
+        //Values already in degree
         const values = value.split(' ');
         targetLat = parseFloat(values[0]);
         targetLong = parseFloat(values[1]);
+    } else {
+        //Translate px to deg
+        const values = value.split(' ');
+        targetLong = parseFloat(values[0]) * Math.abs(stats.widthPixelLong) + long;
+        targetLat = parseFloat(values[1]) * Math.abs(stats.widthPixelLat) + lat;
     }
 
     calculateTarget(targetLat, targetLong);
@@ -172,9 +178,9 @@ function calculateTarget(targetLat, targetLong) {
     var message = '';
 
     if (targetLat != Infinity && targetLong != Infinity) {
-        diffLat = targetLat - lat;
-        diffLong = targetLong - long
-    
+        var diffLat = targetLat - lat;
+        var diffLong = targetLong - long
+
         targetPixelX = Math.round(diffLong / Math.abs(stats.widthPixelLong));
         targetPixelY = Math.round(diffLat / Math.abs(stats.widthPixelLat));
 
