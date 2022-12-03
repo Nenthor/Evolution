@@ -6,14 +6,14 @@ var speed = '0', battery = '0', camera = '000', coords = 'Lokalisieren...', comp
 const importance = { HIGH: 0, MEDIUM: 1, LOW: 2 }; //For debugging
 const incoming = { //Incoming messages from web-clients
     battery: 'battery', speed: 'speed', coords: 'coords', compass: 'compass', camera: 'camera', shutdown: 'shutdown',
-    set_remotedirection: 'set_remotedirection', remote_controll: 'remote_controll'
+    set_music: 'set_music', set_remotedirection: 'set_remotedirection', remote_controll: 'remote_controll'
 };
 const fromHardware = { //Incoming hardware messages
     battery: 'battery', speed: 'speed', coords: 'coords', compass: 'compass', camera: 'camera'
 };
 const toHardware = { //Outgoing hardware messages
     get_camera: 'get_camera', get_coords: 'get_coords', get_compass: 'get_compass', get_battery: 'get_battery', get_speed: 'get_speed',
-    shutdown: 'shutdown', remotedirection: 'remotedirection', remote_controll: 'remote_controll'
+    set_music: 'set_music', shutdown: 'shutdown', remotedirection: 'remotedirection', remote_controll: 'remote_controll'
 };
 
 module.exports = {
@@ -54,6 +54,9 @@ function onWebsocketData(ws, msg) {
             break;
         case incoming.compass:
             data = compass;
+            break;
+        case incoming.set_music:
+            client.send(`${toHardware.set_music}:${message[1]}`);
             break;
         case incoming.set_remotedirection:
             client.send(`${toHardware.remotedirection}:${message[1]}`);
@@ -109,5 +112,7 @@ function onMessage(msg) {
 }
 
 client.onMessage = onMessage;
-client.getDataOnConnect([toHardware.get_speed, toHardware.get_battery, toHardware.get_coords, toHardware.get_compass, toHardware.get_camera]);
+client.getDataOnConnect([
+    toHardware.get_speed, toHardware.get_battery, toHardware.get_coords, toHardware.get_compass, toHardware.get_camera, toHardware.set_music
+]);
 client.connect();

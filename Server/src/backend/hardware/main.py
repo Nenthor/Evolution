@@ -2,6 +2,7 @@ from time import sleep
 import signal
 import server
 import sensors
+import music
 import camera
 import location
 import engine_high
@@ -32,6 +33,7 @@ def close():
     server.stop()
     engine.stop()
     sensors.stop()
+    music.stop()
     location.stop()
     sb_sensors.stop()
     print("Server is closed.")
@@ -42,10 +44,11 @@ for s in signals:
     signal.signal(s, signalClose)
 
 server.start()
+engine = engine_high.Engine()
 # location.start()   # TODO: Enable this line
 # sensors.start()    # TODO: Enable this line
 # sb_sensors.start() # TODO: Enable this line
-
+# music.start() # TODO: Enable this line
 
 def onMessage(message: str):
     msg = message.split(":")
@@ -59,6 +62,8 @@ def onMessage(message: str):
         pass  # TODO: Do some coding
     elif msg[0] == "get_speed":
         pass  # TODO: Do some coding
+    elif msg[0] == "set_music":
+        music.playMusic(msg[1])
     elif msg[0] == "remotedirection":
         engine.onRemotedirection(msg[1])
     elif msg[0] == "remote_controll":

@@ -29,6 +29,7 @@ client.on('connect', () => {
     retryCount = 0;
 
     onConnectMessages.forEach(msg => {
+        if(msg == 'set_music') msg += `:${global.music}`;
         messageQueue.addElement(msg);
     });
     if (!messageQueue.isEmpty()) {

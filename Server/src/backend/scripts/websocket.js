@@ -1,7 +1,6 @@
 const WebSocket = require('ws');
 const fs = require('fs');
 const navigation = require('./navigation');
-const music = require('./music');
 const debug = require('./debug');
 const remoteControll = require('./remoteControll');
 const hardware = require('./hardware');
@@ -18,7 +17,7 @@ const outgoing = {  //Outgoing messages to web-clients
     music: 'music', settings: 'settings', battery: 'battery', speed: 'speed', coords: 'coords', compass: 'compass', camera: 'camera', set_navigation: 'set_navigation',
 };
 
-//Setup debug & remoteControll & navigation & hardware script
+//Setup
 debug.setSendFunction(send);
 navigation.setSendFunctions(send, sendAllClients);
 hardware.setSendFunctions(send, sendAllClients);
@@ -112,7 +111,7 @@ const wssSecure = new WebSocket.Server({ server: global.serverSecure });
                     receiveMessages(`Änderung des "Musik"-Werts zu "${message[1]}" erhalten.`, importance.MEDIUM);
                     writeFile(message[1], 'music');
                     global.music = String(message[1]);
-                    music.playMusic();
+                    hardware.sendData(null, `${incoming.set_music}:${message[1]}`);
                     sendAllClients(`${outgoing.music}:${global.music}`, `Änderung des "Musik"-Werts zu "${message[1]}" wird an alle Klienten gesendet.`, ws, importance.LOW);
                     break;
                 case incoming.set_remotedirection:
@@ -124,8 +123,12 @@ const wssSecure = new WebSocket.Server({ server: global.serverSecure });
                     if (req.socket.localAddress != req.socket.remoteAddress && !global.debug) break;
                     receiveMessages(`Änderung der "Einstellungs"-Datei zu "${message[1]}" erhalten.`, importance.MEDIUM);
                     writeFile(message[1], 'settings');
+                    if(global.settings[0] != message[1][0]){
+                        console.log(message[1][0])
+                        if(message[1][0] == '0') hardware.sendData(null, `${incoming.set_music}:pause`);
+                        else hardware.sendData(null, `${incoming.set_music}:resume`);
+                    }
                     global.settings = String(message[1]);
-                    music.checkForMute();
                     remoteControll.remoteControllUpdate();
                     sendAllClients(`${outgoing.settings}:${global.settings}`, `Änderung der "Einstellungs"-Datei zu "${message[1]}" wird an alle Klienten gesendet.`, ws, importance.LOW);
                     break;

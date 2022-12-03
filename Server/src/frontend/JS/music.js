@@ -75,7 +75,10 @@ function onPlayClick() {
 }
 
 function onClick(index) {
-    if (index == music - 1) return;
+    if (index == music - 1) {
+        onPlayClick();
+        return;
+    }
     if (music == 0) playButton.textContent = "Stoppen";
     musicColorReset();
     musicSetColor(index);
