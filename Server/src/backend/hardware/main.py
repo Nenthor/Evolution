@@ -12,7 +12,7 @@ sensor1 = 500
 sensor2 = 500
 sensor3 = 500
 
-engine:engine_high.Engine
+engine: engine_high.Engine
 
 signals = [
     signal.SIGTERM,
@@ -26,10 +26,14 @@ signals = [
 
 
 def signalClose(sig, frame):
-    close()
+    if sig == signal.SIGINT:
+        close(0)
+    else:
+        print(f"FATAL ERROR: {signal.Signals(value=sig).name}")
+        close(1)
 
 
-def close():
+def close(exitCode):
     server.stop()
     engine.stop()
     sensors.stop()
@@ -37,7 +41,7 @@ def close():
     location.stop()
     sb_sensors.stop()
     print("Server is closed.")
-    exit()
+    exit(code=exitCode)
 
 
 for s in signals:
@@ -48,7 +52,8 @@ engine = engine_high.Engine()
 # location.start()   # TODO: Enable this line
 # sensors.start()    # TODO: Enable this line
 # sb_sensors.start() # TODO: Enable this line
-# music.start() # TODO: Enable this line
+# music.start()      # TODO: Enable this line
+
 
 def onMessage(message: str):
     msg = message.split(":")
@@ -102,4 +107,4 @@ except KeyboardInterrupt:
 except Exception as e:
     print(e)
 
-close()
+close(exitCode=0)

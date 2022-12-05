@@ -13,7 +13,7 @@ var onMessage;
 var isConnected = false;
 var retryCount = 0;
 var onConnectMessages = [];
-
+var retryTimeout = null;
 var messageQueue = new ArrayQueue();
 
 /**
@@ -25,11 +25,12 @@ function connect() {
 
 client.on('connect', () => {
     console.log('Connected to Hardware.');
+    if (retryTimeout != null) clearTimeout(retryTimeout);
     isConnected = true;
     retryCount = 0;
 
     onConnectMessages.forEach(msg => {
-        if(msg == 'set_music') msg += `:${global.music}`;
+        if (msg == 'set_music') msg += `:${global.music}`;
         messageQueue.addElement(msg);
     });
     if (!messageQueue.isEmpty()) {
@@ -59,13 +60,13 @@ client.on('close', () => {
 });
 
 function retryConnecting() {
-    setTimeout(() => {
+    retryTimeout = setTimeout(() => {
         if (retryCount >= MAX_RETRYCOUNT) {
             console.log('Could not establish connection to Hardware.');
             return;
         }
 
-        client.connect(PORT, HOST);
+        connect();
         retryCount++;
     }, 1000);
 }
