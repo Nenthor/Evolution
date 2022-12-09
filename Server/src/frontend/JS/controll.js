@@ -189,6 +189,7 @@ function updateBatterytext(battery) {
 
 //Controller methods
 const controller = document.getElementsByClassName('controll_controllerbutton');
+var directionReady = true
 
 for (let index = 0; index < controller.length; index++) {
     const element = controller[index];
@@ -224,8 +225,13 @@ function onControllerStart(index) {
             break;
     }
 
-    controller[index].style.backgroundColor = '#3268cd';
-    sendCurrentdirection();
+    if (directionReady){
+        // Can only send direction every 0.3s
+        directionReady = false;
+        controller[index].style.backgroundColor = '#3268cd';
+        sendCurrentdirection();
+        setTimeout(() => { directionReady = true; }, 300);
+    }
 }
 
 function onControllerEnd(index) {

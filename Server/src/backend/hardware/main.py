@@ -18,15 +18,7 @@ sensor3 = 500
 
 engine: engine_high.Engine
 
-signals = [
-    signal.SIGTERM,
-    signal.SIGSEGV,
-    signal.SIGPIPE,
-    signal.SIGINT,
-    signal.SIGILL,
-    signal.SIGHUP,
-    signal.SIGBUS,
-]
+signals = [signal.SIGTERM, signal.SIGSEGV, signal.SIGPIPE, signal.SIGINT, signal.SIGILL, signal.SIGHUP, signal.SIGBUS]
 
 
 def signalClose(sig, frame):
