@@ -1,3 +1,6 @@
+import os
+
+os.chdir(os.path.dirname(os.path.abspath(__file__)))  # Set working directory to to file directory (.../backend/hardware/)
 from time import sleep
 import signal
 import server
@@ -7,6 +10,7 @@ import camera
 import location
 import engine_high
 import speed_battery_sensors as sb_sensors
+from datetime import datetime
 
 sensor1 = 500
 sensor2 = 500
@@ -29,6 +33,9 @@ def signalClose(sig, frame):
     if sig == signal.SIGINT:
         close(0)
     else:
+        with open(f"log/error", "r+", encoding="utf-8") as file:
+            file.read()
+            file.write(f"{datetime.now()}: {signal.Signals(value=sig).name}\n")
         print(f"FATAL ERROR: {signal.Signals(value=sig).name}")
         close(1)
 

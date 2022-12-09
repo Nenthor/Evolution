@@ -1,7 +1,6 @@
 import os
 
-os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"    # Disable start message from pygame
-os.chdir(os.path.dirname(os.path.abspath(__file__))) # Set working directory to to file directory (.../backend/hardware/)
+os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"  # Disable start message from pygame
 from pygame import mixer
 
 songs: list[str] = ["rickroll", "mario", "salsa", "podcast"]
