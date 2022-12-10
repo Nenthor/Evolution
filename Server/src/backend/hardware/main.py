@@ -25,7 +25,7 @@ def signalClose(sig, frame):
     if sig == signal.SIGINT:
         close(0)
     else:
-        with open(f"log/error", "r+", encoding="utf-8") as file:
+        with open(f"log/error.log", "w+", encoding="utf-8") as file:
             file.read()
             file.write(f"{datetime.now()}: {signal.Signals(value=sig).name}\n")
         print(f"FATAL ERROR: {signal.Signals(value=sig).name}")
