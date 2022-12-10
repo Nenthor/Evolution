@@ -16,7 +16,7 @@ class Engine:
         self.lock = self.Lock()
         self.threadStarttime = self.time()
         self.gpio.setmode(self.gpio.BCM)
-        self.gpio.setwarnings(False)
+        self.gpio.setwarnings(True)
 
         # self.gpio.setup(self.__gpio_AUTONOMOUS_SWITCH, self.gpio.OUT, initial=self.gpio.LOW)
         self.gpio.setup(self.__GPIO_REVERSE_GEAR, self.gpio.OUT, initial=self.gpio.LOW)

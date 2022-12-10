@@ -116,17 +116,17 @@ def remove_event_detect(channel: int):
     __GPIO.remove_event_detect(channel)
 
 
-def GPIO_function(pin: int):
-    return __GPIO.__GPIO_function(pin)
+def gpio_function(pin: int):
+    return __GPIO.gpio_function(pin)
 
 
 class PWM:
     import RPi.GPIO as GPIO
 
     def __init__(self, channel: int, frequency: int):
-        self.GPIO.setmode(11)  # 11 = BCM
+        self.GPIO.setmode(BCM)
         self.GPIO.setwarnings(True)
-        self.GPIO.setup(channel, 0)  # 0 = OUT ; 1 = IN
+        self.GPIO.setup(channel, OUT)
         self.channel = channel
         self.PWM = self.GPIO.PWM(channel, frequency)
         self.PWM.start(0)
