@@ -29,7 +29,8 @@ def __startLoop():
             __sleep(0.010)
             __sendSignal(__GPIO_TRIGGER_3)
             __sleep(0.060)
-    except Exception:
+    except Exception as e:
+        print(e)
         stop()
 
 
@@ -41,91 +42,85 @@ def __sendSignal(channel):
 
 
 def __onEdgeEvent(channel):
-    global __timer
-    if channel == __GPIO_ECHO_1:
-        if __timer[0] == None:
-            __timer[0] = __time()  # Rising event
+    global __timer, __lock
+    index = __getEchoIndex(channel)
+    if index != -1:
+        if __timer[index] == None:
+            # Rising event - Echo signal start
+            with __lock:
+                __timer[index] = __time()
         else:
-            elapsedTime = __time() - __timer[0]
+            # Falling event - Echo signal end
+            elapsedTime = __time() - __timer[index]
             distance = int((elapsedTime * 34300) / 2)
-            __timer[0] = None
+            with __lock:
+                __timer[index] = None
             if distance <= 450:
-                __onNewData(SENSOR_1, distance)
+                __onNewData(index, distance)
             else:
-                __onNewData(SENSOR_1, 500)
-    elif channel == __GPIO_ECHO_2:
-        if __timer[1] == None:
-            __timer[1] = __time()  # Rising event
-        else:
-            elapsedTime = __time() - __timer[1]
-            distance = int((elapsedTime * 34300) / 2)
-            __timer[1] = None
-            if distance <= 450:
-                __onNewData(SENSOR_2, distance)
-            else:
-                __onNewData(SENSOR_2, 500)
-    elif channel == __GPIO_ECHO_3:
-        if __timer[2] == None:
-            __timer[2] = __time()  # Rising event
-        else:
-            elapsedTime = __time() - __timer[2]
-            distance = int((elapsedTime * 34300) / 2)
-            __timer[2] = None
-            if distance <= 450:
-                __onNewData(SENSOR_3, distance)
-            else:
-                __onNewData(SENSOR_3, 500)
-    else:
-        print("channel is not defined.")
+                __onNewData(index, 500)
 
 
-def __onNewData(sensor, distance):
+def __onNewData(index, distance):
     global __data, __lock
-    (oldTime, oldDistance) = __data[sensor - 1]
+    (oldTime, oldDistance) = __data[index]
     time = __time()
 
-    if time - oldTime >= 1.0 or distance < oldDistance:
-        # Filter: Set data if longer than 1s or distance is smaller
+    if time - oldTime >= 0.5 or distance < oldDistance:
+        # Timeout: Set data if longer than 0.5s or distance is smaller
         with __lock:
-            __data[sensor - 1] = (time, distance)
-        onData(sensor, distance)
+            __data[index] = (time, distance)
+        onData(index, distance)
 
 
-def onData(sensor, distance):
+def __getEchoIndex(echo):
+    if echo == __GPIO_ECHO_1:
+        return 0
+    elif echo == __GPIO_ECHO_2:
+        return 1
+    elif echo == __GPIO_ECHO_3:
+        return 2
+    else:
+        print("channel is not defined.")
+        return -1
+
+
+def __setupSensor(triggerPin, echoPin):
+    __gpio.setup(triggerPin, __gpio.OUT, initial=__gpio.LOW)
+    __gpio.setup(echoPin, __gpio.IN)
+    __gpio.add_event_detect(echoPin, __gpio.BOTH, callback=__onEdgeEvent)
+
+
+def onData(index, distance):
     """Overwrite this function to receive distances from sensors."""
     pass
 
 
 def stop():
     """Deactivate sensors."""
-    global __lock, __isActive
-    with __lock:
+    global __isActive
+    if __isActive:
         __isActive = False
-    __sleep(0.1)
-    __gpio.setwarnings(False)
-    __gpio.cleanup()
+        __sleep(0.1)
+        __gpio.setwarnings(False)
+        __gpio.cleanup()
 
 
 def start():
     """Activate sensors."""
     global __lock, __isActive, __data
-    with __lock:
-        __isActive = True
+    if __isActive:
+        return
+    __isActive = True
     __gpio.setmode(__gpio.BCM)
     __gpio.setwarnings(False)
 
     if __GPIO_TRIGGER_1 != None and __GPIO_ECHO_1 != None:
-        __gpio.setup(__GPIO_TRIGGER_1, __gpio.OUT, initial=__gpio.LOW)
-        __gpio.setup(__GPIO_ECHO_1, __gpio.IN)
-        __gpio.add_event_detect(__GPIO_ECHO_1, __gpio.BOTH, callback=__onEdgeEvent)
+        __setupSensor(__GPIO_TRIGGER_1, __GPIO_ECHO_1)
     if __GPIO_TRIGGER_2 != None and __GPIO_ECHO_2 != None:
-        __gpio.setup(__GPIO_TRIGGER_2, __gpio.OUT, initial=__gpio.LOW)
-        __gpio.setup(__GPIO_ECHO_2, __gpio.IN)
-        __gpio.add_event_detect(__GPIO_ECHO_2, __gpio.BOTH, callback=__onEdgeEvent)
+        __setupSensor(__GPIO_TRIGGER_2, __GPIO_ECHO_2)
     if __GPIO_TRIGGER_3 != None and __GPIO_ECHO_3 != None:
-        __gpio.setup(__GPIO_TRIGGER_3, __gpio.OUT, initial=__gpio.LOW)
-        __gpio.setup(__GPIO_ECHO_3, __gpio.IN)
-        __gpio.add_event_detect(__GPIO_ECHO_3, __gpio.BOTH, callback=__onEdgeEvent)
+        __setupSensor(__GPIO_TRIGGER_3, __GPIO_ECHO_3)
 
     __data = [(__time(), 500), (__time(), 500), (__time(), 500)]
 

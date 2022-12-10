@@ -4,8 +4,8 @@ class Engine:
     import gpio
 
     __GPIO_AUTONOMOUS_SWITCH = 4  # OUT -> HIGH = on : LOW = off
-    __GPIO_REVERSE_GEAR = 5  # OUT -> HIGH = on : LOW = off
-    __GPIO_SPEED_CONTROLL = 26  # OUT -> PWM: 100% = FULL_SPEED : 0% = 0 km/h
+    __GPIO_REVERSE_GEAR = 20  # OUT -> HIGH = on : LOW = off
+    __GPIO_SPEED_CONTROLL = 21  # OUT -> PWM: 100% = FULL_SPEED : 0% = 0 km/h
 
     __SPEED_FREQUENCY = 30  # in Hz
     __THREAD_DELAY = 0.5  # 500ms

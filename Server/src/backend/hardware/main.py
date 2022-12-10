@@ -12,13 +12,8 @@ import engine_high
 import speed_battery_sensors as sb_sensors
 from datetime import datetime
 
-sensor1 = 500
-sensor2 = 500
-sensor3 = 500
-
-engine: engine_high.Engine
-
 signals = [signal.SIGTERM, signal.SIGSEGV, signal.SIGPIPE, signal.SIGINT, signal.SIGILL, signal.SIGHUP, signal.SIGBUS]
+engine: engine_high.Engine
 
 
 def signalClose(sig, frame):
@@ -76,23 +71,8 @@ def onMessage(message: str):
         print(f"{msg[0]} is not available.")
 
 
-def onSensorData(sensor, distance):
-    if sensor == sensors.SENSOR_1:
-        global sensor1
-        camera.sendCameraData(sensor, distance)
-        sensor1 = distance
-    elif sensor == sensors.SENSOR_2:
-        global sensor2
-        camera.sendCameraData(sensor, distance)
-        sensor2 = distance
-    elif sensor == sensors.SENSOR_3:
-        global sensor3
-        camera.sendCameraData(sensor, distance)
-        sensor3 = distance
-
-
 server.onMessage = onMessage
-sensors.onData = onSensorData
+sensors.onData = camera.onSensorData
 camera.sendToServer = server.send
 location.sendToServer = server.send
 engine.sendToServer = server.send

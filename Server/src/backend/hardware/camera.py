@@ -1,28 +1,29 @@
 from sensors import SENSOR_1 as __SENSOR_1, SENSOR_2 as __SENSOR_2, SENSOR_3 as __SENSOR_3
-import time as __time
 
 __FIRST_LEVEL = 300  # [200, 300[
 __MIDDLE_LEVEL = 200  # [100, 200[
 __LAST_LEVEL = 100  # [0, 100[
 
 __camera = [0, 0, 0]
-__last_modified = __time.time()
+__distance = [500, 500, 500]
 
 
-def sendCameraData(sensor, distance):
-    """If camera data has changed it will be sent to the server. Has a cooldown of 0.5s."""
-    global __last_modified, __camera
-    if __time.time() - __last_modified >= 0.5:
-        __last_modified = __time.time()
-        if sensor == __SENSOR_1:
-            if __isDifferentLevel(0, distance):
-                sendToServer(f"camera:{__camera[0]}{__camera[1]}{__camera[2]}")
-        elif sensor == __SENSOR_2:
-            if __isDifferentLevel(1, distance):
-                sendToServer(f"camera:{__camera[0]}{__camera[1]}{__camera[2]}")
-        elif sensor == __SENSOR_3:
-            if __isDifferentLevel(2, distance):
-                sendToServer(f"camera:{__camera[0]}{__camera[1]}{__camera[2]}")
+def sendCameraData(index, distance):
+    """If camera data has changed it will be sent to the server."""
+    global __camera
+    if __isDifferentLevel(index, distance):
+        sendToServer(f"camera:{__camera[0]}{__camera[1]}{__camera[2]}")
+
+
+def onSensorData(index, distance):
+    global __distance
+    __distance[index] = distance
+    sendCameraData(index, distance)
+
+
+def getDistance(index):
+    global __distance
+    return __distance[index]
 
 
 def __isDifferentLevel(index, distance):
