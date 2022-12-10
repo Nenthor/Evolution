@@ -225,12 +225,12 @@ function onControllerStart(index) {
             break;
     }
 
-    if (directionReady){
-        // Can only send direction every 0.3s
+    if (directionReady) {
+        // Can only send direction every 0.5s
         directionReady = false;
         controller[index].style.backgroundColor = '#3268cd';
         sendCurrentdirection();
-        setTimeout(() => { directionReady = true; }, 300);
+        setTimeout(() => { directionReady = true; }, 500);
     }
 }
 
@@ -252,6 +252,9 @@ function onControllerEnd(index) {
     currentdirection = 'STANDBY';
     controller[index].style.backgroundColor = '#ddd';
     sendCurrentdirection();
+
+    directionReady = false;
+    setTimeout(() => { directionReady = true; }, 500);
 }
 
 function sendCurrentdirection() {

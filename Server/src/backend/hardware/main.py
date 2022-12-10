@@ -2,6 +2,7 @@ import os
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))  # Set working directory to to file directory (.../backend/hardware/)
 from time import sleep
+from datetime import datetime
 import signal
 import server
 import sensors
@@ -10,7 +11,6 @@ import camera
 import location
 import engine_high
 import speed_battery_sensors as sb_sensors
-from datetime import datetime
 
 signals = [signal.SIGTERM, signal.SIGSEGV, signal.SIGPIPE, signal.SIGINT, signal.SIGILL, signal.SIGHUP, signal.SIGBUS]
 engine: engine_high.Engine

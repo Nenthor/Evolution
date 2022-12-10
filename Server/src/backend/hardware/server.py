@@ -46,7 +46,8 @@ def __bootServer():
             with __lock:
                 __clients.add(conn)
             __Thread(target=__handleClient, args=(conn, addr), daemon=True).start()
-    except Exception:
+    except Exception as e:
+        print(e)
         stop()
 
 

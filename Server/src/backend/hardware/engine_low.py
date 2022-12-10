@@ -26,8 +26,7 @@ class Engine:
     def stop(self):
         if self.enabled:
             self.__setSpeed(0)
-            self.speed_controll.stop()
-            self.gpio.cleanup()
+            self.__cleanup()
             self.threadStarttime = self.time()
             self.enabled = False
 
@@ -39,17 +38,21 @@ class Engine:
         else:
             self.gpio.output(self.__GPIO_AUTONOMOUS_SWITCH, self.gpio.LOW)
 
+    def __cleanup(self):
+        self.gpio.cleanup(self.__GPIO_AUTONOMOUS_SWITCH)
+        self.gpio.cleanup(self.__GPIO_REVERSE_GEAR)
+        self.speed_control.stop()
+
     def __setReverseState(self, enabled: bool):
-        if not self.enabled:
+        if not self.enabled or self.reverse_state == enabled:
             return
-        if self.reverse_state == enabled:
-            return
-        if enabled:
-            self.gpio.output(self.__GPIO_REVERSE_GEAR, self.gpio.HIGH)
-        else:
-            self.gpio.output(self.__GPIO_REVERSE_GEAR, self.gpio.LOW)
-        self.reverse_state = enabled
-        self.sleep(0.03)  # 30ms
+        with self.lock:
+            if enabled:
+                self.gpio.output(self.__GPIO_REVERSE_GEAR, self.gpio.HIGH)
+            else:
+                self.gpio.output(self.__GPIO_REVERSE_GEAR, self.gpio.LOW)
+            self.reverse_state = enabled
+        self.sleep(0.05)  # 50ms
 
     def __setSpeed(self, percentage):
         if self.enabled:
@@ -62,19 +65,22 @@ class Engine:
     def setDirection(self, speed=0, reverseState=False):
         with self.lock:
             time = self.time()
-            if time - self.threadStarttime >= 0.3:
-                # Timeout-check (0.3s)
-                self.threadStarttime = time
+            self.threadStarttime = time
+            if speed == 0:
+                self.__setSpeed(0)
+                self.__setReverseState(reverseState)
+            elif time - self.threadStarttime >= 0.5:
+                # Timeout-check (500ms)
                 self.Thread(target=self.__startDirection, args=(time, speed, reverseState), daemon=True).start()
 
     def __startDirection(self, time, speed, reverseState):
-        id = time
         self.__setReverseState(reverseState)
-        if id != self.threadStarttime or not self.enabled:
+        if time != self.threadStarttime or not self.enabled or speed == 0:
             return
-        if speed != 0:
+        with self.lock:
             self.__setSpeed(100)
-            self.sleep(self.__THREAD_DELAY)
-            if id != self.threadStarttime or not self.enabled:
-                return
-        self.__setSpeed(speed)
+        self.sleep(self.__THREAD_DELAY)
+        if time != self.threadStarttime or not self.enabled:
+            return
+        with self.lock:
+            self.__setSpeed(speed)
