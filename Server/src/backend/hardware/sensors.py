@@ -90,6 +90,17 @@ def __setupSensor(triggerPin, echoPin):
     __gpio.setup(echoPin, __gpio.IN)
     __gpio.add_event_detect(echoPin, __gpio.BOTH, callback=__onEdgeEvent)
 
+def __cleanupSensors():
+    if __GPIO_TRIGGER_1 != None and __GPIO_ECHO_1 != None:
+        __gpio.cleanup(__GPIO_TRIGGER_1)
+        __gpio.cleanup(__GPIO_ECHO_1)
+    if __GPIO_TRIGGER_2 != None and __GPIO_ECHO_2 != None:
+        __gpio.cleanup(__GPIO_TRIGGER_2)
+        __gpio.cleanup(__GPIO_ECHO_2)
+    if __GPIO_TRIGGER_3 != None and __GPIO_ECHO_3 != None:
+        __gpio.cleanup(__GPIO_TRIGGER_3)
+        __gpio.cleanup(__GPIO_ECHO_3)
+
 
 def onData(index, distance):
     """Overwrite this function to receive distances from sensors."""
@@ -102,8 +113,7 @@ def stop():
     if __isActive:
         __isActive = False
         __sleep(0.1)
-        __gpio.setwarnings(False)
-        __gpio.cleanup()
+        __cleanupSensors()
 
 
 def start():
@@ -113,7 +123,7 @@ def start():
         return
     __isActive = True
     __gpio.setmode(__gpio.BCM)
-    __gpio.setwarnings(False)
+    __gpio.setwarnings(True)
 
     if __GPIO_TRIGGER_1 != None and __GPIO_ECHO_1 != None:
         __setupSensor(__GPIO_TRIGGER_1, __GPIO_ECHO_1)

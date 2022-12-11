@@ -1,51 +1,60 @@
 import gpio
-import time
-from ina219 import INA219
+from time import sleep
+OUT = 0
+IN = 1
+BCM = 11
 
-
-PIN = 5
-
-gpio.setmode(gpio.BCM)
 gpio.setwarnings(True)
+gpio.setmode(BCM)
+
+def testChannels(channel=-1):
+    for index in range(27):
+        if channel != -1:
+            index = channel
+        func = ''
+        try:
+            func:int = gpio.gpio_function(index)
+            if func == IN:
+                print(f"{index}\tIN")
+            elif func == OUT:
+                print(f"{index}\tOUT")
+            else:
+                print(f"{index}\t{func}")
+        except ValueError as e:
+            print(e)
+        if channel != -1:
+            break
+
+channel1 = 13
+
+testChannels(channel1)
+
+PWM = gpio.PWM(channel1, 10)
+testChannels(channel1)
+PWM.stop()
 """
-gpio.setup(PIN, gpio.OUT, initial=gpio.LOW)
-print("start.")
-gpio.output(PIN, gpio.HIGH)
-time.sleep(3)
-gpio.output(PIN, gpio.LOW)
-"""
+class PWM:
+    import RPi.GPIO as GPIO
 
-guidance: gpio.PWM = gpio.PWM(PIN, 333)
+    def __init__(self, channel: int, frequency: int):
+        self.GPIO.setmode(11)  # 11 = BCM
+        self.GPIO.setwarnings(True)
+        self.GPIO.setup(channel, 0)  # 0 = OUT ; 1 = IN
+        self.channel = channel
+        self.PWM = self.GPIO.PWM(channel, frequency)
+        self.PWM.start(0)
 
-__MAX_ANGLE = 300
+    def changeFrequency(self, freq: int):
+        self.PWM.ChangeFrequency(freq)
 
+    def changeDutyCycle(self, dc: float):
+        if 0 <= dc and dc <= 100:
+            self.PWM.ChangeDutyCycle(dc)
+        else:
+            self.PWM.ChangeDutyCycle(0)
+            print("{dc} is not a valid input for duty cycle.")
 
-def angleToPercentage(angle: int):
-    return round(((angle + __MAX_ANGLE / 2) / __MAX_ANGLE) * 100)
-
-
-"""
-angle = -25
-while angle < 25:
-    angle += 1
-    guidance.changeDutyCycle(angleToPercentage(angle))
-    print(f"{angle}°")
-    time.sleep(0.1)
-"""
-
-guidance.changeDutyCycle(25)
-
-time.sleep(2.5)
-guidance.changeDutyCycle(75)
-time.sleep(2.5)
-gpio.cleanup()
-print("done.")
-
-
-"""
-# sudo i2cdetect -y 1 -> get address
-ina = INA219(shunt_ohms=0.1, max_expected_amps=0.001, address=0x40)
-ina.configure(voltage_range=ina.RANGE_32V, gain=ina.GAIN_AUTO, bus_adc=ina.ADC_128SAMP, shunt_adc=ina.ADC_128SAMP)
-
-print(ina.voltage())
+    def stop(self):
+        self.PWM.stop()
+        self.GPIO.cleanup(self.channel)
 """

@@ -1,5 +1,6 @@
 from socket import (
     socket as __socket,
+    SHUT_RDWR,
     error as __error,
     AF_INET as __AF_INET,
     SOCK_STREAM as __SOCK_STREAM,
@@ -16,21 +17,23 @@ __DISCONNECT_MESSAGE = "!DISCONNECT"
 
 __lock = __Lock()
 __clients = set()
-__server: __socket
+__server: __socket = None
 
 
 def start():
     """Start the socket server, so that clients can connect to 127.0.0.1:5050."""
-    global __clients
-    __clients.clear()
-    __Thread(target=__bootServer, daemon=True).start()
+    global __clients, __server
+    if __server == None:
+        __Thread(target=__bootServer, daemon=True).start()
 
 
 def stop():
     """Close the socket server"""
     global __server
-    __server.close()
-    __clients.clear()
+    if __server != None:
+        __server.shutdown(SHUT_RDWR)
+        __clients.clear()
+        __server = None
 
 
 def __bootServer():
@@ -46,6 +49,8 @@ def __bootServer():
             with __lock:
                 __clients.add(conn)
             __Thread(target=__handleClient, args=(conn, addr), daemon=True).start()
+    except __error as e:
+        pass
     except Exception as e:
         print(e)
         stop()
@@ -55,8 +60,8 @@ def __handleClient(conn: __socket, addr):
     global __lock
 
     print("Client has connected.")
-    while True:
-        try:
+    try:
+        while True:
             msg_length = conn.recv(__HEADER).decode(__FORMAT)
             if msg_length:
                 msg_length = int(msg_length)
@@ -66,11 +71,10 @@ def __handleClient(conn: __socket, addr):
                     __clients.remove(conn)
                     break
                 onMessage(msg)
-        except __error:
-            print("Client has disconnected.")
-            with __lock:
-                __clients.remove(conn)
-            break
+    except __error:
+        print("Client has disconnected.")
+        with __lock:
+            __clients.remove(conn)
     conn.close()
 
 
