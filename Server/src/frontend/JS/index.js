@@ -146,9 +146,9 @@ function getSettingsURL(index, state) {
     switch (index) {
         case 0:
             if (state == 1)
-                return "/images/sound_on.webp";
+                return "/images/resume.webp";
             else
-                return "/images/sound_off.webp";
+                return "/images/pause.webp";
         case 1:
             if (state == 1)
                 return "/images/light_on.webp";
