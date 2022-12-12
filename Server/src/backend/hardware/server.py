@@ -1,6 +1,6 @@
 from socket import (
     socket as __socket,
-    SHUT_RDWR,
+    SHUT_RDWR as __SHUT_RDWR,
     error as __error,
     AF_INET as __AF_INET,
     SOCK_STREAM as __SOCK_STREAM,
@@ -31,7 +31,7 @@ def stop():
     """Close the socket server"""
     global __server
     if __server != None:
-        __server.shutdown(SHUT_RDWR)
+        __server.shutdown(__SHUT_RDWR)
         __clients.clear()
         __server = None
 
