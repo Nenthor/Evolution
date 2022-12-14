@@ -75,10 +75,8 @@ function retryConnecting() {
  * Send messages to the server.
  */
 function send(message) {
-    if (!isConnected) {
-        messageQueue.addElement(message);
+    if (!isConnected)
         return;
-    }
 
     messageLength = Buffer.from(String(message.length));
     data = Buffer.allocUnsafe(HEADER);

@@ -13,8 +13,7 @@ class Engine:
     def __init__(self):
         self.speed_control: self.gpio.PWM
         self.reverse_state = False
-        self.lock_speed = self.Lock()
-        self.lock_reverse = self.Lock()
+        self.lock = self.Lock()
         self.threadStarttime = self.time()
         self.gpio.setmode(self.gpio.BCM)
         self.gpio.setwarnings(True)
@@ -40,21 +39,20 @@ class Engine:
             self.gpio.output(self.__GPIO_AUTONOMOUS_SWITCH, self.gpio.LOW)
 
     def __cleanup(self):
-        #self.gpio.cleanup(self.__GPIO_AUTONOMOUS_SWITCH)
+        # self.gpio.cleanup(self.__GPIO_AUTONOMOUS_SWITCH)
         self.gpio.cleanup(self.__GPIO_REVERSE_GEAR)
         self.speed_control.stop()
 
     def __setReverseState(self, enabled: bool):
         if not self.enabled or self.reverse_state == enabled:
             return
-        
-        with self.lock_reverse:
-            if enabled:
-                self.gpio.output(self.__GPIO_REVERSE_GEAR, self.gpio.HIGH)
-            else:
-                self.gpio.output(self.__GPIO_REVERSE_GEAR, self.gpio.LOW)
-            self.reverse_state = enabled
-        
+
+        if enabled:
+            self.gpio.output(self.__GPIO_REVERSE_GEAR, self.gpio.HIGH)
+        else:
+            self.gpio.output(self.__GPIO_REVERSE_GEAR, self.gpio.LOW)
+        self.reverse_state = enabled
+
         self.sleep(0.05)  # 50ms
 
     def __setSpeed(self, percentage):
@@ -66,7 +64,7 @@ class Engine:
             self.speed_control.changeFrequency(frequency)
 
     def setDirection(self, speed=0, reverseState=False):
-        with self.lock_speed:
+        with self.lock:
             time = self.time()
             if speed == 0:
                 self.__setSpeed(0)
@@ -80,10 +78,10 @@ class Engine:
         self.__setReverseState(reverseState)
         if time != self.threadStarttime or not self.enabled or speed == 0:
             return
-        with self.lock_speed:
+        with self.lock:
             self.__setSpeed(100)
         self.sleep(self.__THREAD_DELAY)
         if time != self.threadStarttime or not self.enabled:
             return
-        with self.lock_speed:
+        with self.lock:
             self.__setSpeed(speed)
