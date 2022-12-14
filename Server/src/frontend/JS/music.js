@@ -57,6 +57,24 @@ function updateMusic() {
     if (music != 0) musicSetColor(music - 1);
 }
 
+//TripleTap to Rickroll
+const logo = document.getElementById('logo');
+var tapCount = 0;
+logo.addEventListener('click', () => {
+    addTapcount();
+    if (tapCount >= 3) {
+        tapCount = 0;
+        onClick(5);
+    }
+}, { passive: true });
+
+function addTapcount() {
+    tapCount++;
+    setTimeout(() => {
+        if (tapCount >= 1) tapCount--;
+    }, 500); //Delay for 0.5s
+}
+
 //Buttons
 function onPlayClick() {
     if (music == 0) {
@@ -93,7 +111,8 @@ function musicColorReset() {
 }
 
 function musicSetColor(index) {
-    musicItems[index].style.backgroundColor = "#16AA16";
+    if(index < musicItems.length)
+        musicItems[index].style.backgroundColor = "#16AA16";
 }
 
 function saveData(index) {

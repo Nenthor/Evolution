@@ -3,7 +3,7 @@ import os
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"  # Disable start message from pygame
 from pygame import mixer
 
-songs: list[str] = ["rickroll", "mario", "salsa", "podcast"]
+songs: list[str] = ["catch-it", "mario", "salsa", "retro", "rickroll"]
 currentSong = 0
 isPaused = False
 isEnabled = False
@@ -41,7 +41,7 @@ def playMusic(music: str):
         return
 
     index = int(music)
-    if currentSong == index:
+    if currentSong == index or index > len(songs) or index < 0:
         pass
     elif index == 0:
         currentSong = index
