@@ -208,8 +208,9 @@ for (let index = 0; index < controller.length; index++) {
 var currentdirection = 'STANDBY';
 function onControllerStart(index) {
     // 0: FORWARD ; 1: LEFT ; 2: RIGHT ; 3: BACKWARD
-    if (currentdirection != 'STANDBY') return;
-
+    if (currentdirection != 'STANDBY' || !directionReady) return;
+    // Can only send direction every 0.5s
+    
     switch (index) {
         case 0:
             currentdirection = 'FORWARD';
@@ -225,16 +226,15 @@ function onControllerStart(index) {
             break;
     }
 
-    if (directionReady) {
-        // Can only send direction every 0.5s
-        directionReady = false;
-        controller[index].style.backgroundColor = '#3268cd';
-        sendCurrentdirection();
-        setTimeout(() => { directionReady = true; }, 500);
-    }
+    directionReady = false;
+    controller[index].style.backgroundColor = '#3268cd';
+    sendCurrentdirection();
+    setTimeout(() => { directionReady = true; }, 500);
 }
 
 function onControllerEnd(index) {
+    if (currentdirection == 'STANDBY') return;
+
     switch (index) {
         case 0:
             if (currentdirection != 'FORWARD') return;
