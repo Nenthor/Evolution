@@ -31,7 +31,7 @@ function changeMenu(visible) {
     //Reset Animation
     menu.style.animation = 'none';
     menu.offsetHeight;
-    menu.style.animation = null; 
+    menu.style.animation = null;
 
     //Play Animation
     if (visible) {

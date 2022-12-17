@@ -103,7 +103,11 @@ window.addEventListener('beforeunload', () => {
 const backButton = document.getElementById('backButton');
 
 backButton.addEventListener('click', () => {
-    send('remote_redirect');
+    if (isLocal) {
+        send('remote_devicelogout');
+        open('/index', '_self');
+    } else
+        send('remote_redirect');
 });
 
 function redirect(key) {

@@ -210,7 +210,7 @@ function onControllerStart(index) {
     // 0: FORWARD ; 1: LEFT ; 2: RIGHT ; 3: BACKWARD
     if (currentdirection != 'STANDBY' || !directionReady) return;
     // Can only send direction every 0.5s
-    
+
     switch (index) {
         case 0:
             currentdirection = 'FORWARD';

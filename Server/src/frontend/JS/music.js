@@ -111,7 +111,7 @@ function musicColorReset() {
 }
 
 function musicSetColor(index) {
-    if(index < musicItems.length)
+    if (index < musicItems.length)
         musicItems[index].style.backgroundColor = "#16AA16";
 }
 

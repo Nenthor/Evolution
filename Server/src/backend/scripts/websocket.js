@@ -123,8 +123,8 @@ const wssSecure = new WebSocket.Server({ server: global.serverSecure });
                     if (req.socket.localAddress != req.socket.remoteAddress && !global.debug) break;
                     receiveMessages(`Änderung der "Einstellungs"-Datei zu "${message[1]}" erhalten.`, importance.MEDIUM);
                     writeFile(message[1], 'settings');
-                    if(global.settings[0] != message[1][0]){
-                        if(message[1][0] == '0') hardware.sendData(null, `${incoming.set_music}:pause`);
+                    if (global.settings[0] != message[1][0]) {
+                        if (message[1][0] == '0') hardware.sendData(null, `${incoming.set_music}:pause`);
                         else hardware.sendData(null, `${incoming.set_music}:resume`);
                     }
                     global.settings = String(message[1]);
