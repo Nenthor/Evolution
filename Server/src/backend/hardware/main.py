@@ -3,6 +3,7 @@ import os
 os.chdir(os.path.dirname(os.path.abspath(__file__)))  # Set working directory to to file directory (.../backend/hardware/)
 from time import sleep
 from datetime import datetime
+from subprocess import check_call as sys_call
 import signal
 import server
 import sensors
@@ -27,13 +28,17 @@ def signalClose(sig, frame):
         close(1)
 
 
-def close(exitCode):
+def cleanup():
     server.stop()
     engine.stop()
     sensors.stop()
     music.stop()
     location.stop()
     sb_sensors.stop()
+
+
+def close(exitCode):
+    cleanup()
     print("Server is closed.")
     exit(code=exitCode)
 
@@ -67,6 +72,9 @@ def onMessage(message: str):
         engine.onRemotedirection(msg[1])
     elif msg[0] == "remote_controll":
         engine.onRemoteControll(msg[1] == "on")
+    elif msg[0] == "shutdown":
+        cleanup()
+        sys_call(["sudo", "shutdown", "now"])
     else:
         print(f"{msg[0]} is not available.")
 
