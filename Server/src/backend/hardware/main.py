@@ -6,16 +6,16 @@ from datetime import datetime
 from subprocess import check_call as sys_call
 import signal
 import server
-import sensors
+import sensor
 import music
 import camera
 import location
 import engine_high
-import speed_battery_sensors as sb_sensors
 
 signals = [signal.SIGTERM, signal.SIGSEGV, signal.SIGPIPE, signal.SIGINT, signal.SIGILL, signal.SIGHUP, signal.SIGBUS]
 engine: engine_high.Engine
-
+distanceSensor: sensor.DistanceSensor
+sbSensor: sensor.SpeedBatterySensor
 
 def signalClose(sig, frame):
     if sig == signal.SIGINT:
@@ -31,10 +31,11 @@ def signalClose(sig, frame):
 def cleanup():
     server.stop()
     engine.stop()
-    sensors.stop()
+    distanceSensor.stop()
     music.stop()
     location.stop()
-    sb_sensors.stop()
+    sbSensor.stop()
+    sleep(0.05)
 
 
 def close(exitCode):
@@ -46,12 +47,15 @@ def close(exitCode):
 for s in signals:
     signal.signal(s, signalClose)
 
-server.start()
 engine = engine_high.Engine()
-# location.start()   # TODO: Enable this line
-# sensors.start()    # TODO: Enable this line
-# sb_sensors.start() # TODO: Enable this line
-# music.start()      # TODO: Enable this line
+distanceSensor = sensor.DistanceSensor()
+sbSensor = sensor.SpeedBatterySensor()
+
+server.start()
+# location.start()          # TODO: Enable this line
+# distanceSensor.start()    # TODO: Enable this line
+# sbSensor.start()          # TODO: Enable this line
+# music.start()             # TODO: Enable this line
 
 
 def onMessage(message: str):
@@ -80,11 +84,11 @@ def onMessage(message: str):
 
 
 server.onMessage = onMessage
-sensors.onData = camera.onSensorData
+distanceSensor.updateCamera = camera.onSensorData
 camera.sendToServer = server.send
 location.sendToServer = server.send
 engine.sendToServer = server.send
-sb_sensors.sendToServer = server.send
+sbSensor.sendToServer = server.send
 
 try:
     while True:

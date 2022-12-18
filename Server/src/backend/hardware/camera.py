@@ -1,12 +1,11 @@
-from sensors import SENSOR_1 as __SENSOR_1, SENSOR_2 as __SENSOR_2, SENSOR_3 as __SENSOR_3
+from time import time as __time
 
 __FIRST_LEVEL = 300  # [200, 300[
 __MIDDLE_LEVEL = 200  # [100, 200[
 __LAST_LEVEL = 100  # [0, 100[
 
 __camera = [0, 0, 0]
-__distance = [500, 500, 500]
-
+__lastTime = [__time(), __time(), __time()]
 
 def sendCameraData(index, distance):
     """If camera data has changed it will be sent to the server."""
@@ -15,15 +14,12 @@ def sendCameraData(index, distance):
         sendToServer(f"camera:{__camera[0]}{__camera[1]}{__camera[2]}")
 
 
-def onSensorData(index, distance):
-    global __distance
-    __distance[index] = distance
-    sendCameraData(index, distance)
-
-
-def getDistance(index):
-    global __distance
-    return __distance[index]
+def onSensorData(index:int, distance:int):
+    global __lastTime
+    time = __time()
+    if time - __lastTime[index] > 0.33: # Timeout (0.33s)
+        sendCameraData(index, distance)
+        __lastTime[index] = time
 
 
 def __isDifferentLevel(index, distance):

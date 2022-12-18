@@ -33,11 +33,11 @@ class Engine:
             return
 
         if direction == "STANDBY":
-            self.engine.setDirection(speed=0, reverseState=False)
+            self.engine.setDirection(speed=0, reverse_state=False)
         elif direction == "FORWARD":
-            self.engine.setDirection(speed=60, reverseState=False)
+            self.engine.setDirection(speed=0.6, reverse_state=False)
         elif direction == "BACKWARD":
-            self.engine.setDirection(speed=60, reverseState=True)
+            self.engine.setDirection(speed=0.6, reverse_state=True)
         elif direction == "LEFT":
             pass
         elif direction == "RIGHT":
