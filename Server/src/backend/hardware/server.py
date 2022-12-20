@@ -16,80 +16,84 @@ __FORMAT = "utf-8"
 __DISCONNECT_MESSAGE = "!DISCONNECT"
 
 __lock = __Lock()
-__clients = set()
+__client: __socket = None
 __server: __socket = None
 
 
 def start():
     """Start the socket server, so that clients can connect to 127.0.0.1:5050."""
-    global __clients, __server
+    global __server
     if __server == None:
         __Thread(target=__bootServer, daemon=True).start()
 
 
 def stop():
     """Close the socket server"""
-    global __server
+    global __server, __client
     if __server != None:
         __server.shutdown(__SHUT_RDWR)
-        __clients.clear()
+        __client = None
         __server = None
 
 
 def __bootServer():
-    global __server, __lock
+    global __server, __client, __lock
     __server = __socket(__AF_INET, __SOCK_STREAM)
     __server.setsockopt(__SOL_SOCKET, __SO_REUSEADDR, 1)
     __server.bind((__HOST, __PORT))
     __server.listen()
     print(f"Hardware is listening to {__HOST}:{__PORT}.")
     try:
-        while True:
+        while __server != None:
             conn, addr = __server.accept()
+            if __client != None:  # TODO: Remove these lines
+                print("KLIENT 1:", __client)
+                print("KLIENT 2:", conn)
+                __client.send("MSG: 1")
+                conn.send(("MSG: 2").encode(__FORMAT))
             with __lock:
-                __clients.add(conn)
+                __client = conn
             __Thread(target=__handleClient, args=(conn, addr), daemon=True).start()
     except __error as e:
-        pass
+        if __server == None:
+            return  # Normal server shutdown
+        print(e)
     except Exception as e:
         print(e)
-        stop()
+    stop()
 
 
 def __handleClient(conn: __socket, addr):
-    global __lock
-
+    global __client, __lock, __server
     print("Client has connected.")
     try:
-        while True:
+        while __server != None:
             msg_length = conn.recv(__HEADER).decode(__FORMAT)
             if msg_length:
                 msg_length = int(msg_length)
                 msg = conn.recv(msg_length).decode(__FORMAT)
                 if msg == __DISCONNECT_MESSAGE:
                     print("Client has disconnected.")
-                    __clients.remove(conn)
+                    with __lock:
+                        __client = None
                     break
                 onMessage(msg)
-    except __error:
+    except __error as e:
+        print(e)
         print("Client has disconnected.")
-        with __lock:
-            __clients.remove(conn)
-    conn.close()
+    with __lock:
+        conn.close()
+        __client = None
 
 
 def send(message):
     """Send messages to all clients."""
-    msg = message.encode(__FORMAT)
-
-    for client in __clients:
-        client.send(msg)
+    global __client
+    if __client != None:
+        msg = message.encode(__FORMAT)
+        __client.send(msg)
 
 
 def onMessage(message):
     """Overwrite this function to receive messages from clients."""
     pass
-
-
-def getClientCount():
-    return len(__clients)

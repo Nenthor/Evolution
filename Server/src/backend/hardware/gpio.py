@@ -75,7 +75,7 @@ class Engine:
         if self.reverse_state != reverse_state:
             self.reverse_state = not self.reverse_state
             self.reverse.toggle()
-            self.__sleep(0.05) # 50ms
+            self.__sleep(0.05)  # 50ms
 
     def __setSpeed(self, value):
         self.speed_control.value = value
@@ -85,11 +85,10 @@ class DistanceSensor:
     from gpiozero.pins.pigpio import PiGPIOFactory
     from gpiozero import DistanceSensor as Sensor
 
-    def __init__(self, factory:PiGPIOFactory, trigger: int, echo: int):
+    def __init__(self, factory: PiGPIOFactory, trigger: int, echo: int):
         self.enabled = trigger != None and echo != None
         if self.enabled:
-            self.FACTORY = factory
-            self.sensor = self.Sensor(trigger=trigger, echo=echo, queue_len=1, max_distance=5, pin_factory=self.FACTORY)
+            self.sensor = self.Sensor(trigger=trigger, echo=echo, queue_len=1, max_distance=5, pin_factory=factory)
 
     def close(self):
         if self.enabled:
@@ -105,3 +104,37 @@ class DistanceSensor:
             return round(self.sensor.distance * 100)
         else:
             return -1
+
+
+class Servo:
+    from gpiozero.pins.pigpio import PiGPIOFactory as __Factory
+    from gpiozero import AngularServo as __Servo
+
+    def __init__(self, factory: __Factory, pin: int, min: int, max:int):
+        self.__enabled = pin != None
+        if self.__enabled:
+            self.__servo = self.__Servo(pin=pin, min_angle=min, max_angle=max, initial_angle=0, pin_factory=factory)
+
+    def close(self):
+        if self.__enabled:
+            self.__servo.close()
+            self.__enabled = False
+
+    def getAngle(self):
+        return self.__servo.angle
+
+    def left(self):
+        if self.__enabled:
+            self.__servo.min()
+
+    def normal(self):
+        if self.__enabled:
+            self.__servo.mid()
+
+    def right(self):
+        if self.__enabled:
+            self.__servo.max()
+
+    def setAngle(self, angle):
+        if self.__enabled:
+            self.__servo.angle = angle

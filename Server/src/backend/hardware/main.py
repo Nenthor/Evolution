@@ -15,10 +15,11 @@ from engine import Engine
 
 FACTORY = PiGPIOFactory()
 
-signals = [signal.SIGTERM, signal.SIGSEGV, signal.SIGPIPE, signal.SIGINT, signal.SIGILL, signal.SIGHUP, signal.SIGBUS]
+signals = [signal.SIGTERM, signal.SIGSEGV, signal.SIGINT, signal.SIGILL, signal.SIGHUP, signal.SIGBUS]  # TODO: Check if signal.SIGPIPE is needed
 distanceSensor: sensor.DistanceSensor
 sbSensor: sensor.SpeedBatterySensor
 engine: Engine
+
 
 def signalClose(sig, frame):
     if sig == signal.SIGINT:
