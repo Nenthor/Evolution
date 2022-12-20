@@ -4,18 +4,21 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))  # Set working directory to
 from time import sleep
 from datetime import datetime
 from subprocess import check_call as sys_call
+from gpiozero.pins.pigpio import PiGPIOFactory
 import signal
 import server
 import sensor
 import music
 import camera
 import location
-import engine_high
+from engine import Engine
+
+FACTORY = PiGPIOFactory()
 
 signals = [signal.SIGTERM, signal.SIGSEGV, signal.SIGPIPE, signal.SIGINT, signal.SIGILL, signal.SIGHUP, signal.SIGBUS]
-engine: engine_high.Engine
 distanceSensor: sensor.DistanceSensor
 sbSensor: sensor.SpeedBatterySensor
+engine: Engine
 
 def signalClose(sig, frame):
     if sig == signal.SIGINT:
@@ -47,11 +50,12 @@ def close(exitCode):
 for s in signals:
     signal.signal(s, signalClose)
 
-engine = engine_high.Engine()
-distanceSensor = sensor.DistanceSensor()
+engine = Engine(FACTORY)
+distanceSensor = sensor.DistanceSensor(FACTORY)
 sbSensor = sensor.SpeedBatterySensor()
 
 server.start()
+engine.start()
 # location.start()          # TODO: Enable this line
 # distanceSensor.start()    # TODO: Enable this line
 # sbSensor.start()          # TODO: Enable this line

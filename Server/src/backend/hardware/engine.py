@@ -1,15 +1,15 @@
 class Engine:
-    import engine_low
+    from gpio import Engine as __Engine
 
-    def __init__(self):
+    def __init__(self, factory):
         """First Engine activation."""
         self.isActive = False
-        self.engine: self.engine_low.Engine
+        self.engine = self.__Engine(factory)
 
     def start(self):
         """Activate engine."""
         if not self.isActive:
-            self.engine = self.engine_low.Engine()
+            self.engine.start()
             self.isActive = True
 
     def stop(self):
@@ -31,7 +31,6 @@ class Engine:
     def onRemotedirection(self, direction):
         if not self.isActive:
             return
-
         if direction == "STANDBY":
             self.engine.setDirection(speed=0, reverse_state=False)
         elif direction == "FORWARD":
