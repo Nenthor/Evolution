@@ -31,6 +31,7 @@ client.on('connect', () => {
 
     onConnectMessages.forEach(msg => {
         if (msg == 'set_music') msg += `:${global.music}`;
+        else if (msg == 'set_lights') msg += `:${global.settings[1]}`
         messageQueue.addElement(msg);
     });
     if (!messageQueue.isEmpty()) {
@@ -60,8 +61,9 @@ client.on('close', () => {
 });
 
 function retryConnecting() {
+    if (retryTimeout != null) clearTimeout(retryTimeout);
     retryTimeout = setTimeout(() => {
-        if (retryCount >= MAX_RETRYCOUNT) {
+        if (retryCount >= MAX_RETRYCOUNT && !global.debug) {
             console.log('Could not establish connection to Hardware.');
             return;
         }

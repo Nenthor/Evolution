@@ -46,11 +46,6 @@ def __bootServer():
     try:
         while __server != None:
             conn, addr = __server.accept()
-            if __client != None:  # TODO: Remove these lines
-                print("KLIENT 1:", __client)
-                print("KLIENT 2:", conn)
-                __client.send("MSG: 1")
-                conn.send(("MSG: 2").encode(__FORMAT))
             with __lock:
                 __client = conn
             __Thread(target=__handleClient, args=(conn, addr), daemon=True).start()
@@ -86,7 +81,7 @@ def __handleClient(conn: __socket, addr):
         __client = None
 
 
-def send(message):
+def send(message:str):
     """Send messages to all clients."""
     global __client
     if __client != None:

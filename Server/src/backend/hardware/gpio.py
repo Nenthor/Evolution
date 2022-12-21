@@ -108,33 +108,60 @@ class DistanceSensor:
 
 class Servo:
     from gpiozero.pins.pigpio import PiGPIOFactory as __Factory
-    from gpiozero import AngularServo as __Servo
+    from gpiozero import PWMOutputDevice as __Servo
 
-    def __init__(self, factory: __Factory, pin: int, min: int, max:int):
+    __FREQUENCY = 100  # in Hz
+
+    def __init__(self, factory: __Factory, pin: int, max_angle: int):
         self.__enabled = pin != None
         if self.__enabled:
-            self.__servo = self.__Servo(pin=pin, min_angle=min, max_angle=max, initial_angle=0, pin_factory=factory)
+            self.__MAX_ANGLE = max_angle
+            self.__servo = self.__Servo(pin=pin, frequency=self.__FREQUENCY, initial_value=0.5, pin_factory=factory)
 
     def close(self):
         if self.__enabled:
             self.__servo.close()
             self.__enabled = False
 
-    def getAngle(self):
-        return self.__servo.angle
+    def setAngle(self, angle):
+        self.__servo.value = self.__angleToValue(angle)
 
     def left(self):
-        if self.__enabled:
-            self.__servo.min()
+        self.setAngle(-self.__MAX_ANGLE)
 
-    def normal(self):
-        if self.__enabled:
-            self.__servo.mid()
+    def straight(self):
+        self.setAngle(0)
 
     def right(self):
-        if self.__enabled:
-            self.__servo.max()
+        self.setAngle(self.__MAX_ANGLE)
 
-    def setAngle(self, angle):
+    def __angleToValue(self, angle):
+        # -150° = 0 | 0° = 0.5 | 150° = 1
+        if angle < -self.__MAX_ANGLE:
+            angle = -self.__MAX_ANGLE
+        elif angle > self.__MAX_ANGLE:
+            angle = self.__MAX_ANGLE
+        return (angle + self.__MAX_ANGLE) * (0.5 / self.__MAX_ANGLE)
+
+
+class Light:
+    from gpiozero.pins.pigpio import PiGPIOFactory as __Factory
+    from gpiozero import OutputDevice as __OutputDevice
+
+    def __init__(self, factory: __Factory, pin: int):
+        self.__enabled = pin != None
         if self.__enabled:
-            self.__servo.angle = angle
+            self.__light = self.__OutputDevice(pin=pin, initial_value=False, pin_factory=factory)
+
+    def close(self):
+        if self.__enabled:
+            self.__light.close()
+            self.__enabled = False
+
+    def on(self):
+        if self.__enabled:
+            self.__light.on()
+
+    def off(self):
+        if self.__enabled:
+            self.__light.off()

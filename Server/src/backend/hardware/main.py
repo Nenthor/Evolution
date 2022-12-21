@@ -9,13 +9,14 @@ import signal
 import server
 import sensor
 import music
+import lights
 import camera
 import location
 from engine import Engine
 
 FACTORY = PiGPIOFactory()
 
-signals = [signal.SIGTERM, signal.SIGSEGV, signal.SIGINT, signal.SIGILL, signal.SIGHUP, signal.SIGBUS]  # TODO: Check if signal.SIGPIPE is needed
+signals = [signal.SIGTERM, signal.SIGSEGV, signal.SIGPIPE, signal.SIGINT, signal.SIGILL, signal.SIGHUP, signal.SIGBUS]
 distanceSensor: sensor.DistanceSensor
 sbSensor: sensor.SpeedBatterySensor
 engine: Engine
@@ -37,6 +38,7 @@ def cleanup():
     engine.stop()
     distanceSensor.stop()
     music.stop()
+    lights.stop()
     location.stop()
     sbSensor.stop()
     sleep(0.05)
@@ -61,6 +63,7 @@ engine.start()
 # distanceSensor.start()    # TODO: Enable this line
 # sbSensor.start()          # TODO: Enable this line
 # music.start()             # TODO: Enable this line
+lights.start(FACTORY)  # TODO: Enable this line
 
 
 def onMessage(message: str):
@@ -77,6 +80,8 @@ def onMessage(message: str):
         pass  # TODO: Do some coding
     elif msg[0] == "set_music":
         music.playMusic(msg[1])
+    elif msg[0] == "set_lights":
+        lights.changeState(msg[1])
     elif msg[0] == "remotedirection":
         engine.onRemotedirection(msg[1])
     elif msg[0] == "remote_controll":
