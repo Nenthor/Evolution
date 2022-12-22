@@ -79,9 +79,10 @@ def __handleClient(conn: __socket, addr):
     with __lock:
         conn.close()
         __client = None
+    onMessage("disconnected")
 
 
-def send(message:str):
+def send(message: str):
     """Send messages to all clients."""
     global __client
     if __client != None:

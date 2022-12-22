@@ -74,7 +74,7 @@ class SpeedBatterySensor:
     __ADRESS_SPEED = 0x40
     __ADRESS_BATTERY = 0x41  # TODO: Check with sudo "i2cdetect -y 1" to get address
     __MAX_SPEED_VOLTAGE = 42
-    __MAX_SPEED_VALUE = 47.7  # Without air resistance
+    __MAX_SPEED_VALUE = 35.0  # Value from tracker app
     __MAX_BATTERY_VOLTAGE = 84
     __MIN_BATTERY_VOLTAGE = 60  # TODO: Check value
     __R1_SPEED = 27
@@ -120,9 +120,17 @@ class SpeedBatterySensor:
                 self.__ina_speed.reset()
                 self.__ina_battery.reset()
 
-    def sendToServer(message):
+    def sendToServer(self, message):
         """Send messages to the server if speed or battery is updated."""
         pass
+
+    def forceUpdate(self, type):
+        if not self.isActive:
+            return
+        if type == "speed":
+            self.sendToServer(f"speed:{self.speed}")
+        elif type == "battery":
+            self.sendToServer(f"battery:{self.battery}")
 
     def __checkSpeed(self):
         while self.isActive:

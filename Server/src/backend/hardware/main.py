@@ -63,7 +63,7 @@ engine.start()
 # distanceSensor.start()    # TODO: Enable this line
 # sbSensor.start()          # TODO: Enable this line
 # music.start()             # TODO: Enable this line
-lights.start(FACTORY)  # TODO: Enable this line
+# lights.start(FACTORY)     # TODO: Enable this line
 
 
 def onMessage(message: str):
@@ -75,9 +75,9 @@ def onMessage(message: str):
     elif msg[0] == "get_compass":
         location.forceUpdate("compass")
     elif msg[0] == "get_battery":
-        pass  # TODO: Do some coding
+        sbSensor.forceUpdate("battery")
     elif msg[0] == "get_speed":
-        pass  # TODO: Do some coding
+        sbSensor.forceUpdate("speed")
     elif msg[0] == "set_music":
         music.playMusic(msg[1])
     elif msg[0] == "set_lights":
@@ -89,8 +89,17 @@ def onMessage(message: str):
     elif msg[0] == "shutdown":
         cleanup()
         sys_call(["sudo", "shutdown", "now"])
+    elif msg[0] == "disconnected":
+        onClientDisconnect()
     else:
         print(f"{msg[0]} is not available.")
+
+
+def onClientDisconnect():
+    music.playMusic("0")
+    lights.changeState("0")
+    engine.onRemotedirection("STANDBY")
+    engine.onRemoteControll(False)
 
 
 server.onMessage = onMessage
