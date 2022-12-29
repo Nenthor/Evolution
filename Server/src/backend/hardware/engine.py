@@ -1,11 +1,11 @@
 class Engine:
     from gpio import Engine as __Engine
 
-    def __init__(self, factory):
-        """First Engine activation."""
+    def __init__(self):
+        """Setup Engine."""
         self.isActive = False
         self.old_direction = "STANDBY"
-        self.engine = self.__Engine(factory)
+        self.engine = self.__Engine()
 
     def start(self):
         """Activate engine."""

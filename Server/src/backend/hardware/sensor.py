@@ -10,11 +10,10 @@ class DistanceSensor:
     ]
     sensors: list[__DistanceSensor]
 
-    def __init__(self, factory):
+    def __init__(self):
         self.isActive = False
         self.lock = self.__Lock()
         self.outOfRangeCount: list[int]
-        self.factory = factory
 
     def start(self):
         """Activate sensors."""
@@ -30,7 +29,13 @@ class DistanceSensor:
         if self.isActive:
             self.isActive = False
             for sensor in self.sensors:
-                sensor.close()
+                sensor.stop()
+
+    def changeState(self, state):
+        if state == "0":
+            self.stop()
+        elif state == "1":
+            self.start()
 
     def __startLoop(self):
         try:
@@ -59,7 +64,7 @@ class DistanceSensor:
 
     def __setupSensors(self):
         for index, sensor in enumerate(self.__SENSORS):
-            self.sensors[index] = self.__DistanceSensor(factory=self.factory, trigger=sensor["trigger"], echo=sensor["echo"])
+            self.sensors[index] = self.__DistanceSensor(trigger=sensor["trigger"], echo=sensor["echo"])
 
     def updateCamera(self, index: int, distance: int):
         """Overwrite this function to receive distances from sensors."""

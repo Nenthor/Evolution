@@ -1,10 +1,11 @@
 import os
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))  # Set working directory to to file directory (.../backend/hardware/)
+os.environ["GPIOZERO_PIN_FACTORY"] = "pigpio"
+
 from time import sleep
 from datetime import datetime
 from subprocess import check_call as sys_call
-from gpiozero.pins.pigpio import PiGPIOFactory
 import signal
 import server
 import sensor
@@ -14,7 +15,6 @@ import camera
 import location
 from engine import Engine
 
-FACTORY = PiGPIOFactory()
 
 signals = [signal.SIGTERM, signal.SIGSEGV, signal.SIGPIPE, signal.SIGINT, signal.SIGILL, signal.SIGHUP, signal.SIGBUS]
 distanceSensor: sensor.DistanceSensor
@@ -53,17 +53,16 @@ def close(exitCode):
 for s in signals:
     signal.signal(s, signalClose)
 
-engine = Engine(FACTORY)
-distanceSensor = sensor.DistanceSensor(FACTORY)
+engine = Engine()
+distanceSensor = sensor.DistanceSensor()
 sbSensor = sensor.SpeedBatterySensor()
 
 server.start()
 engine.start()
 # location.start()          # TODO: Enable this line
-# distanceSensor.start()    # TODO: Enable this line
 # sbSensor.start()          # TODO: Enable this line
 # music.start()             # TODO: Enable this line
-# lights.start(FACTORY)     # TODO: Enable this line
+# lights.start()            # TODO: Enable this line
 
 
 def onMessage(message: str):
@@ -82,6 +81,8 @@ def onMessage(message: str):
         music.playMusic(msg[1])
     elif msg[0] == "set_lights":
         lights.changeState(msg[1])
+    elif msg[0] == "set_camera":
+        distanceSensor.changeState(msg[1])
     elif msg[0] == "remotedirection":
         engine.onRemotedirection(msg[1])
     elif msg[0] == "remote_controll":

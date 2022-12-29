@@ -1,21 +1,20 @@
 class Servo:
-    from gpiozero.pins.pigpio import PiGPIOFactory as __Factory
     from gpiozero import PWMOutputDevice as __Servo
     from threading import Thread as __Thread, Lock as _Lock
     from time import sleep as __sleep
 
-    __FREQUENCY = 100  # in Hz
+    __FREQUENCY = 2000  # in Hz
     __MAX_ANGLE = 150  # in deg
-    __ROTATE_TIME = 0.05  # Time needed for Servo to rotate to angle for 1°
+    __ROTATE_TIME = 0.02  # Time needed for Servo to rotate to angle for 1°
     __DEG_PER_CYCLE = 1  # Steeps per cycle
 
-    def __init__(self, factory: __Factory, pin: int):
+    def __init__(self, pin: int):
         self.__enabled = pin != None
         if self.__enabled:
             self.__lock = self._Lock()
             self.__isRotating = False
             self.__angle = 0
-            self.__servo = self.__Servo(pin=pin, frequency=self.__FREQUENCY, initial_value=0.5, pin_factory=factory)
+            self.__servo = self.__Servo(pin=pin, frequency=self.__FREQUENCY, initial_value=0.5)
 
     def close(self):
         if self.__enabled:
@@ -42,11 +41,6 @@ class Servo:
         with self.__lock:
             self.__isRotating = False
 
-    def setAngle(self, angle):
-        with self.__lock:
-            self.__angle = angle
-            self.__servo.value = self.__angleToValue(angle)
-
     def left(self):
         self.setAngle(-self.__MAX_ANGLE)
 
@@ -55,6 +49,11 @@ class Servo:
 
     def right(self):
         self.setAngle(self.__MAX_ANGLE)
+
+    def setAngle(self, angle):
+        with self.__lock:
+            self.__angle = angle
+            self.__servo.value = self.__angleToValue(angle)
 
     def __angleToValue(self, angle):
         # -150° = 0 | 0° = 0.5 | 150° = 1
@@ -66,13 +65,12 @@ class Servo:
 
 
 class Light:
-    from gpiozero.pins.pigpio import PiGPIOFactory as __Factory
     from gpiozero import OutputDevice as __OutputDevice
 
-    def __init__(self, factory: __Factory, pin: int):
+    def __init__(self, pin: int):
         self.__enabled = pin != None
         if self.__enabled:
-            self.__light = self.__OutputDevice(pin=pin, initial_value=False, pin_factory=factory)
+            self.__light = self.__OutputDevice(pin=pin, initial_value=False)
 
     def close(self):
         if self.__enabled:
@@ -81,23 +79,26 @@ class Light:
 
     def on(self):
         if self.__enabled:
-            self.__light.on()
+            self.__light.value = True
 
     def off(self):
         if self.__enabled:
-            self.__light.off()
+            self.__light.value = False
 
 
 class DistanceSensor:
-    from gpiozero.pins.pigpio import PiGPIOFactory
     from gpiozero import DistanceSensor as Sensor
 
-    def __init__(self, factory: PiGPIOFactory, trigger: int, echo: int):
-        self.enabled = trigger != None and echo != None
-        if self.enabled:
-            self.sensor = self.Sensor(trigger=trigger, echo=echo, queue_len=1, max_distance=5, pin_factory=factory)
+    def __init__(self, trigger: int, echo: int):
+        self.enabled = False
+        self.trigger = trigger
+        self.echo = echo
 
-    def close(self):
+    def start(self):
+        if not self.enabled and self.trigger != None and self.echo != None:
+            self.sensor = self.Sensor(trigger=self.trigger, echo=self.echo, queue_len=1, max_distance=5)
+
+    def stop(self):
         if self.enabled:
             self.sensor.close()
             self.enabled = False
@@ -117,7 +118,6 @@ class Engine:
     from threading import Thread as __Thread, Lock as __Lock
     from time import sleep as __sleep, time as __time
     from gpiozero import PWMOutputDevice, OutputDevice
-    from gpiozero.pins.pigpio import PiGPIOFactory as __Factory
 
     __GPIO_AUTONOMOUS_SWITCH = 4  # OUT -> HIGH = on : LOW = off
     __GPIO_REVERSE_GEAR = 20  # OUT -> HIGH = on : LOW = off
@@ -131,19 +131,18 @@ class Engine:
     reverse: OutputDevice
     servo: Servo
 
-    def __init__(self, factory: __Factory):
+    def __init__(self):
         self.enabled = False
         self.reverse_state = False
         self.lock = self.__Lock()
         self.oldTime = self.__time()
-        self.FACTORY = factory
 
     def start(self):
         if not self.enabled:
-            # self.autonomous = self.OutputDevice(pin=self.__GPIO_AUTONOMOUS_SWITCH, initial_value=False, pin_factory=self.FACTORY) TODO: Enable
-            self.speed_control = self.PWMOutputDevice(pin=self.__GPIO_SPEED_CONTROL, frequency=self.__SPEED_FREQUENCY, pin_factory=self.FACTORY)
-            self.reverse = self.OutputDevice(pin=self.__GPIO_REVERSE_GEAR, initial_value=False, pin_factory=self.FACTORY)
-            self.servo = Servo(factory=self.FACTORY, pin=self.__GPIO_SERVO)
+            # self.autonomous = self.OutputDevice(pin=self.__GPIO_AUTONOMOUS_SWITCH, initial_value=False) TODO: Enable
+            self.speed_control = self.PWMOutputDevice(pin=self.__GPIO_SPEED_CONTROL, frequency=self.__SPEED_FREQUENCY)
+            self.reverse = self.OutputDevice(pin=self.__GPIO_REVERSE_GEAR, initial_value=False)
+            self.servo = Servo(pin=self.__GPIO_SERVO)
             self.oldTime = self.__time()
             self.enabled = True
 
@@ -158,12 +157,9 @@ class Engine:
     def setAutonomousState(self, enabled: bool):
         if not self.enabled:
             return
-        if enabled:
-            self.autonomous.on()
-        else:
-            self.autonomous.off()
+        self.autonomous.value = enabled
 
-    def setDirection(self, speed=0, angle=0, reverse_state=False):
+    def setDirection(self, speed=0, reverse_state=False):
         if not self.enabled:
             return
         time = self.__time()

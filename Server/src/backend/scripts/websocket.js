@@ -2,6 +2,7 @@ const WebSocket = require('ws');
 const fs = require('fs');
 const navigation = require('./navigation');
 const debug = require('./debug');
+const camera = require('./camera');
 const remoteControll = require('./remoteControll');
 const hardware = require('./hardware');
 
@@ -10,15 +11,16 @@ const importance = { HIGH: 0, MEDIUM: 1, LOW: 2 }; //For debugging
 var currentImportance = importance.MEDIUM;
 
 const incoming = {  //Incoming websocket messages
-    get_coords: 'get_coords', get_compass: 'get_compass', get_settings: 'get_settings', get_camera: 'get_camera', get_music: 'get_music', get_speed: 'get_speed', get_battery: 'get_battery', set_navigation: 'set_navigation', get_navigation: 'get_navigation', set_target: 'set_target', get_target: 'get_target', get_debugdata: 'get_debugdata', get_remotecontrollstate: 'get_remotecontrollstate', set_music: 'set_music', set_lights: 'set_lights', set_remotedirection: 'set_remotedirection', set_settings: 'set_settings', shutdown: 'shutdown', add_debuglistener: 'add_debuglistener', remove_debuglistener: 'remove_debuglistener', controll_request: 'controll_request', controll_check: 'controll_check', remote_devicelogout: 'remote_devicelogout', remote_redirect: 'remote_redirect', set_importance: 'set_importance'
+    get_coords: 'get_coords', get_compass: 'get_compass', get_settings: 'get_settings', get_camera: 'get_camera', get_music: 'get_music', get_speed: 'get_speed', get_battery: 'get_battery', set_navigation: 'set_navigation', get_navigation: 'get_navigation', set_target: 'set_target', get_target: 'get_target', get_debugdata: 'get_debugdata', get_remotecontrollstate: 'get_remotecontrollstate', set_music: 'set_music', set_lights: 'set_lights', set_remotedirection: 'set_remotedirection', set_settings: 'set_settings', shutdown: 'shutdown', add_debuglistener: 'add_debuglistener', remove_debuglistener: 'remove_debuglistener', add_cameralistener: 'add_cameralistener', remove_cameralistener: 'remove_cameralistener', controll_request: 'controll_request', controll_check: 'controll_check', remote_devicelogout: 'remote_devicelogout', remote_redirect: 'remote_redirect', set_importance: 'set_importance'
 };
 
 const outgoing = {  //Outgoing messages to web-clients
-    music: 'music', settings: 'settings', battery: 'battery', speed: 'speed', coords: 'coords', compass: 'compass', camera: 'camera', set_navigation: 'set_navigation',
+    music: 'music', settings: 'settings', battery: 'battery', speed: 'speed', coords: 'coords', compass: 'compass', camera: 'camera', set_navigation: 'set_navigation'
 };
 
 //Setup
 debug.setSendFunction(send);
+camera.setSendFunction(hardware.sendData)
 navigation.setSendFunctions(send, sendAllClients);
 hardware.setSendFunctions(send, sendAllClients);
 hardware.setOnCoords(navigation.setNavigation)
@@ -152,6 +154,14 @@ const wssSecure = new WebSocket.Server({ server: global.serverSecure });
                 case incoming.remove_debuglistener:
                     receiveMessages(`Debug-Klient wird entfernt.`, importance.LOW);
                     debug.removeDebugListener(ws);
+                    break;
+                case incoming.add_cameralistener:
+                    receiveMessages(`Kamera-Klient wird hinzugefügt.`, importance.LOW);
+                    camera.addCameraListener(ws)
+                    break;
+                case incoming.remove_cameralistener:
+                    receiveMessages(`Kamera-Klient wird entfernt.`, importance.LOW);
+                    camera.removeCameraListener(ws)
                     break;
                 case incoming.controll_request:
                     receiveMessages(`Anfrage auf "Fernsteuerungs-Kontrolle" erhalten.`, importance.MEDIUM);

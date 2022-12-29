@@ -12,7 +12,7 @@ const MAX_RETRYCOUNT = 300; //5min
 var onMessage;
 var isConnected = false;
 var retryCount = 0;
-var onConnectMessages = [];
+var onConnectFunc = null;
 var retryTimeout = null;
 var messageQueue = new ArrayQueue();
 
@@ -29,11 +29,12 @@ client.on('connect', () => {
     isConnected = true;
     retryCount = 0;
 
-    onConnectMessages.forEach(msg => {
-        if (msg == 'set_music') msg += `:${global.music}`;
-        else if (msg == 'set_lights') msg += `:${global.settings[1]}`
-        messageQueue.addElement(msg);
-    });
+    if (onConnectFunc != null){
+        onConnectFunc().forEach(element => {
+            messageQueue.addElement(element)
+        });
+    }
+
     if (!messageQueue.isEmpty()) {
         const messageQueueInterval = setInterval(() => {
             if (messageQueue.isEmpty()) {
@@ -42,7 +43,7 @@ client.on('connect', () => {
                 return;
             }
             send(messageQueue.getElement())
-        }, 50);
+        }, 25);
     }
 });
 
@@ -96,8 +97,8 @@ function setOnMessageFunction(func) {
     onMessage = func;
 }
 
-function getDataOnConnect(messages) {
-    onConnectMessages = messages;
+function setConnectFunc(func) {
+    onConnectFunc = func;
 }
 
 exitEvents = ['SIGINT', 'SIGUSR1', 'SIGUSR2', 'uncaughtException'];
@@ -113,5 +114,5 @@ module.exports = {
     connect,
     send,
     setOnMessageFunction,
-    getDataOnConnect
+    setConnectFunc
 }

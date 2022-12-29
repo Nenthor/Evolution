@@ -6,6 +6,7 @@ var socket = new WebSocket(`ws://${location.host}`);
 addSocketEvents();
 function addSocketEvents() {
     socket.addEventListener('open', () => {
+        socket.send('add_cameralistener');
         socket.send('get_camera');
     }, { passive: true });
 
@@ -39,6 +40,10 @@ function reconnect() {
             }, 1000); // 1s
         });
 }
+
+window.addEventListener('beforeunload', () => {
+    socket.send('remove_cameralistener');
+}, { passive: true })
 
 function getObstacles(data) {
     return [parseInt(data[0]), parseInt(data[1]), parseInt(data[2])];

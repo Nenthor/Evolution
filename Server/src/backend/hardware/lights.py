@@ -1,17 +1,16 @@
-from gpiozero.pins.pigpio import PiGPIOFactory as __Factory
 from gpio import Light
 
-__LIGHT_PIN = 13
+__LIGHT_PIN = 12
 
 __enabled = False
 __light: Light = None
 
 
-def start(factory: __Factory):
+def start():
     global __light, __enabled
     if not __enabled:
         __enabled = True
-        __light = Light(factory=factory, pin=__LIGHT_PIN)
+        __light = Light(pin=__LIGHT_PIN)
 
 
 def stop():
