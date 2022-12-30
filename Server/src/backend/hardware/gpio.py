@@ -10,15 +10,17 @@ class Servo:
     from time import sleep as __sleep
 
     __FREQUENCY = 2000  # in Hz
-    __MAX_ANGLE = 150  # in deg
+    __MAX_ANGLE = 90  # in deg
     __ROTATE_TIME = 0.02  # Time needed for Servo to rotate to angle for 1°
     __DEG_PER_CYCLE = 1  # Steeps per cycle
+
+    __VALUES = {"MIN": 0.0, "MID": 1.5 / 3.3, "MAX": 3.0 / 3.3}
 
     def __init__(self):
         self.__lock = self._Lock()
         self.__isRotating = False
         self.__angle = 0
-        self.__servo = self.__Servo(pin=PIN_LAYOUT["SERVO"], frequency=self.__FREQUENCY, initial_value=0.5)
+        self.__servo = self.__Servo(pin=PIN_LAYOUT["SERVO"], frequency=self.__FREQUENCY, initial_value=self.__VALUES["MID"])
         self.__enabled = True
 
     def close(self):
@@ -61,12 +63,12 @@ class Servo:
             self.__servo.value = self.__angleToValue(angle)
 
     def __angleToValue(self, angle):
-        # -150° = 0 | 0° = 0.5 | 150° = 1
+        # -90° = 0 | 0° = ~0.45 | 90° = ~0.91
         if angle < -self.__MAX_ANGLE:
             angle = -self.__MAX_ANGLE
         elif angle > self.__MAX_ANGLE:
             angle = self.__MAX_ANGLE
-        return (angle + self.__MAX_ANGLE) * (0.5 / self.__MAX_ANGLE)
+        return (angle + self.__MAX_ANGLE) * (self.__VALUES["MID"] / self.__MAX_ANGLE)
 
 
 class Lights:

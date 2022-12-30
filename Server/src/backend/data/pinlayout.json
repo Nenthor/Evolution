@@ -9,5 +9,7 @@
     "TRIGGER_2": 23,
     "ECHO_2": 24,
     "TRIGGER_3": 13,
-    "ECHO_3": 19
+    "ECHO_3": 19,
+    "ADRESS_SPEED": 40,
+    "ADRESS_BATTERY": 44
 }

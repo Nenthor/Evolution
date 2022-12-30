@@ -82,8 +82,8 @@ class SpeedBatterySensor:
     from threading import Thread as __Thread, Lock as __Lock
     from time import sleep as __sleep
 
-    __ADRESS_SPEED = 0x40
-    __ADRESS_BATTERY = 0x41  # TODO: Check with sudo "i2cdetect -y 1" to get address
+    __ADRESS_SPEED = int(f"0x{PIN_LAYOUT['ADRESS_SPEED']}", 16)
+    __ADRESS_BATTERY = int(f"0x{PIN_LAYOUT['ADRESS_BATTERY']}", 16)
     __MAX_SPEED_VOLTAGE = 42
     __MAX_SPEED_VALUE = 35.0  # Value from tracker app
     __MAX_BATTERY_VOLTAGE = 84

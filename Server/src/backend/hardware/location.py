@@ -38,6 +38,7 @@ def __checkForDegree():
     try:
         while __isActive:
             degree = __getDegree()
+            print(degree)
             __onDegreeUpdate(degree)
             __time.sleep(0.75)
     except (KeyboardInterrupt, SystemExit):
@@ -60,11 +61,11 @@ def start():
         __compass.setContinuousMode()
         # With https://www.magnetic-declination.com
         __compass.setDeclination(3, 56)
+        # Degaussing - possible values: 0.88; 1.3; 1.9; 2.5; 4.0; 4.7; 5.6; 8.1
+        __compass.setScale(1.9)
 
-    locationThread = __threading.Thread(target=__checkForLocation, daemon=True)
-    locationThread.start()
-    degreeThread = __threading.Thread(target=__checkForDegree, daemon=True)
-    degreeThread.start()
+    __threading.Thread(target=__checkForLocation, daemon=True).start()
+    __threading.Thread(target=__checkForDegree, daemon=True).start()
 
 
 def stop():
