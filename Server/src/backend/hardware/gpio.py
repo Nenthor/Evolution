@@ -1,3 +1,9 @@
+from json import load as loadJson
+
+with open("../data/pinlayout.json") as f:
+    PIN_LAYOUT: dict[str:int] = loadJson(f)
+
+
 class Servo:
     from gpiozero import PWMOutputDevice as __Servo
     from threading import Thread as __Thread, Lock as _Lock
@@ -8,13 +14,12 @@ class Servo:
     __ROTATE_TIME = 0.02  # Time needed for Servo to rotate to angle for 1°
     __DEG_PER_CYCLE = 1  # Steeps per cycle
 
-    def __init__(self, pin: int):
-        self.__enabled = pin != None
-        if self.__enabled:
-            self.__lock = self._Lock()
-            self.__isRotating = False
-            self.__angle = 0
-            self.__servo = self.__Servo(pin=pin, frequency=self.__FREQUENCY, initial_value=0.5)
+    def __init__(self):
+        self.__lock = self._Lock()
+        self.__isRotating = False
+        self.__angle = 0
+        self.__servo = self.__Servo(pin=PIN_LAYOUT["SERVO"], frequency=self.__FREQUENCY, initial_value=0.5)
+        self.__enabled = True
 
     def close(self):
         if self.__enabled:
@@ -64,13 +69,12 @@ class Servo:
         return (angle + self.__MAX_ANGLE) * (0.5 / self.__MAX_ANGLE)
 
 
-class Light:
+class Lights:
     from gpiozero import OutputDevice as __OutputDevice
 
-    def __init__(self, pin: int):
-        self.__enabled = pin != None
-        if self.__enabled:
-            self.__light = self.__OutputDevice(pin=pin, initial_value=False)
+    def __init__(self):
+        self.__light = self.__OutputDevice(pin=PIN_LAYOUT["LIGHTS"], initial_value=False)
+        self.__enabled = True
 
     def close(self):
         if self.__enabled:
@@ -119,10 +123,6 @@ class Engine:
     from time import sleep as __sleep, time as __time
     from gpiozero import PWMOutputDevice, OutputDevice
 
-    __GPIO_AUTONOMOUS_SWITCH = 4  # OUT -> HIGH = on : LOW = off
-    __GPIO_REVERSE_GEAR = 20  # OUT -> HIGH = on : LOW = off
-    __GPIO_SPEED_CONTROL = 21  # OUT -> PWM: 100% = FULL_SPEED : 0% = 0 km/h
-    __GPIO_SERVO = 26  # OUT -> PWM: 0 = -150° : 0.5 = 0° : 1 = 150°
     __SPEED_FREQUENCY = 30  # in Hz
     __START_HELP = 0.5  # 500ms (time where engine is at 100%)
 
@@ -139,10 +139,10 @@ class Engine:
 
     def start(self):
         if not self.enabled:
-            # self.autonomous = self.OutputDevice(pin=self.__GPIO_AUTONOMOUS_SWITCH, initial_value=False) TODO: Enable
-            self.speed_control = self.PWMOutputDevice(pin=self.__GPIO_SPEED_CONTROL, frequency=self.__SPEED_FREQUENCY)
-            self.reverse = self.OutputDevice(pin=self.__GPIO_REVERSE_GEAR, initial_value=False)
-            self.servo = Servo(pin=self.__GPIO_SERVO)
+            # self.autonomous = self.OutputDevice(pin=PIN_LAYOUT["AUTONOMOUS_SWITCH"], initial_value=False) TODO: Enable
+            self.speed_control = self.PWMOutputDevice(pin=PIN_LAYOUT["SPEED"], frequency=self.__SPEED_FREQUENCY)
+            self.reverse = self.OutputDevice(pin=PIN_LAYOUT["REVERSE"], initial_value=False)
+            self.servo = Servo()
             self.oldTime = self.__time()
             self.enabled = True
 

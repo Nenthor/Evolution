@@ -1,16 +1,14 @@
-from gpio import Light
-
-__LIGHT_PIN = 12
+from gpio import Lights
 
 __enabled = False
-__light: Light = None
+__light: Lights = None
 
 
 def start():
     global __light, __enabled
     if not __enabled:
         __enabled = True
-        __light = Light(pin=__LIGHT_PIN)
+        __light = Lights()
 
 
 def stop():

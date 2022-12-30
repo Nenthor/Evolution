@@ -1,12 +1,18 @@
+from json import load as loadJson
+
+with open("../data/pinlayout.json") as f:
+    PIN_LAYOUT: dict[str:int] = loadJson(f)
+
+
 class DistanceSensor:
     from time import sleep as __sleep
     from threading import Thread as __Thread, Lock as __Lock
     from gpio import DistanceSensor as __DistanceSensor
 
     __SENSORS = [
-        {"trigger": None, "echo": None},
-        {"trigger": 23, "echo": 24},
-        {"trigger": None, "echo": None},
+        {"trigger": PIN_LAYOUT["TRIGGER_1"], "echo": PIN_LAYOUT["ECHO_1"]},
+        {"trigger": PIN_LAYOUT["TRIGGER_2"], "echo": PIN_LAYOUT["ECHO_2"]},
+        {"trigger": PIN_LAYOUT["TRIGGER_3"], "echo": PIN_LAYOUT["ECHO_3"]},
     ]
     sensors: list[__DistanceSensor]
 

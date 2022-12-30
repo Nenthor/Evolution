@@ -1,0 +1,13 @@
+{
+    "AUTONOMOUS_SWITCH": 5,
+    "LIGHTS": 12,
+    "SERVO": 16,
+    "REVERSE": 20,
+    "SPEED": 21,
+    "TRIGGER_1": 27,
+    "ECHO_1": 22,
+    "TRIGGER_2": 23,
+    "ECHO_2": 24,
+    "TRIGGER_3": 13,
+    "ECHO_3": 19
+}
