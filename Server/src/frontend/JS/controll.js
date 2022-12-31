@@ -189,6 +189,7 @@ function updateBatterytext(battery) {
 
 //Controller methods
 const controller = document.getElementsByClassName('controll_controllerbutton');
+const servoReset = document.getElementById('servo_reset');
 var directionReady = true
 
 for (let index = 0; index < controller.length; index++) {
@@ -204,6 +205,14 @@ for (let index = 0; index < controller.length; index++) {
         }, { passive: true })
     });
 }
+
+var resetReady = true;
+servoReset.addEventListener('click', () => {
+    if (!resetReady) return;
+    resetReady = false;
+    send('servo_reset');
+    setTimeout(() => { resetReady = true; }, 5000);
+}, { passive: true })
 
 var currentdirection = 'STANDBY';
 function onControllerStart(index) {

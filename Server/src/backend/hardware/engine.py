@@ -29,6 +29,9 @@ class Engine:
         else:
             self.stop()
 
+    def servoReset(self):
+        self.engine.resetServo()
+
     def onRemotedirection(self, direction):
         if not self.isActive:
             return

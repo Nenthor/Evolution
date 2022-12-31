@@ -87,6 +87,8 @@ def onMessage(message: str):
         engine.onRemotedirection(msg[1])
     elif msg[0] == "remote_controll":
         engine.onRemoteControll(msg[1] == "on")
+    elif msg[0] == "servo_reset":
+        engine.servoReset()
     elif msg[0] == "shutdown":
         cleanup()
         sys_call(["sudo", "shutdown", "now"])

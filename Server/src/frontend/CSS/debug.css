@@ -60,7 +60,7 @@
 .log_formSelected {
   display: none;
   position: absolute;
-  content: "";
+  content: '';
   width: 33.75%;
   height: 100%;
   border-radius: 30px;

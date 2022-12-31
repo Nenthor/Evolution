@@ -27,6 +27,7 @@ RIGHT:    ~0.91
 
 MAX_ANGLE = 90  # in deg
 VALUES = {"MIN": 0.0, "MID": 1.5 / 3.3, "MAX": 3.0 / 3.3}
+
 def angleToValue(angle):
     # -90° = 0 | 0° = ~0.45 | 90° = ~0.91
     if angle < -MAX_ANGLE:

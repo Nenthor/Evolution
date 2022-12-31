@@ -29,7 +29,7 @@ client.on('connect', () => {
     isConnected = true;
     retryCount = 0;
 
-    if (onConnectFunc != null){
+    if (onConnectFunc != null) {
         onConnectFunc().forEach(element => {
             messageQueue.addElement(element)
         });

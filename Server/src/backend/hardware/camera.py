@@ -7,6 +7,7 @@ __LAST_LEVEL = 100  # [0, 100[
 __camera = [0, 0, 0]
 __lastTime = [__time(), __time(), __time()]
 
+
 def sendCameraData(index, distance):
     """If camera data has changed it will be sent to the server."""
     global __camera
@@ -14,10 +15,10 @@ def sendCameraData(index, distance):
         sendToServer(f"camera:{__camera[0]}{__camera[1]}{__camera[2]}")
 
 
-def onSensorData(index:int, distance:int):
+def onSensorData(index: int, distance: int):
     global __lastTime
     time = __time()
-    if time - __lastTime[index] > 0.33: # Timeout (0.33s)
+    if time - __lastTime[index] > 0.33:  # Timeout (0.33s)
         sendCameraData(index, distance)
         __lastTime[index] = time
 

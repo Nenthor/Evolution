@@ -200,3 +200,6 @@ class Engine:
 
     def stopRotating(self):
         self.servo.stopRotating()
+    
+    def resetServo(self):
+        self.servo.straight()
