@@ -16,53 +16,54 @@ __FORMAT = "utf-8"
 __DISCONNECT_MESSAGE = "!DISCONNECT"
 
 __lock = __Lock()
+__isActive = False
 __client: __socket = None
 __server: __socket = None
 
 
 def start():
     """Start the socket server, so that clients can connect to 127.0.0.1:5050."""
-    global __server
-    if __server == None:
+    global __isActive, __server
+    if not __isActive:
+        __isActive = True
         __Thread(target=__bootServer, daemon=True).start()
 
 
 def stop():
     """Close the socket server"""
-    global __server, __client
-    if __server != None:
+    global __isActive, __server, __client
+    if __isActive:
+        __isActive = False
         __server.shutdown(__SHUT_RDWR)
-        __client = None
-        __server = None
 
 
 def __bootServer():
-    global __server, __client, __lock
+    global __isActive, __server, __client, __lock
     __server = __socket(__AF_INET, __SOCK_STREAM)
     __server.setsockopt(__SOL_SOCKET, __SO_REUSEADDR, 1)
     __server.bind((__HOST, __PORT))
     __server.listen()
     print(f"Hardware is listening to {__HOST}:{__PORT}.")
     try:
-        while __server != None:
+        while __isActive:
             conn, addr = __server.accept()
             with __lock:
                 __client = conn
             __Thread(target=__handleClient, args=(conn, addr), daemon=True).start()
     except __error as e:
-        if __server == None:
+        if not __isActive:
             return  # Normal server shutdown
-        print(e)
+        print("N", e)
     except Exception as e:
         print(e)
     stop()
 
 
 def __handleClient(conn: __socket, addr):
-    global __client, __lock, __server
+    global __isActive, __client, __lock, __server
     print("Client has connected.")
     try:
-        while __server != None:
+        while __isActive:
             msg_length = conn.recv(__HEADER).decode(__FORMAT)
             if msg_length:
                 msg_length = int(msg_length)
