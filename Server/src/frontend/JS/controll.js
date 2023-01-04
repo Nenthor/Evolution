@@ -211,7 +211,7 @@ servoReset.addEventListener('click', () => {
     if (!resetReady) return;
     resetReady = false;
     send('servo_reset');
-    setTimeout(() => { resetReady = true; }, 5000);
+    setTimeout(() => { resetReady = true; }, 1000);
 }, { passive: true })
 
 var currentdirection = 'STANDBY';
@@ -238,7 +238,7 @@ function onControllerStart(index) {
     directionReady = false;
     controller[index].style.backgroundColor = '#3268cd';
     sendCurrentdirection();
-    setTimeout(() => { directionReady = true; }, 500);
+    setTimeout(() => { directionReady = true; }, 100);
 }
 
 function onControllerEnd(index) {
@@ -263,7 +263,7 @@ function onControllerEnd(index) {
     sendCurrentdirection();
 
     directionReady = false;
-    setTimeout(() => { directionReady = true; }, 500);
+    setTimeout(() => { directionReady = true; }, 100);
 }
 
 function sendCurrentdirection() {

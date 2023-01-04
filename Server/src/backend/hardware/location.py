@@ -4,6 +4,7 @@ __sys.path.append("/home/pi/quick2wire")
 del __sys
 
 from i2clibraries import i2c_hmc5883l as __i2c_hmc5883l
+from os import error as __error
 import time as __time
 import threading as __threading
 import gps as __gps
@@ -11,7 +12,7 @@ import gps as __gps
 __lock = __threading.Lock()
 __session = None
 __compass = None
-__isActive = False
+__isActive = {"gps": False, "compass": False}
 __lat = 0.0
 __long = 0.0
 __degree = 0
@@ -20,7 +21,7 @@ __degree = 0
 def __checkForLocation():
     global __session, __isActive, __degree
     try:
-        while __isActive:
+        while __isActive["gps"]:
             report = __session.next()
             if report["class"] == "TPV":
                 lat = float(getattr(report, "lat", "0.0"))
@@ -36,7 +37,7 @@ def __checkForLocation():
 def __checkForDegree():
     global __degree, __isActive
     try:
-        while __isActive:
+        while __isActive["compass"]:
             degree = __getDegree()
             print(degree)
             __onDegreeUpdate(degree)
@@ -53,25 +54,34 @@ def __getDegree():
 
 
 def start():
-    global __lock, __session, __isActive, __compass
+    global __lock, __session, __isActive, __compass, __error
     with __lock:
-        __isActive = True
-        __session = __gps.gps(mode=__gps.WATCH_ENABLE | __gps.WATCH_NEWSTYLE)
-        __compass = __i2c_hmc5883l.i2c_hmc5883l(1)
-        __compass.setContinuousMode()
-        # With https://www.magnetic-declination.com
-        __compass.setDeclination(3, 56)
-        # Degaussing - possible values: 0.88; 1.3; 1.9; 2.5; 4.0; 4.7; 5.6; 8.1
-        __compass.setScale(1.9)
-
-    __threading.Thread(target=__checkForLocation, daemon=True).start()
-    __threading.Thread(target=__checkForDegree, daemon=True).start()
+        if not __isActive["gps"]:
+            try:
+                __session = __gps.gps(mode=__gps.WATCH_ENABLE | __gps.WATCH_NEWSTYLE)
+                __isActive["gps"] = True
+                __threading.Thread(target=__checkForLocation, daemon=True).start()
+            except __error:
+                print("GPS is not connected.")
+        if not __isActive["compass"]:
+            try:
+                __compass = __i2c_hmc5883l.i2c_hmc5883l(1)
+                __compass.setContinuousMode()
+                # With https://www.magnetic-declination.com
+                __compass.setDeclination(3, 56)
+                # Degaussing - possible values: 0.88; 1.3; 1.9; 2.5; 4.0; 4.7; 5.6; 8.1
+                __compass.setScale(1.9)
+                __isActive["compass"] = True
+                __threading.Thread(target=__checkForDegree, daemon=True).start()
+            except __error:
+                print("Compass is not connected.")
 
 
 def stop():
     global __lock, __isActive
     with __lock:
-        __isActive = False
+        __isActive["gps"] = False
+        __isActive["compass"] = False
 
 
 def __onLocationUpdate(newLat, newLong):

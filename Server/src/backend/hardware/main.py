@@ -61,8 +61,8 @@ server.start()
 engine.start()
 music.start()
 lights.start()
-# location.start()          # TODO: Enable this line
-# sbSensor.start()          # TODO: Enable this line
+location.start()
+sbSensor.start()
 
 
 def onMessage(message: str):

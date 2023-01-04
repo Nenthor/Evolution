@@ -10,11 +10,11 @@ class Servo:
     from time import sleep as __sleep
 
     __FREQUENCY = 333  # in Hz
-    __MAX_ANGLE = 90  # in deg
-    __ROTATE_TIME = 0.07  # Time needed for Servo to rotate to angle for 1°
+    __MAX_ANGLE = 30  # in deg
+    __ROTATE_TIME = 0.23  # Time needed for Servo to rotate to angle for 1°
     __DEG_PER_CYCLE = 1  # Steeps per cycle
 
-    __VALUES = {"MIN": 0.0, "MID": 1.5 / 3.3, "MAX": 3.0 / 3.3}
+    __VALUES = {"MIN": (-__MAX_ANGLE + 150) / 300, "MID": (0 + 150) / 300, "MAX": (__MAX_ANGLE + 150) / 300}
 
     def __init__(self):
         self.__lock = self._Lock()
@@ -40,13 +40,15 @@ class Servo:
     def __rotatingLoop(self, direction: int):
         while self.__isRotating:
             if (direction == -1 and self.__angle == -self.__MAX_ANGLE) or (direction == 1 and self.__angle == self.__MAX_ANGLE):
+                self.stopRotating()
                 break
             self.setAngle(self.__angle + (self.__DEG_PER_CYCLE * direction))
             self.__sleep(self.__ROTATE_TIME * self.__DEG_PER_CYCLE)
 
     def stopRotating(self):
-        with self.__lock:
-            self.__isRotating = False
+        if self.__isRotating:
+            with self.__lock:
+                self.__isRotating = False
 
     def left(self):
         self.setAngle(-self.__MAX_ANGLE)
@@ -59,19 +61,18 @@ class Servo:
 
     def setAngle(self, angle):
         with self.__lock:
-            self.__angle = angle
             self.__servo.value = self.__angleToValue(angle)
+            self.__angle = self.__valueToAngle(self.__servo.value)
 
     def getAngle(self):
         return self.__angle
 
     def __angleToValue(self, angle):
-        # -90° = 0 | 0° = ~0.45 | 90° = ~0.91
-        if angle < -self.__MAX_ANGLE:
-            angle = -self.__MAX_ANGLE
-        elif angle > self.__MAX_ANGLE:
-            angle = self.__MAX_ANGLE
-        return (angle + self.__MAX_ANGLE) * (self.__VALUES["MID"] / self.__MAX_ANGLE)
+        angle = max(min(angle, self.__MAX_ANGLE), -self.__MAX_ANGLE)  # cap angle to MAX_ANGLE
+        return (angle + 150) / 300
+
+    def __valueToAngle(self, value):
+        return 300 * value - 150
 
 
 class Lights:
@@ -85,7 +86,6 @@ class Lights:
         if self.__enabled:
             self.__light.close()
             self.__enabled = False
-            
 
     def on(self):
         if self.__enabled:
@@ -131,6 +131,7 @@ class Engine:
 
     __SPEED_FREQUENCY = 30  # in Hz
     __START_HELP = 0.5  # 500ms (time where engine is at 100%)
+    __TIMEOUT = 0.1  # 100ms
 
     autonomous: OutputDevice
     speed_control: PWMOutputDevice
@@ -169,7 +170,7 @@ class Engine:
         if not self.enabled:
             return
         time = self.__time()
-        if time - self.oldTime > self.__START_HELP or speed == 0:
+        if time - self.oldTime > self.__TIMEOUT or speed == 0:
             with self.lock:
                 self.oldTime = time
                 if speed == 0:
