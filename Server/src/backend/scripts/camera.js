@@ -16,7 +16,7 @@ function setSendFunction(func) {
 }
 
 function addCameraListener(client) {
-    if (cameraListeners.length == 0) changeState('1');
+    if (cameraListeners.length == 0) changeState('on');
     cameraListeners.push(client);
 }
 
@@ -26,7 +26,7 @@ function removeCameraListener(client) {
         if (listener != client) continue;
 
         cameraListeners.splice(index);
-        if (cameraListeners.length == 0) changeState('0');
+        if (cameraListeners.length == 0) changeState('off');
     }
 }
 

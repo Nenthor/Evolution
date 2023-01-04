@@ -12,6 +12,7 @@ def sendCameraData(index, distance):
     """If camera data has changed it will be sent to the server."""
     global __camera
     if __isDifferentLevel(index, distance):
+        getCamera(__camera)
         sendToServer(f"camera:{__camera[0]}{__camera[1]}{__camera[2]}")
 
 
@@ -42,6 +43,11 @@ def __isDifferentLevel(index, distance):
 
 def sendToServer(message):
     """Send messages to the server if camera has changed."""
+    pass
+
+
+def getCamera(camera: list[int]):
+    """Send camera values if camera has changed."""
     pass
 
 

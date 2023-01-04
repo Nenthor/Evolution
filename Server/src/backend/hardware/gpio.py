@@ -62,6 +62,9 @@ class Servo:
             self.__angle = angle
             self.__servo.value = self.__angleToValue(angle)
 
+    def getAngle(self):
+        return self.__angle
+
     def __angleToValue(self, angle):
         # -90° = 0 | 0° = ~0.45 | 90° = ~0.91
         if angle < -self.__MAX_ANGLE:
@@ -200,6 +203,9 @@ class Engine:
 
     def stopRotating(self):
         self.servo.stopRotating()
-    
+
     def resetServo(self):
         self.servo.straight()
+
+    def getAngle(self):
+        return self.servo.getAngle()

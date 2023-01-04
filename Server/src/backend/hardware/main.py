@@ -82,11 +82,19 @@ def onMessage(message: str):
     elif msg[0] == "set_lights":
         lights.changeState(msg[1])
     elif msg[0] == "set_camera":
-        distanceSensor.changeState(msg[1])
+        if msg[1] == "on":
+            distanceSensor.addListener("websocket")
+        elif msg[1] == "off":
+            distanceSensor.removeListener("websocket")
     elif msg[0] == "remotedirection":
         engine.onRemotedirection(msg[1])
     elif msg[0] == "remote_controll":
-        engine.onRemoteControll(msg[1] == "on")
+        if msg[1] == "on":
+            distanceSensor.addListener("remote_controll")
+            engine.onRemoteControll(True)
+        elif msg[1] == "off":
+            engine.onRemoteControll(False)
+            distanceSensor.removeListener("remote_controll")
     elif msg[0] == "servo_reset":
         engine.servoReset()
     elif msg[0] == "shutdown":
@@ -110,6 +118,7 @@ distanceSensor.updateCamera = camera.onSensorData
 camera.sendToServer = server.send
 location.sendToServer = server.send
 engine.sendToServer = server.send
+engine.onNewCameraData = camera.getCamera
 sbSensor.sendToServer = server.send
 
 try:

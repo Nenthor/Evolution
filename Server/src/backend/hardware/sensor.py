@@ -20,6 +20,7 @@ class DistanceSensor:
         self.isActive = False
         self.lock = self.__Lock()
         self.outOfRangeCount: list[int]
+        self.cameraListeners: list[str] = []
 
     def start(self):
         """Activate sensors."""
@@ -32,16 +33,22 @@ class DistanceSensor:
 
     def stop(self):
         """Deactivate sensors."""
-        if self.isActive:
+        if self.isActive and not self.remoteControll:
             self.isActive = False
             for sensor in self.sensors:
                 sensor.stop()
 
-    def changeState(self, state):
-        if state == "0":
-            self.stop()
-        elif state == "1":
-            self.start()
+    def addListener(self, listener: str):
+        if not listener in self.cameraListeners:
+            if len(self.cameraListeners) == 0:
+                self.start()
+            self.cameraListeners.append(listener)
+
+    def removeListener(self, listener: str):
+        if listener in self.cameraListeners:
+            self.cameraListeners.remove(listener)
+            if len(self.cameraListeners) == 0:
+                self.stop()
 
     def __startLoop(self):
         try:
