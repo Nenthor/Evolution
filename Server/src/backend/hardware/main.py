@@ -59,10 +59,10 @@ sbSensor = sensor.SpeedBatterySensor()
 
 server.start()
 engine.start()
+music.start()
+lights.start()
 # location.start()          # TODO: Enable this line
 # sbSensor.start()          # TODO: Enable this line
-# music.start()             # TODO: Enable this line
-# lights.start()            # TODO: Enable this line
 
 
 def onMessage(message: str):

@@ -46,9 +46,9 @@ class Engine:
         if direction == "STANDBY":
             self.engine.setDirection(speed=0, reverse_state=False)
         elif direction == "FORWARD":
-            self.engine.setDirection(speed=0.5, reverse_state=False)
+            self.engine.setDirection(speed=0.55, reverse_state=False)
         elif direction == "BACKWARD":
-            self.engine.setDirection(speed=0.5, reverse_state=True)
+            self.engine.setDirection(speed=0.55, reverse_state=True)
         elif direction == "LEFT":
             self.engine.startRotating(direction=-1)
         elif direction == "RIGHT":
