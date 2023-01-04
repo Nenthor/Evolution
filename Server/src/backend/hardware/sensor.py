@@ -33,7 +33,7 @@ class DistanceSensor:
 
     def stop(self):
         """Deactivate sensors."""
-        if self.isActive and not self.remoteControll:
+        if self.isActive:
             self.isActive = False
             for sensor in self.sensors:
                 sensor.stop()
