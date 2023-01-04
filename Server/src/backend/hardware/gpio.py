@@ -9,9 +9,9 @@ class Servo:
     from threading import Thread as __Thread, Lock as _Lock
     from time import sleep as __sleep
 
-    __FREQUENCY = 2000  # in Hz
+    __FREQUENCY = 333  # in Hz
     __MAX_ANGLE = 90  # in deg
-    __ROTATE_TIME = 0.02  # Time needed for Servo to rotate to angle for 1°
+    __ROTATE_TIME = 0.07  # Time needed for Servo to rotate to angle for 1°
     __DEG_PER_CYCLE = 1  # Steeps per cycle
 
     __VALUES = {"MIN": 0.0, "MID": 1.5 / 3.3, "MAX": 3.0 / 3.3}
@@ -85,6 +85,7 @@ class Lights:
         if self.__enabled:
             self.__light.close()
             self.__enabled = False
+            
 
     def on(self):
         if self.__enabled:
