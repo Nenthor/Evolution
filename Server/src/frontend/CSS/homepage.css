@@ -65,9 +65,7 @@
   width: 100%;
   height: 50vh;
   min-height: 500px;
-  background-color: #161616;
-  background-image: url(/images/wifi.webp);
-  background-size: cover;
+  background-image: linear-gradient(to bottom, #13273a, #14133a);
   box-shadow: inset 0 0 0 2000px #16161699;
   display: flex;
   align-items: center;
@@ -77,6 +75,7 @@
 
 .connection_text {
   color: white;
+  font-size: 1.1rem;
   text-align: center;
 }
 
@@ -107,34 +106,12 @@
   }
 }
 
-/*--Information--*/
-.information {
-  width: 100%;
-  height: 50vh;
-  min-height: 500px;
-  background-color: #161616;
-  /*background-image: url(/images/);*/
-  background-size: cover;
-  box-shadow: inset 0 0 0 2000px #16161699;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-}
-
-.information_text {
-  color: white;
-  text-align: center;
-}
-
 /*--Sponsors--*/
 .sponsors {
   width: 100%;
   height: 50vh;
   min-height: 500px;
-  background-color: #161616;
-  /*background-image: url(/images/);*/
-  background-size: cover;
+  background-image: linear-gradient(to top, #13273a, #14133a);
   box-shadow: inset 0 0 0 2000px #16161699;
   display: flex;
   align-items: center;
@@ -145,6 +122,15 @@
 .sponsors_text {
   color: white;
   text-align: center;
+  margin: 1% 0;
 }
 
 /*--Footer--*/
+.footer{
+  font-family: 'robotoMono';
+  width: 100%;
+  height: 50px;
+  font-size: 0.9rem;
+  text-align: center;
+  line-height: 50px;
+}
