@@ -84,6 +84,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
   width: 40%;
   height: 40%;
 }
@@ -159,5 +160,6 @@
   border-radius: 25px;
   text-align: center;
   font-weight: bold;
+  cursor: pointer;
   color: white;
 }

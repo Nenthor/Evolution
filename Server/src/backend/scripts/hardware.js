@@ -5,13 +5,13 @@ var speed = '0', battery = '0', camera = '000', coords = 'Lokalisieren...', comp
 
 const importance = { HIGH: 0, MEDIUM: 1, LOW: 2 }; //For debugging
 const incoming = { //Incoming messages from web-clients
-    battery: 'battery', speed: 'speed', coords: 'coords', compass: 'compass', camera: 'camera', shutdown: 'shutdown', set_music: 'set_music', set_lights: 'set_lights', set_camera: 'set_camera', set_remotedirection: 'set_remotedirection', remote_controll: 'remote_controll', servo_reset: 'servo_reset'
+    battery: 'battery', speed: 'speed', coords: 'coords', compass: 'compass', camera: 'camera', shutdown: 'shutdown', set_music: 'set_music', set_lights: 'set_lights', set_camera: 'set_camera', set_remotedirection: 'set_remotedirection', remote_controll: 'remote_controll', servo_reset: 'servo_reset', set_target: 'set_target'
 };
 const fromHardware = { //Incoming hardware messages
     battery: 'battery', speed: 'speed', coords: 'coords', compass: 'compass', camera: 'camera'
 };
 const toHardware = { //Outgoing hardware messages
-    get_camera: 'get_camera', get_coords: 'get_coords', get_compass: 'get_compass', get_battery: 'get_battery', get_speed: 'get_speed', set_music: 'set_music', set_lights: 'set_lights', set_camera: 'set_camera', shutdown: 'shutdown', remotedirection: 'remotedirection', remote_controll: 'remote_controll', servo_reset: 'servo_reset'
+    get_camera: 'get_camera', get_coords: 'get_coords', get_compass: 'get_compass', get_battery: 'get_battery', get_speed: 'get_speed', set_music: 'set_music', set_lights: 'set_lights', set_camera: 'set_camera', shutdown: 'shutdown', remotedirection: 'remotedirection', remote_controll: 'remote_controll', servo_reset: 'servo_reset', set_target: 'set_target'
 };
 
 module.exports = {
@@ -71,11 +71,14 @@ function onWebsocketData(ws, msg) {
         case incoming.servo_reset:
             client.send(`${toHardware.servo_reset}`);
             break;
+        case incoming.set_target:
+            client.send(`${toHardware.set_target}:${message[1]}`);
+            break;
         case incoming.shutdown:
             client.send(`${toHardware.shutdown}`);
             break;
         default:
-            console.warn(`${type} is not a defined type.`);
+            console.warn(`${message[0]} is not a defined type.`);
             break;
     }
 

@@ -1,5 +1,6 @@
 class Engine:
     from gpio import Engine as __Engine
+    import autonomous
 
     def __init__(self):
         """Setup Engine."""
@@ -18,6 +19,7 @@ class Engine:
         """Deactivate engine."""
         if self.isActive:
             self.engine.stop()
+            self.autonomous.cancel()
             self.isActive = False
 
     def sendToServer(self, message):
@@ -81,3 +83,17 @@ class Engine:
 
     def brake(self):
         self.onRemotedirection(self, "STANDBY")
+
+    def setTarget(self, msg: str):
+        if msg == "-1":
+            self.autonomous.cancel()
+            return
+        values = msg.split(";")
+        lat = float(values[0])
+        long = float(values[1])
+        dLat = float(values[2])
+        dLong = float(values[3])
+        self.autonomous.setTarget(lat, long, dLat, dLong)
+    
+    def updateDegree(self, deg):
+        self.autonomous.updateDegree(deg)

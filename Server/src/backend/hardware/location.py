@@ -103,10 +103,16 @@ def __onDegreeUpdate(newDegree):
             __degree = newDegree
         if __degree >= 0 and __degree < 360:
             sendToServer(f"compass:{__degree}")
+            updateDegree(__degree)
 
 
 def sendToServer(message):
     """Send messages to the server if location is updated."""
+    pass
+
+
+def updateDegree(deg):
+    """Update degree for autonomous.py"""
     pass
 
 

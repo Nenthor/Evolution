@@ -27,14 +27,14 @@ body {
   overflow: hidden;
 }
 
-.display_locationDot {
+.display_locationNeedle {
   position: absolute;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background-color: #cd3232;
-  box-shadow: 0px 0px 6px 2px #cd3232;
-  animation: glow 1s ease-in-out infinite alternate;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 7.5px 20px 7.5px;
+  border-color: transparent transparent #cd3232 transparent;
+  transform: rotateZ(0deg);
 }
 
 .display_mapLizenz {

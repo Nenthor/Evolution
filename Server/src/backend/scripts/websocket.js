@@ -21,7 +21,7 @@ const outgoing = {  //Outgoing messages to web-clients
 //Setup
 debug.setSendFunction(send);
 camera.setSendFunction(hardware.sendData)
-navigation.setSendFunctions(send, sendAllClients);
+navigation.setSendFunctions(send, sendAllClients, hardware.sendData);
 hardware.setSendFunctions(send, sendAllClients);
 hardware.setOnCoords(navigation.setNavigation)
 remoteControll.setSendFunctions(send, sendAllClients, hardware.sendData);

@@ -7,6 +7,7 @@ var sendStop = false;
 var currentX = 0, currentY = 0;
 var pixelX = 0, pixelY = 0;
 var targetX = 0, targetY = 0;
+var compass = 0;
 var hasData = false, hasTarget = false, hasLoaded = 0, hasControll = false;
 var onSetWaiting = false;
 var gpsWatch = null, gpsWatchTimeout = null;
@@ -15,6 +16,7 @@ addSocketEvents();
 function addSocketEvents() {
     socket.addEventListener('open', () => {
         send('get_navigation');
+        send('get_compass');
         send('get_target');
         if (!isLocal && document.hasFocus()) requestControll();
     }, { passive: true });
@@ -32,6 +34,12 @@ function addSocketEvents() {
                 if (hasData) displayMap();
                 checkButtonStatus();
                 checkMapImages();
+                break;
+            case 'compass':
+                if (compass != parseInt(data[1])) {
+                    compass = parseInt(data[1]);
+                    updateNeedle()
+                }
                 break;
             case 'target':
                 extractTargetMessage(data[1]);
@@ -541,4 +549,12 @@ function drawTarget() {
         ctx.stroke()
         ctx.fillRect(canvas.width / 2 + targetX * scale - 6 * scale, canvas.height / 2 - targetY * scale - 6 * scale, 12 * scale, 12 * scale);
     }, 0);
+}
+
+//Rotate needle
+const needle = document.getElementById('needle');
+needle.style.transform = `rotateZ(${compass}deg)`;
+
+function updateNeedle() {
+    needle.style.transform = `rotateZ(${compass}deg)`;
 }

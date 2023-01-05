@@ -38,7 +38,7 @@ def signalClose(sig, frame):
 def cleanup():
     server.stop()
     engine.stop()
-    distanceSensor.stop()
+    distanceSensor.close()
     music.stop()
     lights.stop()
     location.stop()
@@ -99,6 +99,8 @@ def onMessage(message: str):
             distanceSensor.removeListener("remote_controll")
     elif msg[0] == "servo_reset":
         engine.servoReset()
+    elif msg[0] == "set_target":
+        engine.setTarget(msg[1])
     elif msg[0] == "shutdown":
         cleanup()
         sys_call(["sudo", "shutdown", "now"])
@@ -120,6 +122,7 @@ server.onMessage = onMessage
 distanceSensor.updateCamera = camera.onSensorData
 camera.sendToServer = server.send
 location.sendToServer = server.send
+location.updateDegree = engine.updateDegree
 engine.sendToServer = server.send
 engine.onNewCameraData = camera.getCamera
 sbSensor.sendToServer = server.send

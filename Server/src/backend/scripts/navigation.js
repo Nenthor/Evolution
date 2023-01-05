@@ -8,7 +8,7 @@ var targetLat = Infinity, targetLong = Infinity;
 var pixelX = 0, pixelY = 0;
 var targetPixelX = 0, targetPixelY = 0;
 var currentTile = null;
-var send, sendAllClients;
+var send, sendAllClients, sendHardware;
 
 const importance = { HIGH: 0, MEDIUM: 1, LOW: 2 }; //For debugging
 const outgoing = {  //Outgoing messages to web-clients
@@ -23,9 +23,10 @@ module.exports = {
     getTarget
 }
 
-function setSendFunctions(single, all) {
+function setSendFunctions(single, all, hardware) {
     send = single;
     sendAllClients = all;
+    sendHardware = hardware;
 }
 
 //Load navigation data
@@ -147,6 +148,7 @@ function setTarget(isDeg, value) {
         targetPixelY = 0;
         targetLat = Infinity;
         targetLong = Infinity;
+        sendHardware(null, `set_target:-1`);
     } else if (isDeg) {
         //Values already in degree
         const values = value.split(' ');
@@ -184,6 +186,7 @@ function calculateTarget(targetLat, targetLong) {
         targetPixelX = Math.round(diffLong / Math.abs(stats.widthPixelLong));
         targetPixelY = Math.round(diffLat / Math.abs(stats.widthPixelLat));
 
+        sendHardware(null, `set_target:${lat};${long};${targetLat};${targetLong}`);
         message = `${targetPixelX} ${targetPixelY}`;
     } else message = '-1';
 

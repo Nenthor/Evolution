@@ -24,6 +24,8 @@ class DistanceSensor:
         self.oldTime = self.__time()
         self.currentActionID = 0
         self.deactivationInfo = [False, False, False]
+        self.sensors = [None, None, None]
+        self.__setupSensors()
 
     def start(self):
         """Activate sensors."""
@@ -33,8 +35,6 @@ class DistanceSensor:
                 self.isActive = True
                 self.oldTime = currentTime
                 self.outOfRangeCount = [0, 0, 0]
-                self.sensors = [None, None, None]
-                self.__setupSensors()
                 self.__Thread(target=self.__startLoop, daemon=True).start()
             else:
                 delay = 1 - (currentTime - self.oldTime)
@@ -49,14 +49,16 @@ class DistanceSensor:
             if currentTime - self.oldTime >= 1.0:
                 self.isActive = False
                 self.oldTime = self.__time()
-                for sensor in self.sensors:
-                    if sensor != None:
-                        sensor.stop()
             else:
                 delay = 1 - (currentTime - self.oldTime)
                 with self.lock:
                     self.currentActionID += 1
                 self.__Thread(target=self.__delayAction, args=(delay, "stop", self.currentActionID), daemon=True).start()
+
+    def close(self):
+        for index, sensor in enumerate(self.__SENSORS):
+            if self.sensors[index] != None:
+                self.sensors[index].stop()
 
     def addListener(self, listener: str):
         if not listener in self.cameraListeners:
