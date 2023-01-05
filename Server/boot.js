@@ -4,7 +4,7 @@ global.music = '0';
 global.navigation = 'Lokalisieren...';
 global.coords = 'Lokalisieren...';
 global.compass = '0';
-global.camera = '0';
+global.camera = 'off';
 global.debug = true;
 
 //Setup webserver

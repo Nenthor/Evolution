@@ -1,7 +1,9 @@
 import os
+import warnings
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))  # Set working directory to to file directory (.../backend/hardware/)
 os.environ["GPIOZERO_PIN_FACTORY"] = "pigpio"
+warnings.simplefilter("ignore")
 
 from time import sleep
 from datetime import datetime
@@ -57,12 +59,12 @@ engine = Engine()
 distanceSensor = sensor.DistanceSensor()
 sbSensor = sensor.SpeedBatterySensor()
 
-server.start()
 engine.start()
 music.start()
 lights.start()
 location.start()
 sbSensor.start()
+server.start()
 
 
 def onMessage(message: str):
@@ -111,6 +113,7 @@ def onClientDisconnect():
     lights.changeState("0")
     engine.onRemotedirection("STANDBY")
     engine.onRemoteControll(False)
+    distanceSensor.removeListener("websocket")
 
 
 server.onMessage = onMessage

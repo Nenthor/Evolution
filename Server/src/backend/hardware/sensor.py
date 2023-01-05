@@ -5,7 +5,7 @@ with open("../data/pinlayout.json") as f:
 
 
 class DistanceSensor:
-    from time import sleep as __sleep
+    from time import sleep as __sleep, time as __time
     from threading import Thread as __Thread, Lock as __Lock
     from gpio import DistanceSensor as __DistanceSensor
 
@@ -21,22 +21,42 @@ class DistanceSensor:
         self.lock = self.__Lock()
         self.outOfRangeCount: list[int]
         self.cameraListeners: list[str] = []
+        self.oldTime = self.__time()
+        self.currentActionID = 0
+        self.deactivationInfo = [False, False, False]
 
     def start(self):
         """Activate sensors."""
         if not self.isActive:
-            self.isActive = True
-            self.outOfRangeCount = [0, 0, 0]
-            self.sensors = [None, None, None]
-            self.__setupSensors()
-            self.__Thread(target=self.__startLoop, daemon=True).start()
+            currentTime = self.__time()
+            if currentTime - self.oldTime >= 1.0:
+                self.isActive = True
+                self.oldTime = currentTime
+                self.outOfRangeCount = [0, 0, 0]
+                self.sensors = [None, None, None]
+                self.__setupSensors()
+                self.__Thread(target=self.__startLoop, daemon=True).start()
+            else:
+                delay = 1 - (currentTime - self.oldTime)
+                with self.lock:
+                    self.currentActionID += 1
+                self.__Thread(target=self.__delayAction, args=(delay, "start", self.currentActionID), daemon=True).start()
 
     def stop(self):
         """Deactivate sensors."""
         if self.isActive:
-            self.isActive = False
-            for sensor in self.sensors:
-                sensor.stop()
+            currentTime = self.__time()
+            if currentTime - self.oldTime >= 1.0:
+                self.isActive = False
+                self.oldTime = self.__time()
+                for sensor in self.sensors:
+                    if sensor != None:
+                        sensor.stop()
+            else:
+                delay = 1 - (currentTime - self.oldTime)
+                with self.lock:
+                    self.currentActionID += 1
+                self.__Thread(target=self.__delayAction, args=(delay, "stop", self.currentActionID), daemon=True).start()
 
     def addListener(self, listener: str):
         if not listener in self.cameraListeners:
@@ -50,22 +70,53 @@ class DistanceSensor:
             if len(self.cameraListeners) == 0:
                 self.stop()
 
+    def __delayAction(self, delay: float, action: str, id: int):
+        self.__sleep(delay)
+        with self.lock:
+            if self.currentActionID == id:
+                if action == "start":
+                    self.start()
+                elif action == "stop":
+                    self.stop()
+
     def __startLoop(self):
-        try:
-            while self.isActive:
-                self.__sleep(0.06)
-                for index, sensor in enumerate(self.sensors):
-                    if sensor.isEnabled():
-                        self.__onData(index, sensor.getDistance())
-        except Exception as e:
-            print(e)
-            self.stop()
+        while self.isActive:
+            self.__sleep(0.06)
+            for index, sensor in enumerate(self.sensors):
+                if sensor == None:
+                    continue
+                if sensor.isEnabled():
+                    distance = sensor.getDistance()
+                    if distance == 0:
+                        self.__enabledCheck(index)
+                    else:
+                        self.__onData(index, distance)
+
+    def __setupSensors(self):
+        for index, sensor in enumerate(self.__SENSORS):
+            self.sensors[index] = self.__DistanceSensor(trigger=sensor["trigger"], echo=sensor["echo"])
+            self.sensors[index].start()
+
+    def __enabledCheck(self, index) -> bool:
+        if not self.sensors[index].enabledCheck():
+            self.sensors[index].stop()
+            self.sensors[index] = None
+            if not self.deactivationInfo[index]:
+                self.deactivationInfo[index] = True
+                print(f"DistanceSensor {index + 1} is not connected.")
+            for index, sensor in enumerate(self.sensors):
+                if sensor != None:
+                    break
+                if index == len(self.sensors) - 1:
+                    self.stop()
+            return False
+        return True
 
     def __onData(self, index, distance):
-        if self.checkData(index, distance):
+        if self.__checkData(index, distance):
             self.updateCamera(index, distance)
 
-    def checkData(self, index, distance) -> bool:
+    def __checkData(self, index, distance) -> bool:
         if distance != 500 or self.outOfRangeCount[index] >= 10:
             with self.lock:
                 self.outOfRangeCount[index] = 0
@@ -74,10 +125,6 @@ class DistanceSensor:
             with self.lock:
                 self.outOfRangeCount[index] += 1
             return False
-
-    def __setupSensors(self):
-        for index, sensor in enumerate(self.__SENSORS):
-            self.sensors[index] = self.__DistanceSensor(trigger=sensor["trigger"], echo=sensor["echo"])
 
     def updateCamera(self, index: int, distance: int):
         """Overwrite this function to receive distances from sensors."""
@@ -188,17 +235,13 @@ class SpeedBatterySensor:
     def __calculate_speed(self, vOut):
         # Vout = (Vin * R2) / (R1 + R2) -> Vin = (Vout * (R1 + R2)) / R2
         vIn = (vOut * (self.__R1_SPEED + self.__R2_SPEED)) / self.__R2_SPEED
-        print("vIn:", vIn)
         # speed = (current_difference) * MAX_SPEED_VALUE
         speed = (vIn / self.__MAX_SPEED_VOLTAGE) * self.__MAX_SPEED_VALUE
-        print("speed:", round(max(0, min(self.__MAX_SPEED_VALUE, speed))))
         return round(max(0, min(self.__MAX_SPEED_VALUE, speed)))
 
     def __calculate_battery(self, vOut):
         # Vout = (Vin * R2) / (R1 + R2) -> Vin = (Vout * (R1 + R2)) / R2
         vIn = (vOut * (self.__R1_BATTERY + self.__R2_BATTERY)) / self.__R2_BATTERY
-        print("vIn:", vIn)
         # battery = (current_difference / max_differenz) * 100
         battery = ((vIn - self.__MIN_BATTERY_VOLTAGE) / (self.__MAX_BATTERY_VOLTAGE - self.__MIN_BATTERY_VOLTAGE)) * 100
-        print("battery:", round(max(0, min(100, battery))))
         return round(max(0, min(100, battery)))

@@ -10,11 +10,16 @@ class Servo:
     from time import sleep as __sleep
 
     __FREQUENCY = 333  # in Hz
-    __MAX_ANGLE = 30  # in deg
-    __ROTATE_TIME = 0.23  # Time needed for Servo to rotate to angle for 1°
+    __MAX_ANGLE = 150  # in deg
+    __MIDDLE_VALUE = 0  # start value: MAX_ANGLE + MIDDLE_VALUE <= 150
+    __ROTATE_TIME = 0.02  # Time needed for Servo to rotate to angle for 1°
     __DEG_PER_CYCLE = 1  # Steeps per cycle
 
-    __VALUES = {"MIN": (-__MAX_ANGLE + 150) / 300, "MID": (0 + 150) / 300, "MAX": (__MAX_ANGLE + 150) / 300}
+    __VALUES = {
+        "MIN": (-__MAX_ANGLE + 150 + __MIDDLE_VALUE) / 300,
+        "MID": (0 + 150 + __MIDDLE_VALUE) / 300,
+        "MAX": (__MAX_ANGLE + 150 + __MIDDLE_VALUE) / 300,
+    }
 
     def __init__(self):
         self.__lock = self._Lock()
@@ -63,16 +68,19 @@ class Servo:
         with self.__lock:
             self.__servo.value = self.__angleToValue(angle)
             self.__angle = self.__valueToAngle(self.__servo.value)
+        print(f"DEG: {round(self.__angle, 2)}°\tPWM: {self.__servo.value}")
 
     def getAngle(self):
         return self.__angle
 
     def __angleToValue(self, angle):
         angle = max(min(angle, self.__MAX_ANGLE), -self.__MAX_ANGLE)  # cap angle to MAX_ANGLE
-        return (angle + 150) / 300
+        value = (angle + 150 + self.__MIDDLE_VALUE) / 300
+        return max(0, min(1, value))
 
     def __valueToAngle(self, value):
-        return 300 * value - 150
+        angle = 300 * value - 150 - self.__MIDDLE_VALUE
+        return max(min(angle, self.__MAX_ANGLE), -self.__MAX_ANGLE)
 
 
 class Lights:
@@ -97,31 +105,45 @@ class Lights:
 
 
 class DistanceSensor:
-    from gpiozero import DistanceSensor as Sensor
+    from gpiozero import DistanceSensor as Sensor, PinSetInput as __Error
+
+    sensor: Sensor
 
     def __init__(self, trigger: int, echo: int):
         self.enabled = False
         self.trigger = trigger
         self.echo = echo
+        self.sensor = None
 
     def start(self):
         if not self.enabled and self.trigger != None and self.echo != None:
-            self.sensor = self.Sensor(trigger=self.trigger, echo=self.echo, queue_len=1, max_distance=5)
+            self.sensor = self.Sensor(trigger=self.trigger, echo=self.echo, queue_len=1, max_distance=5, partial=True)
+            self.enabled = True
 
     def stop(self):
         if self.enabled:
-            self.sensor.close()
+            if self.sensor != None:
+                self.sensor.close()
+                self.sensor = None
             self.enabled = False
 
     def isEnabled(self) -> bool:
         return self.enabled
 
+    def enabledCheck(self) -> bool:
+        if self.enabled:
+            if self.sensor.active_time == None and self.sensor.inactive_time != None:
+                if self.sensor.inactive_time > 1.0:
+                    return False
+            return True
+        return False
+
     def getDistance(self) -> int:
         """Returns distance in cm (0cm - 500cm)"""
+        distance = -1
         if self.enabled:
-            return round(self.sensor.distance * 100)
-        else:
-            return -1
+            distance = round(self.sensor.distance * 100)
+        return distance
 
 
 class Engine:
