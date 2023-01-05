@@ -39,7 +39,6 @@ def __checkForDegree():
     try:
         while __isActive["compass"]:
             degree = __getDegree()
-            print(degree)
             __onDegreeUpdate(degree)
             __time.sleep(0.75)
     except (KeyboardInterrupt, SystemExit):
@@ -94,6 +93,7 @@ def __onLocationUpdate(newLat, newLong):
             sendToServer("coords:Lokalisieren...")
         else:
             sendToServer(f"coords:{__lat} {__long}")
+        updatePosition(__lat, __long)
 
 
 def __onDegreeUpdate(newDegree):
@@ -113,6 +113,11 @@ def sendToServer(message):
 
 def updateDegree(deg):
     """Update degree for autonomous.py"""
+    pass
+
+
+def updatePosition(lat, long):
+    """Update position for autonomous.py"""
     pass
 
 

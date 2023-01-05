@@ -8,6 +8,7 @@ class Engine:
         self.old_direction = "STANDBY"
         self.engine = self.__Engine()
         self.camera = [0, 0, 0]
+        self.autonomous.setServo = self.engine.setAngle
 
     def start(self):
         """Activate engine."""
@@ -41,16 +42,16 @@ class Engine:
 
         if self.old_direction == "LEFT" or self.old_direction == "RIGHT":
             self.engine.stopRotating()
-
-        if not self.cameraCheck(direction):
-            return
+        check = self.cameraCheck(direction)
+        if not check:
+            self.brake()
 
         if direction == "STANDBY":
             self.engine.setDirection(speed=0, reverse_state=False)
         elif direction == "FORWARD":
-            self.engine.setDirection(speed=0.55, reverse_state=False)
+            self.engine.setDirection(speed=0.6, reverse_state=False)
         elif direction == "BACKWARD":
-            self.engine.setDirection(speed=0.55, reverse_state=True)
+            self.engine.setDirection(speed=0.6, reverse_state=True)
         elif direction == "LEFT":
             self.engine.startRotating(direction=-1)
         elif direction == "RIGHT":
@@ -70,7 +71,12 @@ class Engine:
         elif direction == "BACKWARD":
             isValid = True
         elif direction == "FORWARD":
+            angle = self.engine.servo.getAngle()
             if self.camera[1] != 0 or self.camera[0] == 3 or self.camera[2] == 3:
+                isValid = False
+            elif (angle <= -3 and self.camera[0] >= 2) or (angle >= 1 and self.camera[2] >= 2):
+                isValid = False
+            elif (angle <= -5 and self.camera[0] != 0) or (angle >= 5 and self.camera[2] != 0):
                 isValid = False
             else:
                 isValid = True
@@ -82,7 +88,7 @@ class Engine:
         return isValid
 
     def brake(self):
-        self.onRemotedirection(self, "STANDBY")
+        self.onRemotedirection("STANDBY")
 
     def setTarget(self, msg: str):
         if msg == "-1":
@@ -97,3 +103,6 @@ class Engine:
     
     def updateDegree(self, deg):
         self.autonomous.updateDegree(deg)
+
+    def updatePosition(self, lat, long):
+        self.autonomous.updatePosition(lat, long)

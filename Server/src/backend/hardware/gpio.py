@@ -10,15 +10,16 @@ class Servo:
     from time import sleep as __sleep
 
     __FREQUENCY = 333  # in Hz
-    __MAX_ANGLE = 150  # in deg
-    __MIDDLE_VALUE = 0  # start value: MAX_ANGLE + MIDDLE_VALUE <= 150
-    __ROTATE_TIME = 0.02  # Time needed for Servo to rotate to angle for 1°
+    __MAX_LEFT = 25 # in deg
+    __MAX_RIGHT = 25 # in deg
+    __MIDDLE_VALUE = -5  # start value: MAX_ANGLE + MIDDLE_VALUE <= 150
+    __ROTATE_TIME = 0.04  # Time needed for Servo to rotate to angle for 1°
     __DEG_PER_CYCLE = 1  # Steeps per cycle
 
     __VALUES = {
-        "MIN": (-__MAX_ANGLE + 150 + __MIDDLE_VALUE) / 300,
+        "MIN": (-__MAX_LEFT + 150 + __MIDDLE_VALUE) / 300,
         "MID": (0 + 150 + __MIDDLE_VALUE) / 300,
-        "MAX": (__MAX_ANGLE + 150 + __MIDDLE_VALUE) / 300,
+        "MAX": (__MAX_RIGHT + 150 + __MIDDLE_VALUE) / 300,
     }
 
     def __init__(self):
@@ -44,7 +45,7 @@ class Servo:
 
     def __rotatingLoop(self, direction: int):
         while self.__isRotating:
-            if (direction == -1 and self.__angle == -self.__MAX_ANGLE) or (direction == 1 and self.__angle == self.__MAX_ANGLE):
+            if (direction == -1 and self.__angle == -self.__MAX_LEFT) or (direction == 1 and self.__angle == self.__MAX_RIGHT):
                 self.stopRotating()
                 break
             self.setAngle(self.__angle + (self.__DEG_PER_CYCLE * direction))
@@ -56,31 +57,31 @@ class Servo:
                 self.__isRotating = False
 
     def left(self):
-        self.setAngle(-self.__MAX_ANGLE)
+        self.setAngle(-self.__MAX_LEFT)
 
     def straight(self):
         self.setAngle(0)
 
     def right(self):
-        self.setAngle(self.__MAX_ANGLE)
+        self.setAngle(self.__MAX_RIGHT)
 
     def setAngle(self, angle):
         with self.__lock:
             self.__servo.value = self.__angleToValue(angle)
             self.__angle = self.__valueToAngle(self.__servo.value)
-        print(f"DEG: {round(self.__angle, 2)}°\tPWM: {self.__servo.value}")
+        # print(f"DEG: {round(self.__angle, 2)}°\tPWM: {self.__servo.value}")
 
     def getAngle(self):
         return self.__angle
 
     def __angleToValue(self, angle):
-        angle = max(min(angle, self.__MAX_ANGLE), -self.__MAX_ANGLE)  # cap angle to MAX_ANGLE
+        angle = max(min(angle, self.__MAX_RIGHT), -self.__MAX_LEFT)  # cap angle to MAX_ANGLE
         value = (angle + 150 + self.__MIDDLE_VALUE) / 300
         return max(0, min(1, value))
 
     def __valueToAngle(self, value):
         angle = 300 * value - 150 - self.__MIDDLE_VALUE
-        return max(min(angle, self.__MAX_ANGLE), -self.__MAX_ANGLE)
+        return max(min(angle, self.__MAX_RIGHT), -self.__MAX_LEFT)
 
 
 class Lights:
@@ -220,6 +221,7 @@ class Engine:
             self.__sleep(0.05)  # 50ms
 
     def __setSpeed(self, value):
+        print(value)
         self.speed_control.value = value
 
     def startRotating(self, direction: int):
@@ -230,6 +232,9 @@ class Engine:
 
     def resetServo(self):
         self.servo.straight()
+
+    def setAngle(self, angle):
+        self.servo.setAngle(angle)
 
     def getAngle(self):
         return self.servo.getAngle()

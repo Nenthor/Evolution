@@ -123,8 +123,9 @@ distanceSensor.updateCamera = camera.onSensorData
 camera.sendToServer = server.send
 location.sendToServer = server.send
 location.updateDegree = engine.updateDegree
+location.updatePosition = engine.updatePosition
 engine.sendToServer = server.send
-engine.onNewCameraData = camera.getCamera
+camera.getCamera = engine.onNewCameraData
 sbSensor.sendToServer = server.send
 
 try:
