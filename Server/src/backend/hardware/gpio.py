@@ -118,7 +118,7 @@ class DistanceSensor:
 
     def start(self):
         if not self.enabled and self.trigger != None and self.echo != None:
-            self.sensor = self.Sensor(trigger=self.trigger, echo=self.echo, queue_len=1, max_distance=5, partial=True)
+            self.sensor = self.Sensor(trigger=self.trigger, echo=self.echo, queue_len=3, max_distance=5, partial=True)
             self.enabled = True
 
     def stop(self):
@@ -153,7 +153,7 @@ class Engine:
     from gpiozero import PWMOutputDevice, OutputDevice
 
     __SPEED_FREQUENCY = 30  # in Hz
-    __START_HELP = 0.5  # 500ms (time where engine is at 100%)
+    __START_HELP = 0.75  # 750ms (time where engine is at 100%)
     __TIMEOUT = 0.1  # 100ms
 
     autonomous: OutputDevice

@@ -144,7 +144,7 @@ class SpeedBatterySensor:
     __MAX_SPEED_VOLTAGE = 42
     __MAX_SPEED_VALUE = 35.0  # Value from tracker app
     __MAX_BATTERY_VOLTAGE = 84
-    __MIN_BATTERY_VOLTAGE = 60  # TODO: Check value
+    __MIN_BATTERY_VOLTAGE = 60
     __R1_SPEED = 10
     __R2_SPEED = 10
     __R1_BATTERY = 27
@@ -156,8 +156,8 @@ class SpeedBatterySensor:
     def __init__(self):
         self.lock = self.__Lock()
         self.isActive = {"speed": False, "battery": False}
-        self.__speed = 0
-        self.__battery = 0
+        self.speed = 0
+        self.battery = 0
 
     def start(self):
         if not self.isActive["speed"]:
@@ -204,14 +204,14 @@ class SpeedBatterySensor:
         if not self.isActive[type]:
             return
         if type == "speed":
-            self.sendToServer(f"speed:{self.__speed}")
+            self.sendToServer(f"speed:{self.speed}")
         elif type == "battery":
-            self.sendToServer(f"battery:{self.__battery}")
+            self.sendToServer(f"battery:{self.battery}")
 
     def __checkSpeed(self):
         while self.isActive["speed"]:
-            self.__sleep(0.50)  # 0.5s timeout
-            while not self.__ina_battery.is_conversion_ready() and self.isActive["speed"]:
+            self.__sleep(0.10)  # 0.1s timeout
+            while not self.__ina_speed.is_conversion_ready() and self.isActive["speed"]:
                 self.__sleep(0.1)
             speed = self.__calculate_speed(self.__ina_speed.voltage())
             if speed != self.speed:
@@ -228,11 +228,11 @@ class SpeedBatterySensor:
             while not self.__ina_battery.is_conversion_ready() and self.isActive["battery"]:
                 self.__sleep(0.1)
             battery = self.__calculate_battery(self.__ina_battery.voltage())
-            if battery != self.__battery:
+            if battery != self.battery:
                 with self.lock:
                     # Update battery value
-                    self.__battery = battery
-                    self.sendToServer(f"battery:{self.__battery}")
+                    self.battery = battery
+                    self.sendToServer(f"battery:{self.battery}")
 
     def __calculate_speed(self, vOut):
         # Vout = (Vin * R2) / (R1 + R2) -> Vin = (Vout * (R1 + R2)) / R2

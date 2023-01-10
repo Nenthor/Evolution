@@ -49,9 +49,9 @@ class Engine:
         if direction == "STANDBY":
             self.engine.setDirection(speed=0, reverse_state=False)
         elif direction == "FORWARD":
-            self.engine.setDirection(speed=0.6, reverse_state=False)
+            self.engine.setDirection(speed=0.75, reverse_state=False)
         elif direction == "BACKWARD":
-            self.engine.setDirection(speed=0.6, reverse_state=True)
+            self.engine.setDirection(speed=0.75, reverse_state=True)
         elif direction == "LEFT":
             self.engine.startRotating(direction=-1)
         elif direction == "RIGHT":
@@ -88,6 +88,7 @@ class Engine:
         return isValid
 
     def brake(self):
+        print("BRAKE")
         self.onRemotedirection("STANDBY")
 
     def setTarget(self, msg: str):
