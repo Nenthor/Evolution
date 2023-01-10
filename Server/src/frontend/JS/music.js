@@ -64,7 +64,7 @@ logo.addEventListener('click', () => {
     addTapcount();
     if (tapCount >= 3) {
         tapCount = 0;
-        onClick(5);
+        onClick(4);
     }
 }, { passive: true });
 
