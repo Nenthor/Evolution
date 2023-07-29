@@ -1,0 +1,60 @@
+{
+  "display": {
+    "battery": 0,
+    "reverse": false,
+    "speed": 0,
+    "settings": [
+      {
+        "name": "music",
+        "status": false
+      },
+      {
+        "name": "car_light",
+        "status": false
+      },
+      {
+        "name": "remote_controll",
+        "status": false
+      },
+      {
+        "name": "shutdown",
+        "status": false
+      }
+    ],
+    "coords_txt": "Lokalisieren...",
+    "connection_quality": "?"
+  },
+  "music": {
+    "volume": 50,
+    "current_song": -1,
+    "songs": [
+      {
+        "title": "Catch it",
+        "url": "/images/music/catch_it.webp"
+      },
+      {
+        "title": "Salsa Musik",
+        "url": "/images/music/salsa.webp"
+      },
+      {
+        "title": "Lady of the 80's",
+        "url": "/images/music/80s.webp"
+      }
+    ]
+  },
+  "camera": {
+    "obstacles": [
+      0,
+      0,
+      0
+    ]
+  },
+  "map": {
+    "hasLocation": true,
+    "imageX": 18,
+    "imageY": 19,
+    "pixelX": 2815,
+    "pixelY": 2815,
+    "rotation": 0
+  }
+}
