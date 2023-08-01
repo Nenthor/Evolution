@@ -18,10 +18,10 @@
 		musicStore.set(JSON.parse(data.music));
 		displayStore.set(JSON.parse(data.display));
 
-		music_socket = new SocketClient('music');
+		music_socket = new SocketClient('music', data.socket_port);
 		music_socket.onMessage((message) => musicStore.set(JSON.parse(message)));
 
-		display_socket = new SocketClient('display');
+		display_socket = new SocketClient('display', data.socket_port);
 		display_socket.onMessage((message) => displayStore.set(JSON.parse(message)));
 
 		let offset = 75;
@@ -119,7 +119,7 @@
 	<ul class="list">
 		{#each music.songs as song, i}
 			<button class="song {i == music.current_song ? 'selected' : ''}" on:click={() => setMusic(i)}>
-				<div class="img" style="background-image: url({song.url});" />
+				<div class="img" style="background-image: url({song.img});" />
 				<span class="title">{song.title}</span>
 			</button>
 		{/each}

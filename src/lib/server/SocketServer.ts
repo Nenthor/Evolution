@@ -1,7 +1,8 @@
 import { Server as ioServer } from 'socket.io';
 import { createServer as createHttpServer } from 'http';
+import { dev } from '$app/environment';
+import { SOCKET_PORT_DEV as DEV_PORT, SOCKET_PORT_PROD as PROD_PORT} from '$env/static/private';
 
-const PORT = 3010;
 export const channels = ['display', 'music', 'camera', 'map'] as const;
 export type Channel = (typeof channels)[number];
 
@@ -11,7 +12,7 @@ let callback = (message: string) => {};
 export function start() {
 	if (server) return;
 
-	const http_server = createHttpServer().listen(PORT);
+	const http_server = createHttpServer().listen(dev ? DEV_PORT: PROD_PORT);
 	server = new ioServer(http_server, {
 		cors: { origin: '*' }
 	});

@@ -19,7 +19,7 @@
 	onMount(() => {
 		mapStore.set(JSON.parse(data.map));
 
-		map_socket = new SocketClient('map');
+		map_socket = new SocketClient('map', data.socket_port);
 		map_socket.onMessage((message) => mapStore.set(JSON.parse(message)));
 
 		let offset = 75 + 12;

@@ -1,11 +1,11 @@
 {
 	"name": "evolution",
-	"version": "3.0.1",
+	"version": "3.0.2",
 	"private": true,
 	"scripts": {
-		"dev": "vite dev --host --port 3001",
+		"dev": "vite dev --host --port 3000",
 		"build": "vite build",
-		"preview": "vite preview --host --port 3001"
+		"preview": "vite preview --host --port 3000"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^2.0.0",

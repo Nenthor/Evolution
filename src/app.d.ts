@@ -8,6 +8,7 @@ declare global {
 		// interface Error {}
 		interface Locals {}
 		interface PageData {
+			socket_port: string;
 			display?: string;
 			music?: string;
 			camera?: string;

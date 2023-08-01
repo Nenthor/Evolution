@@ -1,1 +1,22 @@
-{"settings":[{"name":"music","status":true},{"name":"car_light","status":true},{"name":"remote_controll","status":false},{"name":"shutdown","status":false}],"volume":44,"current_song":0}
+{
+  "settings": [
+    {
+      "name": "music",
+      "status": true
+    },
+    {
+      "name": "car_light",
+      "status": false
+    },
+    {
+      "name": "remote_controll",
+      "status": false
+    },
+    {
+      "name": "shutdown",
+      "status": false
+    }
+  ],
+  "volume": 50,
+  "current_song": 0
+}

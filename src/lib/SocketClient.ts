@@ -4,8 +4,8 @@ import type { Channel } from '$lib/server/SocketServer';
 export default class SocketClient {
 	private socket;
 
-	constructor(channel: Channel) {
-		this.socket = ioClient(`${window.location.hostname}:3010`);
+	constructor(channel: Channel, port: string) {
+		this.socket = ioClient(`${window.location.hostname}:${port}`);
 		this.socket.emit('join', channel);
 	}
 

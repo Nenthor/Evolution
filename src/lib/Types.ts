@@ -15,6 +15,7 @@ export interface MusicData {
 	current_song: number;
 	songs: {
 		title: string;
+		img: string;
 		url: string;
 	}[];
 }

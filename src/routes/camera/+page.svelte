@@ -13,7 +13,7 @@
 	onMount(() => {
 		cameraStore.set(JSON.parse(data.camera));
 
-		camera_socket = new SocketClient('camera');
+		camera_socket = new SocketClient('camera', data.socket_port);
 		camera_socket.onMessage((message) => cameraStore.set(JSON.parse(message)));
 
 		let offset = 75;

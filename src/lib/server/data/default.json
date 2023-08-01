@@ -30,15 +30,18 @@
     "songs": [
       {
         "title": "Catch it",
-        "url": "/images/music/catch_it.webp"
+        "img": "/images/music/catch_it.webp",
+        "url": "/sound/music/catch_it.mp3"
       },
       {
         "title": "Salsa Musik",
-        "url": "/images/music/salsa.webp"
+        "img": "/images/music/salsa.webp",
+        "url": "/sound/music/salsa.mp3"
       },
       {
         "title": "Lady of the 80's",
-        "url": "/images/music/80s.webp"
+        "img": "/images/music/80s.webp",
+        "url": "/sound/music/80s.mp3"
       }
     ]
   },
