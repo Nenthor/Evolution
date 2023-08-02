@@ -1,10 +1,14 @@
 import { loadSettings } from '$lib/server/DataHub';
 import { start as startSocketServer } from '$lib/server/SocketServer';
 import type { Handle } from '@sveltejs/kit';
+import { dev } from '$app/environment';
 
 let first_connection = false;
+
+if(!dev) await checkForFirstConnection();
+
 export const handle: Handle = (async ({ event, resolve }) => {
-	await checkForFirstConnection();
+	if(dev) await checkForFirstConnection();
 	return resolve(event);
 }) satisfies Handle;
 

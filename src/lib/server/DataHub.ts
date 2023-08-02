@@ -2,6 +2,7 @@ import type { DisplayData, MapData, CameraData, MusicData, Settings } from '$lib
 import { onMessage, send } from './SocketServer';
 import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
+import Sound, { checkMusicSetting, playMusic } from './channels/Sound'
 import { DIR } from '$env/static/private';
 import default_data from './data/default.json' assert { type: 'json' };
 
@@ -11,6 +12,8 @@ let music: MusicData = default_data.music;
 let display: DisplayData = default_data.display;
 let camera: CameraData = default_data.camera;
 let map: MapData = default_data.map;
+
+Sound();
 
 export function getDisplayData() {
 	return display;
@@ -55,10 +58,12 @@ onMessage((message) => {
 	switch (key[0]) {
 		case 'settings':
 			display.settings = JSON.parse(key[1]);
+			checkMusicSetting(display.settings, music)
 			setDisplayData(display);
 			break;
 		case 'music':
 			music = JSON.parse(key[1]);
+			playMusic(music);
 			setMusicData(music);
 			break;
 		case 'test':
@@ -82,6 +87,7 @@ export async function loadSettings() {
 
 	setDisplayData(display);
 	setMusicData(music);
+	checkMusicSetting(display.settings, music);
 }
 
 async function saveSettings() {

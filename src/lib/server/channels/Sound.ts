@@ -1,3 +1,88 @@
+import type { DisplayData, MusicData } from '$lib/Types';
+import { DIR } from '$env/static/private';
+import { join } from 'path'
+import { exec } from 'child_process'
 import soundPlayer from 'play-sound';
+import { getMusicData, setMusicData } from '../DataHub';
+import { exit } from 'process';
 
-const player = soundPlayer();
+const TIMEOUT = 500 // in ms
+const player = soundPlayer({player: 'mpg123'});
+let current_song: any, current_volume = 0, current_index = -1, current_status = false;
+
+export default function start() {
+	console.log('Sound is online');
+
+	process.stdin.resume();
+	['SIGINT', 'SIGTERM'].forEach((signal) => {
+		process.on(signal, () => {
+			current_status = false;
+			stopSong();
+			exit();
+		})
+	})
+}
+
+export function checkMusicSetting(settings: DisplayData['settings'], music: MusicData) {
+	let status = settings.find(s => s.name == 'music')?.status || false
+	if(current_status != status) {
+		current_status = status;
+		if(current_status) playMusic(music)
+		else stopSong();
+	}
+}
+
+export function playMusic(music: MusicData) {
+	//Change volume
+	if(current_volume != music.volume) {
+		current_volume = music.volume
+		changeVolume(music.volume);
+
+		if(current_index == music.current_song) return;
+	}
+
+	//Play new song
+	stopSong();
+	current_index = music.current_song
+	if(music.current_song == -1 || !current_status) return;
+
+	let url = join(DIR, 'static', music.songs[music.current_song].url)
+	current_song = player.play(url, (err) => {
+		if(err) throw err;
+		if(current_index != music.current_song || !current_status) return;
+		nextSong();
+	});
+}
+
+function nextSong() {
+	let music = getMusicData();
+	music.current_song++;
+	if(music.current_song == music.songs.length)
+		music.current_song = 0;
+	playMusic(music)
+	setMusicData(music)
+}
+
+function stopSong() {
+	if(current_song) {
+		current_song.kill();
+		current_song = null;
+	}
+}
+
+let timeout = false
+let change = false;
+function changeVolume(new_volume: number) {
+	let volume = Math.round(new_volume / 100 * 90 + 10)
+	if (new_volume == 0) volume = 0
+	if (!timeout) {
+		timeout = true
+		exec(`amixer -q -M sset PCM ${volume}%`)
+		setTimeout(() => {
+			timeout = false;
+			if(change) changeVolume(current_volume)
+			change = false;
+		}, TIMEOUT);
+	} else change = true;
+}
+
