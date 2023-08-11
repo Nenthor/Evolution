@@ -38,7 +38,7 @@ let camera_data: CameraData = {
 };
 
 let map_data: MapData = {
-	hasLocation: true,
+	hasLocation: false,
 	imageX: 0,
 	imageY: 0,
 	pixelX: 0,

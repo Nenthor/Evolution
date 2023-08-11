@@ -39,6 +39,7 @@
 
 	function setWaitingAnimation(hasLocation: boolean) {
 		if (!hasLocation) {
+			if (interval) return;
 			interval = setInterval(() => {
 				if (dots == '...') dots = '';
 				else dots += '.';
@@ -66,15 +67,18 @@
 </Navbar>
 
 <div class="container" bind:this={container}>
-	<p class="placeholder {map.hasLocation ? 'off' : 'on'}">Lokalisieren{dots}</p>
-	<img
-		class="needle {map.hasLocation ? 'on' : 'off'}"
-		src="/images/needle.webp"
-		alt="Hier"
-		draggable="false"
-		style="transform: rotate({getRotation(map.rotation)}deg)"
-	/>
-	<MapCanvas {pass_data} />
+	{#if map.hasLocation}
+		<img
+			class="needle"
+			src="/images/needle.webp"
+			alt="Hier"
+			draggable="false"
+			style="transform: rotate({getRotation(map.rotation)}deg)"
+		/>
+		<MapCanvas {pass_data} />
+	{:else}
+		<p class="placeholder">Lokalisieren{dots}</p>
+	{/if}
 </div>
 
 <style>
@@ -96,7 +100,7 @@
 		line-height: 50px;
 		top: calc(50% - 25px);
 		text-align: center;
-		z-index: -1;
+		color: white;
 	}
 
 	.needle {
@@ -107,13 +111,5 @@
 		top: calc(50% - 16px);
 		filter: saturate(1.5);
 		transition: transform ease 0.3s;
-	}
-
-	.on {
-		display: block;
-	}
-
-	.off {
-		display: none;
 	}
 </style>

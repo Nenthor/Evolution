@@ -10,7 +10,6 @@
 	$: data, update();
 
 	//Draw Camera
-	const imageWidth = 2816;
 	const images: { x: number; y: number; image: HTMLImageElement }[] = [];
 
 	let canvas: HTMLCanvasElement;
@@ -35,9 +34,7 @@
 		window.addEventListener('wheel', (e) => {
 			if (e.deltaY == 0) return;
 			// >0 up | <0 down
-
-			zoom = Math.min(2.5, Math.max(0.5, zoom - e.deltaY / 1000));
-			update();
+			setZoom(-e.deltaY / 1000);
 		});
 
 		let old_dist = 0;
@@ -51,12 +48,9 @@
 			);
 
 			if (old_dist != 0) {
-				let delta = old_dist - dist;
+				let delta = dist - old_dist;
 
-				if (delta >= 1 || delta <= -1) {
-					zoom = Math.min(2.5, Math.max(0.5, zoom - delta / 500));
-					update();
-				}
+				if (delta >= 1 || delta <= -1) setZoom(delta / 500);
 			}
 
 			old_dist = dist;
@@ -112,16 +106,11 @@
 		}
 
 		//Search for cached images
-		for (let image of images) {
-			let serach = searches.find((s) => s.x == image.x && s.y == image.y);
-			if (serach) {
+		for (let search of searches) {
+			let image = images.find((img) => img.x == search.x && img.y == search.y);
+			if (image) {
 				drawImage(image.image, image.x - data.imageX, image.y - data.imageY);
-			}
-		}
-
-		//Download non-cached images
-		for (let searchIndex in searches) {
-			loadGeoDataImage(searches[searchIndex].x, searches[searchIndex].y);
+			} else loadGeoDataImage(search.x, search.y);
 		}
 	}
 
@@ -170,6 +159,11 @@
 			image.height * scale //dHeight
 		);
 	}
+
+	function setZoom(change: number) {
+		zoom = Math.min(2.5, Math.max(0.5, zoom + change));
+		update();
+	}
 </script>
 
 <svelte:head>
@@ -179,11 +173,50 @@
 	/>
 </svelte:head>
 
-<canvas id="canvas" bind:this={canvas} />
+<div class="box">
+	<canvas id="canvas" bind:this={canvas} />
+	<div class="zoom">
+		<button class="zoom_button" on:click={() => setZoom(0.4)}>+</button>
+		<button class="zoom_button" on:click={() => setZoom(-0.4)}>-</button>
+	</div>
+</div>
 
 <style>
+	.box {
+		width: 100%;
+		height: 100%;
+	}
+
 	#canvas {
 		width: 100%;
 		height: 100%;
+	}
+
+	.zoom {
+		position: absolute;
+		bottom: 5px;
+		right: 5px;
+		height: 150px;
+		width: 75px;
+	}
+
+	.zoom_button {
+		background-color: white;
+		height: 65px;
+		width: 65px;
+		margin: 5px;
+		border: 2px solid #0d85d4;
+		border-radius: 10px;
+		cursor: pointer;
+		color: #0d85d4;
+		font-size: 3.5rem;
+		font-weight: bold;
+		font-family: comfortaa;
+		transition: background-color 0.3s ease, color 0.3s ease;
+	}
+
+	.zoom_button:hover {
+		background-color: #0d85d4;
+		color: white;
 	}
 </style>

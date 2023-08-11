@@ -52,13 +52,11 @@
 		font-family: montserrat;
 	}
 
-	html {
-		min-height: 100%;
-	}
-
+	html,
 	body {
 		min-height: 100%;
 		background-color: #161616;
+		overscroll-behavior-x: none;
 	}
 
 	#content {
