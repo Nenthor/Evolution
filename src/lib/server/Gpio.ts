@@ -1,5 +1,4 @@
 import { Gpio as GPIO } from 'pigpio';
-import pinlayout from './data/pinlayout.json' assert { type: 'json' };
 
 export class DistanceSensor {
 	private trigger;

@@ -4,6 +4,7 @@ import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
 import Sound, { checkMusicSetting, playMusic } from './channels/Sound';
 import Map from './channels/Navigation';
+import SettingsSystem, { checkSettings, shutdown } from './channels/Settings';
 import { DIR } from '$env/static/private';
 import default_data from './data/default.json' assert { type: 'json' };
 
@@ -52,18 +53,21 @@ export function setMapData(new_data: MapData) {
 
 onMessage((message) => {
 	let key = message.split('=');
-	if (key.length != 2) return;
+	if (key.length > 2) return;
 
 	switch (key[0]) {
 		case 'settings':
 			display.settings = JSON.parse(key[1]);
-			checkMusicSetting(display.settings, music);
+			checkSettings(display.settings, music);
 			setDisplayData(display);
 			break;
 		case 'music':
 			music = JSON.parse(key[1]);
 			playMusic(music);
 			setMusicData(music);
+			break;
+		case 'shutdown':
+			shutdown();
 			break;
 		case 'test':
 			console.log(key[1]);
@@ -86,7 +90,7 @@ export async function loadSettings() {
 
 	setDisplayData(display);
 	setMusicData(music);
-	checkMusicSetting(display.settings, music);
+	checkSettings(display.settings, music);
 }
 
 async function saveSettings() {
@@ -102,3 +106,4 @@ async function saveSettings() {
 //Enable channels
 Sound();
 Map();
+SettingsSystem();
