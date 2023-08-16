@@ -9,8 +9,9 @@ const isPi = IS_PI == 'true';
 let light: Light;
 
 export default function start() {
-	if (isPi) light = new Light(pinlayout.LIGHTS);
-	console.log('Settings-System is online');
+	if (!isPi) return;
+	light = new Light(pinlayout.LIGHTS);
+	console.log('Light is online');
 }
 
 export function checkSettings(settings: DisplayData['settings'], music: MusicData) {

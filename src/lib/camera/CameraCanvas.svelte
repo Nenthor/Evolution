@@ -10,6 +10,8 @@
 	let width: number, height: number;
 	let middleX: number, middleY: number;
 
+	$: data, update();
+
 	const angels = [190, 235, 305, 350],
 		radius = [0.4, 0.7, 1.0],
 		emptyColor = '#aaa',
@@ -25,6 +27,8 @@
 	});
 
 	function update() {
+		if (!canvas) return;
+
 		canvas.width = canvas.clientWidth;
 		canvas.height = canvas.clientHeight;
 

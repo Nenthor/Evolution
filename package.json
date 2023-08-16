@@ -1,6 +1,6 @@
 {
 	"name": "evolution",
-	"version": "3.0.5",
+	"version": "3.0.6",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev --host --port 3000",

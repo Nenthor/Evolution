@@ -1,6 +1,7 @@
 import { Gpio as GPIO } from 'pigpio';
 
 export class DistanceSensor {
+	private id;
 	private trigger;
 	private echo;
 	private interval;
@@ -9,12 +10,14 @@ export class DistanceSensor {
 	private filter: number[] = [];
 
 	constructor(
+		id: number,
 		trigger: number,
 		echo: number,
-		callback = (distance: number) => {},
+		callback = (id: number, distance: number) => {},
 		delay = 60,
 		filter_level = 5
 	) {
+		this.id = id;
 		this.trigger = new GPIO(trigger, { mode: GPIO.OUTPUT });
 		this.echo = new GPIO(echo, { mode: GPIO.INPUT, alert: true });
 
@@ -32,7 +35,7 @@ export class DistanceSensor {
 
 				if (this.filter.length >= filter_level) {
 					let median = this.getMedian(this.filter);
-					callback(Math.round(median));
+					callback(this.id, Math.round(median));
 					this.filter.splice(0);
 				}
 			}
@@ -42,6 +45,10 @@ export class DistanceSensor {
 			// Set trigger to HIGH for 10μs
 			this.trigger.trigger(10, 1);
 		}, delay);
+	}
+
+	public getID() {
+		return this.id;
 	}
 
 	public clear() {

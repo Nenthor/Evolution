@@ -2,8 +2,9 @@ import type { DisplayData, MapData, CameraData, MusicData, Settings } from '$lib
 import { onMessage, send } from './SocketServer';
 import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
-import Sound, { checkMusicSetting, playMusic } from './channels/Sound';
+import Sound, { playMusic } from './channels/Sound';
 import Map from './channels/Navigation';
+import Camera from './channels/Camera';
 import SettingsSystem, { checkSettings, shutdown } from './channels/Settings';
 import { DIR } from '$env/static/private';
 import default_data from './data/default.json' assert { type: 'json' };
@@ -107,3 +108,4 @@ async function saveSettings() {
 Sound();
 Map();
 SettingsSystem();
+Camera();

@@ -4,12 +4,23 @@
     "SERVO": 16,
     "REVERSE": 20,
     "SPEED": 21,
-    "TRIGGER_1": 27,
-    "ECHO_1": 22,
-    "TRIGGER_2": 23,
-    "ECHO_2": 24,
-    "TRIGGER_3": 13,
-    "ECHO_3": 19,
     "ADRESS_SPEED": 40,
-    "ADRESS_BATTERY": 44
+    "ADRESS_BATTERY": 44,
+    "distance_sensor": [
+        {
+            "ID": 0,
+            "TRIGGER": 27,
+            "ECHO": 22
+        },
+        {
+            "ID": 1,
+            "TRIGGER": 23,
+            "ECHO": 24
+        },
+        {
+            "ID": 2,
+            "TRIGGER": 13,
+            "ECHO": 19
+        }
+    ]
 }
