@@ -1,5 +1,3 @@
 #!/bin/bash
 
-systemctl stop evolution.service
-killall pigpiod
 npm run dev

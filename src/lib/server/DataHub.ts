@@ -8,6 +8,7 @@ import Camera from './channels/Camera';
 import SettingsSystem, { checkSettings, shutdown } from './channels/Settings';
 import { DIR } from '$env/static/private';
 import default_data from './data/default.json' assert { type: 'json' };
+import Hardware from './Hardware';
 
 const settings_url = join(DIR, 'src/lib/server/data/settings.json');
 
@@ -105,6 +106,7 @@ async function saveSettings() {
 }
 
 //Enable channels
+Hardware();
 Sound();
 Map();
 SettingsSystem();

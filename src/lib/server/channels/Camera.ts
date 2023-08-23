@@ -1,19 +1,18 @@
 import pinlayout from '../data/pinlayout.json' assert { type: 'json' };
 import { IS_PI } from '$env/static/private';
-import { DistanceSensor } from '../Gpio';
 import { getCameraData, setCameraData } from '../DataHub';
 
 const LEVELS = [300, 200, 100];
 const isPi = IS_PI == 'true';
-let camera: DistanceSensor[] = [];
+//let camera: DistanceSensor[] = [];
 
 export default function start() {
 	if (!isPi) return;
 
-	for (const pins of pinlayout.distance_sensor) {
+	/*for (const pins of pinlayout.distance_sensor) {
 		let sensor = new DistanceSensor(pins.ID, pins.TRIGGER, pins.ECHO, onSignal);
 		camera.push(sensor);
-	}
+	}*/
 
 	console.log('Camera is online');
 }
