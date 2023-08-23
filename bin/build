@@ -1,0 +1,5 @@
+#!/bin/bash
+
+systemctl stop evolution.service
+npm run build
+exit 0

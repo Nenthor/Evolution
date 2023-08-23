@@ -1,0 +1,4 @@
+#!/bin/bash
+
+version=`cat /home/pi/.nvm/alias/default`
+PORT=8080 /home/pi/.nvm/versions/node/v$version/bin/node /home/pi/Evolution/build/index.js
