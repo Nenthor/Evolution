@@ -1,16 +1,23 @@
-import { Light } from './Gpio.js';
+import { onMessage, startCommunication } from './Communication.js';
+import Light, { light } from './Light.js';
+import Camera from './Camera.js';
 
-console.log('Hardware is online.');
+//Enable channels
+Light();
+Camera();
 
-process.on('message', (msg) => {
-	console.log('Console' + msg);
-	process.send('HEY: ' + msg);
+onMessage((message) => {
+	const msg = message.split('=');
+
+	switch (msg[0]) {
+		case 'light':
+			if (msg[1] == 'on') light.on();
+			else light.off();
+			break;
+		default:
+			console.log(`Message key not defined: ${msg[0]}`);
+			break;
+	}
 });
 
-const light = new Light(12);
-
-light.on();
-
-setTimeout(() => {
-	light.off();
-}, 1000);
+startCommunication();

@@ -1,14 +1,13 @@
 import type { DisplayData, MapData, CameraData, MusicData, Settings } from '$lib/Types';
-import { onMessage, send } from './SocketServer';
+import { onMessage as onUserMessage, send } from './SocketServer';
 import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
 import Sound, { playMusic } from './channels/Sound';
 import Map from './channels/Navigation';
-import Camera from './channels/Camera';
-import SettingsSystem, { checkSettings, shutdown } from './channels/Settings';
+import { checkSettings, shutdown } from './channels/Settings';
 import { DIR } from '$env/static/private';
 import default_data from './data/default.json' assert { type: 'json' };
-import Hardware from './Hardware';
+import Hardware, { onMessage as onHardwareMessage } from './Hardware';
 
 const settings_url = join(DIR, 'src/lib/server/data/settings.json');
 
@@ -53,35 +52,6 @@ export function setMapData(new_data: MapData) {
 	send('map', JSON.stringify(map));
 }
 
-onMessage((message) => {
-	let key = message.split('=');
-	if (key.length > 2) return;
-
-	switch (key[0]) {
-		case 'settings':
-			display.settings = JSON.parse(key[1]);
-			checkSettings(display.settings, music);
-			setDisplayData(display);
-			break;
-		case 'music':
-			music = JSON.parse(key[1]);
-			playMusic(music);
-			setMusicData(music);
-			break;
-		case 'shutdown':
-			shutdown();
-			break;
-		case 'test':
-			console.log(key[1]);
-			break;
-		default:
-			console.log(`${key[0]} not available`);
-			break;
-	}
-
-	saveSettings();
-});
-
 export async function loadSettings() {
 	let data = await readFile(settings_url, 'utf-8');
 	let settings: Settings = JSON.parse(data.toString());
@@ -105,9 +75,51 @@ async function saveSettings() {
 	await writeFile(settings_url, JSON.stringify(settings, null, 2));
 }
 
+onUserMessage((message) => {
+	let msg = message.split('=');
+	if (msg.length > 2) return;
+
+	switch (msg[0]) {
+		case 'settings':
+			display.settings = JSON.parse(msg[1]);
+			checkSettings(display.settings, music);
+			setDisplayData(display);
+			break;
+		case 'music':
+			music = JSON.parse(msg[1]);
+			playMusic(music);
+			setMusicData(music);
+			break;
+		case 'shutdown':
+			shutdown();
+			break;
+		case 'test':
+			console.log(msg[1]);
+			break;
+		default:
+			console.log(`${msg[0]} not available to user request`);
+			break;
+	}
+
+	saveSettings();
+});
+
+onHardwareMessage((message) => {
+	let msg = message.split('=');
+	if (msg.length > 2) return;
+
+	switch (msg[0]) {
+		case 'camera':
+			camera.obstacles = JSON.parse(msg[1]);
+			setCameraData(camera);
+			break;
+		default:
+			console.log(`${msg[0]} not available to hardware request`);
+			break;
+	}
+});
+
 //Enable channels
 Hardware();
 Sound();
 Map();
-SettingsSystem();
-Camera();
