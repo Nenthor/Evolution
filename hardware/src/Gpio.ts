@@ -1,10 +1,10 @@
 import { Gpio as GPIO } from 'pigpio';
 
 export class DistanceSensor {
-	private id;
-	private trigger;
-	private echo;
-	private interval;
+	private id: number;
+	private trigger: GPIO;
+	private echo: GPIO;
+	private interval: string | number | NodeJS.Timer;
 
 	private MICROSECDONDS_PER_CM = 1e6 / 34321;
 	private filter: number[] = [];
@@ -26,7 +26,7 @@ export class DistanceSensor {
 
 		//Measure distance
 		let start_tick: number;
-		this.echo.on('alert', (level, tick) => {
+		this.echo.on('alert', (level: number, tick: number) => {
 			if (level == 1) start_tick = tick;
 			else {
 				let delta = (tick >> 0) - (start_tick >> 0);
@@ -69,7 +69,7 @@ export class DistanceSensor {
 }
 
 export class Light {
-	private light;
+	private light: GPIO;
 
 	constructor(pin: number, default_state: 0 | 1 = 0) {
 		this.light = new GPIO(pin, { mode: GPIO.OUTPUT });
@@ -82,10 +82,10 @@ export class Light {
 	}
 
 	public on() {
-		this.light.digitalWrite(1);
+		this.light.digitalWrite(1)
 	}
 
 	public off() {
-		this.light.digitalWrite(0);
+		this.light.digitalWrite(0)
 	}
 }

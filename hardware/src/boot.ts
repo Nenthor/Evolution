@@ -1,6 +1,7 @@
-import { onMessage, startCommunication } from './Communication.js';
+import { onClientExit, onMessage, startCommunication, stopCommunication } from './Communication.js';
 import Light, { light } from './Light.js';
 import Camera from './Camera.js';
+import { exit } from 'process';
 
 //Enable channels
 Light();
@@ -19,5 +20,23 @@ onMessage((message) => {
 			break;
 	}
 });
+
+//Cleanup on client exit
+onClientExit(cleanup);
+
+//Cleanup on exit
+['SIGINT', 'SIGTERM'].forEach((signal) => {
+	process.on(signal, () => {
+		cleanup(true)
+		setTimeout(() => {
+			process.exit(0)
+		}, 300);
+	});
+});
+
+function cleanup(force = false) {
+	light.off();
+	if(force) stopCommunication();
+}
 
 startCommunication();

@@ -6,7 +6,7 @@
     },
     {
       "name": "car_light",
-      "status": false
+      "status": true
     },
     {
       "name": "remote_controll",

@@ -4,10 +4,10 @@ import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
 import Sound, { playMusic } from './channels/Sound';
 import Map from './channels/Navigation';
-import { checkSettings, shutdown } from './channels/Settings';
+import { checkLight, checkSettings, shutdown } from './channels/Settings';
 import { DIR } from '$env/static/private';
 import default_data from './data/default.json' assert { type: 'json' };
-import Hardware, { onMessage as onHardwareMessage } from './Hardware';
+import Hardware, {send as hardwareMessage, onMessage as onHardwareMessage, onReconnect as onHardwareReconnect} from './Hardware';
 
 const settings_url = join(DIR, 'src/lib/server/data/settings.json');
 
@@ -118,6 +118,10 @@ onHardwareMessage((message) => {
 			break;
 	}
 });
+
+onHardwareReconnect(() => {
+	checkLight(display.settings);
+})
 
 //Enable channels
 Hardware();

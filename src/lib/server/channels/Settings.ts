@@ -13,7 +13,7 @@ export function shutdown() {
 	exec('poweroff');
 }
 
-function checkLight(settings: DisplayData['settings']) {
+export function checkLight(settings: DisplayData['settings']) {
 	const light_setting = settings.find((s) => s.name == 'car_light');
 	if (light_setting) light_setting.status ? send('light=on') : send('light=off');
 }

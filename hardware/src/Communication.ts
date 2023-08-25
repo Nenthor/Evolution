@@ -4,6 +4,7 @@ const port = 4000;
 let server: Server;
 let clients: Socket[] = [];
 let onMessageCallback = (msg: string) => {};
+let onResetCallback = () => {};
 
 export function startCommunication() {
 	if (server) return;
@@ -20,6 +21,7 @@ export function startCommunication() {
 		client.on('close', () => {
 			console.log('Client disconnected');
 			clients.splice(id, 1);
+			if(clients.length == 0) onResetCallback();
 		});
 		client.on('data', (data) => {
 			onMessageCallback(data.toString());
@@ -40,4 +42,8 @@ export function send(msg: string) {
 
 export function onMessage(callback: (msg: string) => void) {
 	onMessageCallback = callback;
+}
+
+export function onClientExit(callback: () => void) {
+	onResetCallback = callback;
 }

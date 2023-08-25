@@ -6,7 +6,7 @@ export default class SocketClient {
 
 	constructor(channel: Channel, port: string) {
 		this.socket = ioClient(`${window.location.hostname}:${port}`);
-		this.socket.emit('join', channel);
+		this.socket.on('connect', () => this.socket.emit('join', channel))
 	}
 
 	public close() {
