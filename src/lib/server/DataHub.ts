@@ -3,7 +3,7 @@ import { onMessage as onUserMessage, send } from './SocketServer';
 import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
 import Sound, { playMusic } from './channels/Sound';
-import Map from './channels/Navigation';
+import Map, { parseGpsMessage } from './channels/Navigation';
 import { checkLight, checkSettings, shutdown } from './channels/Settings';
 import { DIR } from '$env/static/private';
 import default_data from './data/default.json' assert { type: 'json' };
@@ -112,6 +112,9 @@ onHardwareMessage((message) => {
 		case 'camera':
 			camera.obstacles = JSON.parse(msg[1]);
 			setCameraData(camera);
+			break;
+		case 'gps':
+			parseGpsMessage(msg[1])
 			break;
 		default:
 			console.log(`${msg[0]} not available to hardware request`);

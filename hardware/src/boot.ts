@@ -1,11 +1,13 @@
 import { onClientExit, onMessage, startCommunication, stopCommunication } from './Communication.js';
 import Light, { light } from './Light.js';
-import Camera from './Camera.js';
+import Camera, {cleanup as cameraCleanup} from './Camera.js';
 import { exit } from 'process';
+import GPS from './Gps.js';
 
 //Enable channels
 Light();
 Camera();
+GPS();
 
 onMessage((message) => {
 	const msg = message.split('=');
@@ -36,6 +38,7 @@ onClientExit(cleanup);
 
 function cleanup(force = false) {
 	light.off();
+	cameraCleanup();
 	if(force) stopCommunication();
 }
 

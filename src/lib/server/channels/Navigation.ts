@@ -5,7 +5,11 @@ let current_index = -1;
 
 export default function start() {
 	console.log('Navigation is online');
-	//update(48.0723886, 11.677054166666666);
+}
+
+export function parseGpsMessage(msg: string) {
+	const data = JSON.parse(msg)
+	update(data.lat, data.long)
 }
 
 function update(lat: number, long: number) {
