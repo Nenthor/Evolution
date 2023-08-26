@@ -2,4 +2,3 @@
 
 version=`cat /home/pi/.nvm/alias/default`
 /home/pi/.nvm/versions/node/v$version/bin/node /home/pi/Evolution/hardware/build/hardware/src/boot.js
-

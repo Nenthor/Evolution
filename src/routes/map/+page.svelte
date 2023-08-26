@@ -75,6 +75,7 @@
 			draggable="false"
 			style="transform: rotate({getRotation(map.rotation)}deg)"
 		/>
+		<span class="credits">Erstellt mit OpenStreetMap</span>
 		<MapCanvas {pass_data} />
 	{:else}
 		<p class="placeholder">Lokalisieren{dots}</p>
@@ -111,5 +112,15 @@
 		top: calc(50% - 16px);
 		filter: saturate(1.5);
 		transition: transform ease 0.3s;
+	}
+
+	.credits {
+		position: absolute;
+		bottom: 3px;
+		left: 50%;
+		transform: translateX(-50%);
+		font-family: roboto;
+		font-size: 0.9rem;
+		color: #161616;
 	}
 </style>

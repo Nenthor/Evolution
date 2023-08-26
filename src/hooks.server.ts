@@ -5,10 +5,10 @@ import { dev } from '$app/environment';
 
 let first_connection = false;
 
-if(!dev) await checkForFirstConnection();
+if (!dev) await checkForFirstConnection();
 
 export const handle: Handle = (async ({ event, resolve }) => {
-	if(dev) await checkForFirstConnection();
+	if (dev) await checkForFirstConnection();
 	return resolve(event);
 }) satisfies Handle;
 

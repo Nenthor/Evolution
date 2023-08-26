@@ -30,5 +30,5 @@ function onSignal(id: number, distance: number) {
 }
 
 export function cleanup() {
-	for(const sensor of camera) sensor.clear()
+	for (const sensor of camera) sensor.clear();
 }

@@ -5,11 +5,12 @@ let current_index = -1;
 
 export default function start() {
 	console.log('Navigation is online');
+	update(48.081667, 11.661944);
 }
 
 export function parseGpsMessage(msg: string) {
-	const data = JSON.parse(msg)
-	update(data.lat, data.long)
+	const data = JSON.parse(msg);
+	update(data.lat, data.long);
 }
 
 function update(lat: number, long: number) {
@@ -25,7 +26,7 @@ function update(lat: number, long: number) {
 }
 
 function updateCoordsText(lat = 0, long = 0) {
-	let coords = `N${degreeToDMS(lat)} O${degreeToDMS(long)}`;
+	let coords = `${degreeToDMS(lat)}N ${degreeToDMS(long)}E`;
 	let display = getDisplayData();
 	display.coords_txt = current_index != -1 ? coords : 'Lokalisieren...';
 	setDisplayData(display);

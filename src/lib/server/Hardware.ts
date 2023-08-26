@@ -8,7 +8,7 @@ const reconnect_delay = 1500; // 2s
 let client: Socket;
 let reconnect: NodeJS.Timer | null = null;
 let onMessageCallback = (msg: string) => {};
-let onHardwareReconnect  = () => {};
+let onHardwareReconnect = () => {};
 
 ['SIGINT', 'SIGTERM'].forEach((signal) => {
 	process.on(signal, () => {

@@ -82,10 +82,10 @@ export class Light {
 	}
 
 	public on() {
-		this.light.digitalWrite(1)
+		this.light.digitalWrite(1);
 	}
 
 	public off() {
-		this.light.digitalWrite(0)
+		this.light.digitalWrite(0);
 	}
 }

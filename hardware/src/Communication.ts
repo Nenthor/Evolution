@@ -1,4 +1,5 @@
-import { Socket, Server, createServer } from 'net';
+import type { Socket, Server } from 'net';
+import { createServer } from 'net';
 
 const port = 4000;
 let server: Server;
@@ -21,7 +22,7 @@ export function startCommunication() {
 		client.on('close', () => {
 			console.log('Client disconnected');
 			clients.splice(id, 1);
-			if(clients.length == 0) onResetCallback();
+			if (clients.length == 0) onResetCallback();
 		});
 		client.on('data', (data) => {
 			onMessageCallback(data.toString());

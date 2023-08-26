@@ -7,7 +7,10 @@ import Map, { parseGpsMessage } from './channels/Navigation';
 import { checkLight, checkSettings, shutdown } from './channels/Settings';
 import { DIR } from '$env/static/private';
 import default_data from './data/default.json' assert { type: 'json' };
-import Hardware, {send as hardwareMessage, onMessage as onHardwareMessage, onReconnect as onHardwareReconnect} from './Hardware';
+import Hardware, {
+	onMessage as onHardwareMessage,
+	onReconnect as onHardwareReconnect
+} from './Hardware';
 
 const settings_url = join(DIR, 'src/lib/server/data/settings.json');
 
@@ -114,7 +117,7 @@ onHardwareMessage((message) => {
 			setCameraData(camera);
 			break;
 		case 'gps':
-			parseGpsMessage(msg[1])
+			parseGpsMessage(msg[1]);
 			break;
 		default:
 			console.log(`${msg[0]} not available to hardware request`);
@@ -124,7 +127,7 @@ onHardwareMessage((message) => {
 
 onHardwareReconnect(() => {
 	checkLight(display.settings);
-})
+});
 
 //Enable channels
 Hardware();

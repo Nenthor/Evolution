@@ -1,7 +1,6 @@
 import { onClientExit, onMessage, startCommunication, stopCommunication } from './Communication.js';
 import Light, { light } from './Light.js';
-import Camera, {cleanup as cameraCleanup} from './Camera.js';
-import { exit } from 'process';
+import Camera, { cleanup as cameraCleanup } from './Camera.js';
 import GPS from './Gps.js';
 
 //Enable channels
@@ -29,9 +28,9 @@ onClientExit(cleanup);
 //Cleanup on exit
 ['SIGINT', 'SIGTERM'].forEach((signal) => {
 	process.on(signal, () => {
-		cleanup(true)
+		cleanup(true);
 		setTimeout(() => {
-			process.exit(0)
+			process.exit(0);
 		}, 300);
 	});
 });
@@ -39,7 +38,7 @@ onClientExit(cleanup);
 function cleanup(force = false) {
 	light.off();
 	cameraCleanup();
-	if(force) stopCommunication();
+	if (force) stopCommunication();
 }
 
 startCommunication();
