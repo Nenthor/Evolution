@@ -38,3 +38,20 @@ export interface Settings {
 	volume: MusicData['volume'];
 	current_song: MusicData['current_song'];
 }
+
+export interface HardwareGps {
+	type: 'gps';
+	lat: number;
+	long: number;
+	rotation: number;
+}
+
+export interface HardwareCamera {
+	type: 'camera';
+	obstacles: CameraData['obstacles']
+}
+
+export interface HardwareLight {
+	type: 'light';
+	status: 'on' | 'off'
+}

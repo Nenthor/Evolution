@@ -1,22 +1,22 @@
-import { getDisplayData, getMapData, setDisplayData, setMapData } from '../DataHub';
+import type { HardwareGps } from '$lib/Types';
+import { getDisplayData, setDisplayData, setMapData } from '../DataHub';
 import map_data from '../data/navigation.json' assert { type: 'json' };
 
 let current_index = -1;
 
 export default function start() {
 	console.log('Navigation is online');
-	update(48.081667, 11.661944);
+	//update(48.081667, 11.661944);
 }
 
-export function parseGpsMessage(msg: string) {
-	const data = JSON.parse(msg);
-	update(data.lat, data.long);
+export function parseGpsMessage(data: HardwareGps) {
+	update(data.lat, data.long, data.rotation);
 }
 
-function update(lat: number, long: number) {
+function update(lat: number, long: number, rotation: number) {
 	current_index = findImage(lat, long, current_index);
 	if (current_index != -1) {
-		updateNavigation(lat, long, current_index);
+		updateNavigation(lat, long, rotation, current_index);
 		updateCoordsText(lat, long);
 	} else {
 		console.log('Navigation not available...');
@@ -57,7 +57,7 @@ function isMatchingImage(lat: number, long: number, index: number) {
 	return true;
 }
 
-function updateNavigation(lat: number, long: number, index: number) {
+function updateNavigation(lat: number, long: number, rotation: number, index: number) {
 	const img = map_data.geodata[index];
 	setMapData({
 		hasLocation: true,
@@ -65,7 +65,7 @@ function updateNavigation(lat: number, long: number, index: number) {
 		imageY: parseInt(img.filename.split('_')[2]),
 		pixelX: Math.round((long - img.startLong) / map_data.settings.widthPixelLong),
 		pixelY: Math.round((lat - img.startLat) / map_data.settings.widthPixelLat),
-		rotation: getMapData().rotation
+		rotation
 	});
 }
 
@@ -76,6 +76,6 @@ function clearNavigation() {
 		imageY: 0,
 		pixelX: 0,
 		pixelY: 0,
-		rotation: getMapData().rotation
+		rotation: 0
 	});
 }

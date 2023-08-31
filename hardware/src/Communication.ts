@@ -6,18 +6,20 @@ let server: Server;
 let clients: Socket[] = [];
 let onMessageCallback = (msg: string) => {};
 let onResetCallback = () => {};
+let onForceUpdateCallback = () => {};
 
 export function startCommunication() {
 	if (server) return;
 
 	server = createServer();
 
-	server.on('error', (err) => console.log(err));
+	server.on('error', (err) => console.log('ERROR:' + err));
 	server.on('close', () => console.log('Communication channel is offline'));
 	server.on('connection', (client) => {
 		console.log('Client connected');
 		const id = clients.length;
 		clients.push(client);
+		onForceUpdateCallback()
 
 		client.on('close', () => {
 			console.log('Client disconnected');
@@ -25,7 +27,9 @@ export function startCommunication() {
 			if (clients.length == 0) onResetCallback();
 		});
 		client.on('data', (data) => {
-			onMessageCallback(data.toString());
+			let msg = data.toString().replaceAll('{', '={').split('=')
+			msg.shift()
+			msg.forEach((m) => onMessageCallback(m))
 		});
 	});
 	server.listen(port, () => console.log('Communication channel is online'));
@@ -47,4 +51,8 @@ export function onMessage(callback: (msg: string) => void) {
 
 export function onClientExit(callback: () => void) {
 	onResetCallback = callback;
+}
+
+export function onForceUpdate(callback: () => void) {
+	onForceUpdateCallback = callback;
 }

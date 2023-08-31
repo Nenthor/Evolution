@@ -1,5 +1,5 @@
 import { DistanceSensor } from './Gpio.js';
-import type { CameraData } from '../../src/lib/Types.js';
+import type { HardwareCamera, CameraData } from '../../src/lib/Types.js';
 import pinlayout from '../../src/lib/server/data/pinlayout.json' assert { type: 'json' };
 import { send } from './Communication.js';
 
@@ -23,10 +23,22 @@ function onSignal(id: number, distance: number) {
 			if (obstacles[id] == i) return;
 
 			obstacles[id] = i;
-			send(`camera=${JSON.stringify(obstacles)}`);
+			send(getCameraString());
 			return;
 		}
 	}
+}
+
+function getCameraString() {
+	const data: HardwareCamera = {
+		type: 'camera',
+		obstacles
+	}
+	return JSON.stringify(data);
+}
+
+export function forceUpdate() {
+	send(getCameraString());
 }
 
 export function cleanup() {

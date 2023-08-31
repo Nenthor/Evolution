@@ -35,7 +35,7 @@
 	// Dots animation
 	$: setWaitingAnimation(map.hasLocation);
 	let dots = '';
-	let interval: NodeJS.Timer | null;
+	let interval: NodeJS.Timeout | null;
 
 	function setWaitingAnimation(hasLocation: boolean) {
 		if (!hasLocation) {
@@ -51,8 +51,26 @@
 	}
 
 	//Needle Rotation
+	let rotation = Infinity
+	let old_deg = 0;
+	
 	function getRotation(deg: number) {
-		return deg - 45;
+		if(old_deg == deg) return
+		if(rotation == Infinity || rotation == -Infinity) {
+			rotation = deg
+			old_deg = deg
+		}
+		else {
+			let diff = deg - old_deg
+			old_deg = deg
+
+			if(diff > 180) diff -= 360
+			else if(diff < -180) diff +=360
+
+			rotation += diff
+		}
+
+		return rotation - 45; // -45deg to rotate image to true north
 	}
 
 	//cleanup
@@ -111,7 +129,7 @@
 		left: calc(50% - 16px);
 		top: calc(50% - 16px);
 		filter: saturate(1.5);
-		transition: transform ease 0.3s;
+		transition: transform ease-out 0.3s;
 	}
 
 	.credits {

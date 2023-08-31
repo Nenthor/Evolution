@@ -4,7 +4,7 @@ export class DistanceSensor {
 	private id: number;
 	private trigger: GPIO;
 	private echo: GPIO;
-	private interval: string | number | NodeJS.Timer;
+	private interval: NodeJS.Timeout;
 
 	private MICROSECDONDS_PER_CM = 1e6 / 34321;
 	private filter: number[] = [];

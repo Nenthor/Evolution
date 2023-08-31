@@ -1,4 +1,4 @@
-import type { DisplayData, MapData, CameraData, MusicData, Settings } from '$lib/Types';
+import type { DisplayData, MapData, CameraData, MusicData, Settings, HardwareCamera, HardwareGps } from '$lib/Types';
 import { onMessage as onUserMessage, send } from './SocketServer';
 import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
@@ -108,19 +108,19 @@ onUserMessage((message) => {
 });
 
 onHardwareMessage((message) => {
-	let msg = message.split('=');
-	if (msg.length > 2) return;
+	const data = JSON.parse(message)
+	if(!data) throw Error('Message has not the right format')
 
-	switch (msg[0]) {
+	switch (data.type) {
 		case 'camera':
-			camera.obstacles = JSON.parse(msg[1]);
+			camera.obstacles = (data as HardwareCamera).obstacles;
 			setCameraData(camera);
 			break;
 		case 'gps':
-			parseGpsMessage(msg[1]);
+			parseGpsMessage(data as HardwareGps);
 			break;
 		default:
-			console.log(`${msg[0]} not available to hardware request`);
+			console.log(`${data.type} not available to hardware request`);
 			break;
 	}
 });

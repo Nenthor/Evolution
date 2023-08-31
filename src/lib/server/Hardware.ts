@@ -1,12 +1,12 @@
 import { IS_PI } from '$env/static/private';
-import { Socket, connect as connectToHardware } from 'net';
+import { type Socket, connect as connectToHardware } from 'net';
 
 const isPI = IS_PI == 'true';
 const port = 4000;
-const reconnect_delay = 1500; // 2s
+const reconnect_delay = 1000; // 1s
 
 let client: Socket;
-let reconnect: NodeJS.Timer | null = null;
+let reconnect: NodeJS.Timeout | null = null;
 let onMessageCallback = (msg: string) => {};
 let onHardwareReconnect = () => {};
 
@@ -52,7 +52,11 @@ function connect() {
 	});
 
 	//On Message
-	client.on('data', (data) => onMessageCallback(data.toString()));
+	client.on('data', (data) => {
+		let msg = data.toString().replaceAll('{', '={').split('=')
+		msg.shift()
+		msg.forEach((m) => onMessageCallback(m))
+	});
 }
 
 export function send(msg: string) {
