@@ -5,7 +5,9 @@ import { exec } from 'child_process';
 import soundPlayer from 'play-sound';
 import { getMusicData, setMusicData } from '../DataHub';
 import { exit } from 'process';
+import { IS_PI } from '$env/static/private';
 
+const isPI = IS_PI == 'true';
 const TIMEOUT = 500; // in ms
 const player = soundPlayer({ player: 'mpg123' });
 let current_song: any,
@@ -14,6 +16,7 @@ let current_song: any,
 	current_status = false;
 
 export default function start() {
+	if (!isPI) console.log('Not running on Raspberry PI - Sound is offline');
 	console.log('Sound is online');
 
 	process.stdin.resume();
@@ -37,6 +40,8 @@ export function checkMusicSetting(settings: DisplayData['settings'], music: Musi
 }
 
 export function playMusic(music: MusicData) {
+	if (!isPI) return;
+
 	//Change volume
 	if (current_volume != music.volume) {
 		current_volume = music.volume;
@@ -59,6 +64,7 @@ export function playMusic(music: MusicData) {
 }
 
 function nextSong() {
+	if (!isPI) return;
 	let music = getMusicData();
 	music.current_song++;
 	if (music.current_song == music.songs.length) music.current_song = 0;
@@ -67,6 +73,7 @@ function nextSong() {
 }
 
 function stopSong() {
+	if (!isPI) return;
 	if (current_song) {
 		current_song.kill();
 		current_song = null;
@@ -76,6 +83,7 @@ function stopSong() {
 let timeout = false;
 let change = false;
 function changeVolume(new_volume: number) {
+	if (!isPI) return;
 	let volume = Math.round((new_volume / 100) * 90 + 10);
 	if (new_volume == 0) volume = 0;
 	if (!timeout) {

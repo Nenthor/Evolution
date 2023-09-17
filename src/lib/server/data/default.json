@@ -34,9 +34,34 @@
         "url": "/sound/music/catch-it.mp3"
       },
       {
+        "title": "Back in Black",
+        "img": "/images/music/back-in-black.webp",
+        "url": "/sound/music/back-in-black.mp3"
+      },
+      {
+        "title": "Gas Gas Gas",
+        "img": "/images/music/gas-gas-gas.webp",
+        "url": "/sound/music/gas-gas-gas.mp3"
+      },
+      {
         "title": "Salsa Musik",
         "img": "/images/music/salsa.webp",
         "url": "/sound/music/salsa.mp3"
+      },
+      {
+        "title": "Mr. Blue Sky",
+        "img": "/images/music/mr-blue-sky.webp",
+        "url": "/sound/music/mr-blue-sky.mp3"
+      },
+      {
+        "title": "Shoot to Thrill",
+        "img": "/images/music/shoot-to-thrill.webp",
+        "url": "/sound/music/shoot-to-thrill.mp3"
+      },
+      {
+        "title": "Hotel California",
+        "img": "/images/music/hotel-california.webp",
+        "url": "/sound/music/hotel-california.mp3"
       },
       {
         "title": "Lady of the 80's",
