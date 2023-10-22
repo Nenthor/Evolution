@@ -39,6 +39,11 @@
         "url": "/sound/music/back-in-black.mp3"
       },
       {
+        "title": "Wake Me Up Before You Go-Go",
+        "img": "/images/music/wake-me-up-before-you-go-go.webp",
+        "url": "/sound/music/wake-me-up-before-you-go-go.mp3"
+      },
+      {
         "title": "Gas Gas Gas",
         "img": "/images/music/gas-gas-gas.webp",
         "url": "/sound/music/gas-gas-gas.mp3"
@@ -54,6 +59,11 @@
         "url": "/sound/music/mr-blue-sky.mp3"
       },
       {
+        "title": "You Make My Dreams",
+        "img": "/images/music/you-make-my-dreams.webp",
+        "url": "/sound/music/you-make-my-dreams.mp3"
+      },
+      {
         "title": "Shoot to Thrill",
         "img": "/images/music/shoot-to-thrill.webp",
         "url": "/sound/music/shoot-to-thrill.mp3"
@@ -64,9 +74,34 @@
         "url": "/sound/music/hotel-california.mp3"
       },
       {
+        "title": "Discord",
+        "img": "/images/music/discord.webp",
+        "url": "/sound/music/discord.mp3"
+      },
+      {
+        "title": "Stressed Out",
+        "img": "/images/music/stressed-out.webp",
+        "url": "/sound/music/stressed-out.mp3"
+      },
+      {
         "title": "Lady of the 80's",
         "img": "/images/music/80s.webp",
         "url": "/sound/music/80s.mp3"
+      },
+      {
+        "title": "Another One Bites the Dust",
+        "img": "/images/music/another-one-bites-the-dust.webp",
+        "url": "/sound/music/another-one-bites-the-dust.mp3"
+      },
+      {
+        "title": "Blinding Lights",
+        "img": "/images/music/blinding-lights.webp",
+        "url": "/sound/music/blinding-lights.mp3"
+      },
+      {
+        "title": "Coconut Mall",
+        "img": "/images/music/coconut-mall.webp",
+        "url": "/sound/music/coconut-mall.mp3"
       }
     ]
   },

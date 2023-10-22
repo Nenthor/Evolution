@@ -16,7 +16,10 @@ let current_song: any,
 	current_status = false;
 
 export default function start() {
-	if (!isPI) console.log('Not running on Raspberry PI - Sound is offline');
+	if (!isPI) {
+		console.log('Not running on Raspberry PI - Sound is offline');
+		return;
+	}
 	console.log('Sound is online');
 
 	process.stdin.resume();

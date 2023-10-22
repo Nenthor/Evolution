@@ -1,10 +1,16 @@
 import type { HardwareGps } from '$lib/Types';
 import { getDisplayData, setDisplayData, setMapData } from '../DataHub';
 import map_data from '../data/navigation.json' assert { type: 'json' };
+import { IS_PI } from '$env/static/private';
 
+const isPI = IS_PI == 'true';
 let current_index = -1;
 
 export default function start() {
+	if (!isPI) {
+		console.log('Not running on Raspberry PI - Navigation is offline');
+		return;
+	}
 	console.log('Navigation is online');
 	//update(48.081667, 11.661944);
 }
