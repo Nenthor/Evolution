@@ -17,6 +17,7 @@ export interface MusicData {
 		title: string;
 		img: string;
 		url: string;
+		volume_adj: number;
 	}[];
 }
 
@@ -48,10 +49,10 @@ export interface HardwareGps {
 
 export interface HardwareCamera {
 	type: 'camera';
-	obstacles: CameraData['obstacles']
+	obstacles: CameraData['obstacles'];
 }
 
 export interface HardwareLight {
 	type: 'light';
-	status: 'on' | 'off'
+	status: 'on' | 'off';
 }

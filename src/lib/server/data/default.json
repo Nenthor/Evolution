@@ -31,77 +31,98 @@
       {
         "title": "Catch it",
         "img": "/images/music/catch-it.webp",
-        "url": "/sound/music/catch-it.mp3"
+        "url": "/sound/music/catch-it.mp3",
+        "volume_adj": 0.0
       },
       {
         "title": "Back in Black",
         "img": "/images/music/back-in-black.webp",
-        "url": "/sound/music/back-in-black.mp3"
+        "url": "/sound/music/back-in-black.mp3",
+        "volume_adj": 40.0
       },
       {
         "title": "Wake Me Up Before You Go-Go",
         "img": "/images/music/wake-me-up-before-you-go-go.webp",
-        "url": "/sound/music/wake-me-up-before-you-go-go.mp3"
+        "url": "/sound/music/wake-me-up-before-you-go-go.mp3",
+        "volume_adj": 20.0
       },
       {
         "title": "Gas Gas Gas",
         "img": "/images/music/gas-gas-gas.webp",
-        "url": "/sound/music/gas-gas-gas.mp3"
+        "url": "/sound/music/gas-gas-gas.mp3",
+        "volume_adj": 0.0
       },
       {
         "title": "Salsa Musik",
         "img": "/images/music/salsa.webp",
-        "url": "/sound/music/salsa.mp3"
+        "url": "/sound/music/salsa.mp3",
+        "volume_adj": 0.0
       },
       {
         "title": "Mr. Blue Sky",
         "img": "/images/music/mr-blue-sky.webp",
-        "url": "/sound/music/mr-blue-sky.mp3"
+        "url": "/sound/music/mr-blue-sky.mp3",
+        "volume_adj": 40.0
+      },
+      {
+        "title": "Highway to Hell",
+        "img": "/images/music/highway-to-hell.webp",
+        "url": "/sound/music/highway-to-hell.mp3",
+        "volume_adj": 0.0
       },
       {
         "title": "You Make My Dreams",
         "img": "/images/music/you-make-my-dreams.webp",
-        "url": "/sound/music/you-make-my-dreams.mp3"
+        "url": "/sound/music/you-make-my-dreams.mp3",
+        "volume_adj": 0.0
       },
       {
         "title": "Shoot to Thrill",
         "img": "/images/music/shoot-to-thrill.webp",
-        "url": "/sound/music/shoot-to-thrill.mp3"
+        "url": "/sound/music/shoot-to-thrill.mp3",
+        "volume_adj": 0.0
       },
       {
         "title": "Hotel California",
         "img": "/images/music/hotel-california.webp",
-        "url": "/sound/music/hotel-california.mp3"
+        "url": "/sound/music/hotel-california.mp3",
+        "volume_adj": 0.0
       },
       {
         "title": "Discord",
         "img": "/images/music/discord.webp",
-        "url": "/sound/music/discord.mp3"
+        "url": "/sound/music/discord.mp3",
+        "volume_adj": 0.0
       },
       {
         "title": "Stressed Out",
         "img": "/images/music/stressed-out.webp",
-        "url": "/sound/music/stressed-out.mp3"
+        "url": "/sound/music/stressed-out.mp3",
+        "volume_adj": 0.0
       },
       {
         "title": "Lady of the 80's",
         "img": "/images/music/80s.webp",
-        "url": "/sound/music/80s.mp3"
+        "url": "/sound/music/80s.mp3",
+        "volume_adj": 0.0
       },
       {
         "title": "Another One Bites the Dust",
         "img": "/images/music/another-one-bites-the-dust.webp",
-        "url": "/sound/music/another-one-bites-the-dust.mp3"
+        "url": "/sound/music/another-one-bites-the-dust.mp3",
+        "volume_adj": 0.0
       },
       {
         "title": "Blinding Lights",
         "img": "/images/music/blinding-lights.webp",
-        "url": "/sound/music/blinding-lights.mp3"
+        "url": "/sound/music/blinding-lights.mp3",
+        "volume_adj": 0.0
       },
       {
         "title": "Coconut Mall",
         "img": "/images/music/coconut-mall.webp",
-        "url": "/sound/music/coconut-mall.mp3"
+        "url": "/sound/music/coconut-mall.mp3",
+        "volume_adj": 100.0
       }
     ]
   },

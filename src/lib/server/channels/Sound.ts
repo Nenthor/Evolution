@@ -1,11 +1,10 @@
+import { DIR, IS_PI } from '$env/static/private';
 import type { DisplayData, MusicData } from '$lib/Types';
-import { DIR } from '$env/static/private';
-import { join } from 'path';
 import { exec } from 'child_process';
+import { join } from 'path';
 import soundPlayer from 'play-sound';
-import { getMusicData, setMusicData } from '../DataHub';
 import { exit } from 'process';
-import { IS_PI } from '$env/static/private';
+import { getMusicData, setMusicData } from '../DataHub';
 
 const isPI = IS_PI == 'true';
 const TIMEOUT = 500; // in ms
@@ -46,9 +45,13 @@ export function playMusic(music: MusicData) {
 	if (!isPI) return;
 
 	//Change volume
-	if (current_volume != music.volume) {
+	if (
+		current_volume != music.volume ||
+		(music.current_song != -1 && current_index != music.current_song)
+	) {
 		current_volume = music.volume;
-		changeVolume(music.volume);
+		const volume_adj = music.current_song == -1 ? 0 : music.songs[music.current_song].volume_adj;
+		changeVolume(music.volume + volume_adj);
 
 		if (current_index == music.current_song) return;
 	}

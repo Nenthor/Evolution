@@ -48,10 +48,16 @@
 		justify-content: center;
 		flex-direction: column;
 		line-height: normal;
-		font-size: clamp(0.5rem, 3vw, 1rem);
+		
 	}
 
 	.title {
 		font-weight: bold;
+		font-size: clamp(0.5rem, 3vw, 1rem);
+	}
+
+	.text {
+		font-size: clamp(0.5rem, 1.75vw, 1rem);
+		white-space: nowrap;
 	}
 </style>
