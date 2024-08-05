@@ -2,10 +2,9 @@ import GPS from 'gps';
 import { SerialPort } from 'serialport';
 import { send } from './Communication.js';
 import { getRotation, setDeclination } from './Compass.js';
-import type { HardwareGps } from '../../src/lib/Types.js';
 
-let gps: GPS;
-let serial: SerialPort;
+let gps;
+let serial;
 let lat = 0,
 	long = 0,
 	deg = 0;
@@ -35,8 +34,13 @@ export default () => {
 	console.log('GPS is online');
 };
 
+/**
+ * Get the GPS data as a string
+ * @param {boolean} valid
+ * @returns {string}
+ */
 function getGpsString(valid = true) {
-	const data: HardwareGps = {
+	const data = {
 		type: 'gps',
 		lat: valid ? lat : 0,
 		long: valid ? long : 0,

@@ -4,8 +4,8 @@ import Geomagnetism from 'geomagnetism';
 const DELAY = 1000;
 const OFFSET = 270;
 
-let compass: Compasss;
-let interval: NodeJS.Timeout;
+let compass;
+let interval;
 let rotation = 0;
 let options = {
 	sampleRate: '30',
@@ -27,7 +27,12 @@ export default () => {
 	console.log('Compass is online');
 };
 
-export function setDeclination(lat: number, long: number) {
+/**
+ * Set the declination for the compass
+ * @param {number} lat
+ * @param {number} long
+ */
+export function setDeclination(lat, long) {
 	if (!compass) return;
 	const declination = Geomagnetism.model().point([lat, long]).decl;
 	compass.setDeclination(declination);
@@ -44,7 +49,7 @@ export function getRotation() {
 function setRefreshLoop() {
 	interval = setInterval(() => {
 		// Get the compass values between x and y.  Heading is returned in degrees.
-		compass.getHeadingDegrees('x', 'y', (err: any, heading: number) => {
+		compass.getHeadingDegrees('x', 'y', (err, heading) => {
 			if (err) {
 				console.log(err);
 				return;
