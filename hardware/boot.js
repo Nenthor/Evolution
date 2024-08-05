@@ -8,6 +8,7 @@ import {
 } from './Communication.js';
 import Compass, { cleanup as compassCleanup } from './Compass.js';
 import GPS, { forceUpdate as forceUpdateGPS } from './Gps.js';
+import Ina219, { cleanup as Ina219Cleanup } from './Ina219.js';
 import Light, { light } from './Light.js';
 
 //Enable channels
@@ -15,6 +16,7 @@ Light();
 Camera();
 GPS();
 Compass();
+Ina219();
 
 onMessage((msg) => {
 	let data = JSON.parse(msg);
@@ -52,6 +54,7 @@ function cleanup(force = false) {
 	light.off();
 	cameraCleanup();
 	compassCleanup();
+	Ina219Cleanup();
 	if (force) stopCommunication();
 }
 

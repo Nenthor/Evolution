@@ -1,6 +1,5 @@
 import Ina219Board from 'ina219-async';
-import type { HardwareBattery, HardwareSpeed } from '../../src/lib/Types.js';
-import pinlayout from '../../src/lib/server/data/pinlayout.json' assert { type: 'json' };
+import pinlayout from '../src/lib/server/data/pinlayout.json' assert { type: 'json' };
 import { send } from './Communication.js';
 
 const SPEED_UPDATE_INTERVAL = 333; // ms
@@ -12,10 +11,10 @@ const MAX_BATTERY_V = 84;
 const MAX_SPEED_V = 20;
 const MAX_SPEED_KMH = 30;
 
-let speed: Ina219Board;
-let battery: Ina219Board;
-let speedInterval: NodeJS.Timeout;
-let batteryInterval: NodeJS.Timeout;
+let speed;
+let battery;
+let speedInterval;
+let batteryInterval;
 
 export default async () => {
 	if (!speed) {
@@ -49,7 +48,7 @@ export function cleanup() {
 	if (battery) battery.closeSync();
 }
 
-function intToHex(n: number) {
+function intToHex(n) {
 	return parseInt(`0x${n}`, 16);
 }
 
@@ -58,7 +57,7 @@ async function getSpeed() {
 
 	const volt = await speed.getBusVoltage_V();
 
-	const data: HardwareSpeed = {
+	const data = {
 		type: 'speed',
 		speed: (volt / MAX_BATTERY_V) * MAX_SPEED_KMH
 	};
@@ -71,7 +70,7 @@ async function getBattery() {
 
 	const volt = await battery.getBusVoltage_V();
 
-	const data: HardwareBattery = {
+	const data = {
 		type: 'battery',
 		battery: ((volt - MIN_BATTERY_V) / (MAX_BATTERY_V - MIN_BATTERY_V)) * 100
 	};

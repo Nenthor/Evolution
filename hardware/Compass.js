@@ -51,7 +51,7 @@ function setRefreshLoop() {
 		// Get the compass values between x and y.  Heading is returned in degrees.
 		compass.getHeadingDegrees('x', 'y', (err, heading) => {
 			if (err) {
-				console.log(err);
+				// console.log(err);
 				return;
 			}
 
