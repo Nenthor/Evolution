@@ -59,7 +59,7 @@ async function getSpeed() {
 
 	const data = {
 		type: 'speed',
-		speed: (volt / MAX_BATTERY_V) * MAX_SPEED_KMH
+		speed: (volt / MAX_SPEED_V) * MAX_SPEED_KMH
 	};
 
 	send(JSON.stringify(data));
