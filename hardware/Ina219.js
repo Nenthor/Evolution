@@ -61,12 +61,13 @@ async function getSpeed() {
 	if (volt === undefined || volt === null) return;
 
 	let newSpeed = Math.floor((volt / MAX_SPEED_V) * MAX_SPEED_KMH);
+	console.log('newSpeed', newSpeed, volt);
 	newSpeed = Math.min(MAX_SPEED_KMH, Math.max(0, newSpeed));
 
 	speedHistory.push(newSpeed);
 	if (speedHistory.length > 3) speedHistory.shift();
 	// Ignore if speed is 0 for 3 consecutive readings to avoid false positives
-	if (!speedHistory.every((s) => s == 0)) return;
+	if (newSpeed == 0 && !speedHistory.every((s) => s == 0)) return;
 
 	const data = {
 		type: 'speed',
@@ -85,6 +86,7 @@ async function getBattery() {
 	let newBattery = Math.ceil(
 		((volt * V_DIVIDER_BATTERY - MIN_BATTERY_V) / (MAX_BATTERY_V - MIN_BATTERY_V)) * 100
 	);
+	console.log('newBattery', newBattery, volt);
 	newBattery = Math.min(100, Math.max(0, newBattery));
 
 	const data = {
