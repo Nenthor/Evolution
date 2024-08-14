@@ -1,16 +1,24 @@
-import type { DisplayData, MapData, CameraData, MusicData, Settings, HardwareCamera, HardwareGps } from '$lib/Types';
-import { onMessage as onUserMessage, send } from './SocketServer';
+import { DIR } from '$env/static/private';
+import type {
+	CameraData,
+	DisplayData,
+	HardwareCamera,
+	HardwareGps,
+	MapData,
+	MusicData,
+	Settings
+} from '$lib/Types';
 import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
-import Sound, { playMusic } from './channels/Sound';
 import Map, { parseGpsMessage } from './channels/Navigation';
 import { checkLight, checkSettings, shutdown } from './channels/Settings';
-import { DIR } from '$env/static/private';
+import Sound, { playMusic } from './channels/Sound';
 import default_data from './data/default.json' assert { type: 'json' };
 import Hardware, {
 	onMessage as onHardwareMessage,
 	onReconnect as onHardwareReconnect
 } from './Hardware';
+import { onMessage as onUserMessage, send } from './SocketServer';
 
 const settings_url = join(DIR, 'src/lib/server/data/settings.json');
 
@@ -108,10 +116,19 @@ onUserMessage((message) => {
 });
 
 onHardwareMessage((message) => {
-	const data = JSON.parse(message)
-	if(!data) throw Error('Message has not the right format')
+	const data = JSON.parse(message);
+	console.log(data);
+	if (!data) throw Error('Message has not the right format');
 
 	switch (data.type) {
+		case 'speed':
+			display.speed = (data as { speed: number }).speed;
+			setDisplayData(display);
+			break;
+		case 'battery':
+			display.battery = (data as { battery: number }).battery;
+			setDisplayData(display);
+			break;
 		case 'camera':
 			camera.obstacles = (data as HardwareCamera).obstacles;
 			setCameraData(camera);

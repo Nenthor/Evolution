@@ -53,9 +53,9 @@ function connect() {
 
 	//On Message
 	client.on('data', (data) => {
-		let msg = data.toString().replaceAll('{', '={').split('=')
-		msg.shift()
-		msg.forEach((m) => onMessageCallback(m))
+		let msg = data.toString().replaceAll('{', '={').split('=');
+		msg.shift();
+		msg.forEach((m) => onMessageCallback(m));
 	});
 }
 
