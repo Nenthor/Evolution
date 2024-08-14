@@ -39,12 +39,12 @@ export default () => {
  * @param {boolean} valid
  * @returns {string}
  */
-function getGpsString(valid = true) {
+function getGpsString() {
 	const data = {
 		type: 'gps',
-		lat: valid ? lat : 0,
-		long: valid ? long : 0,
-		rotation: valid ? deg : 0
+		lat,
+		long,
+		rotation: deg
 	};
 	return JSON.stringify(data);
 }

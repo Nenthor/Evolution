@@ -60,17 +60,17 @@ async function getSpeed() {
 	const volt = await speed.getBusVoltage_V();
 	if (volt === undefined || volt === null) return;
 
-	let speed = Math.floor(((volt * V_DIVIDER_BATTERY) / MAX_SPEED_V) * MAX_SPEED_KMH);
-	speed = Math.min(MAX_SPEED_KMH, Math.max(0, speed));
+	let newSpeed = Math.floor((volt / MAX_SPEED_V) * MAX_SPEED_KMH);
+	newSpeed = Math.min(MAX_SPEED_KMH, Math.max(0, newSpeed));
 
-	speedHistory.push(speed);
+	speedHistory.push(newSpeed);
 	if (speedHistory.length > 3) speedHistory.shift();
 	// Ignore if speed is 0 for 3 consecutive readings to avoid false positives
 	if (!speedHistory.every((s) => s == 0)) return;
 
 	const data = {
 		type: 'speed',
-		speed
+		speed: newSpeed
 	};
 
 	send(JSON.stringify(data));
@@ -82,12 +82,14 @@ async function getBattery() {
 	const volt = await battery.getBusVoltage_V();
 	if (volt === undefined || volt === null) return;
 
-	let battery = Math.ceil(((volt - MIN_BATTERY_V) / (MAX_BATTERY_V - MIN_BATTERY_V)) * 100);
-	battery = Math.min(100, Math.max(0, battery));
+	let newBattery = Math.ceil(
+		((volt * V_DIVIDER_BATTERY - MIN_BATTERY_V) / (MAX_BATTERY_V - MIN_BATTERY_V)) * 100
+	);
+	newBattery = Math.min(100, Math.max(0, newBattery));
 
 	const data = {
 		type: 'battery',
-		battery
+		battery: newBattery
 	};
 
 	send(JSON.stringify(data));
