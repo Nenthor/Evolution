@@ -2,7 +2,7 @@ import Ina219Board from 'ina219-async';
 import pinlayout from '../src/lib/server/data/pinlayout.json' assert { type: 'json' };
 import { send } from './Communication.js';
 
-const SPEED_UPDATE_INTERVAL = 500; // ms
+const SPEED_UPDATE_INTERVAL = 300; // ms
 const BATTERY_UPDATE_INTERVAL = 10_000; // ms
 
 const MIN_BATTERY_V = 69;
@@ -54,6 +54,7 @@ function intToHex(n) {
 }
 
 const speedHistory = [];
+const SPEED_SAMPLES = 3;
 async function getSpeed() {
 	if (!speed) return;
 
@@ -61,22 +62,25 @@ async function getSpeed() {
 	if (volt === undefined || volt === null) return;
 
 	let newSpeed = Math.floor((volt / MAX_SPEED_V) * MAX_SPEED_KMH);
-	console.log('newSpeed', newSpeed, volt);
+	if (newSpeed <= 3) newSpeed = 0; // Ignore low speeds to avoid false positives
 	newSpeed = Math.min(MAX_SPEED_KMH, Math.max(0, newSpeed));
 
 	speedHistory.push(newSpeed);
-	if (speedHistory.length > 3) speedHistory.shift();
+	if (speedHistory.length > SPEED_SAMPLES) speedHistory.shift();
 	// Ignore if speed is 0 for 3 consecutive readings to avoid false positives
 	if (newSpeed == 0 && !speedHistory.every((s) => s == 0)) return;
 
+	const avgSpeed = Math.round(speedHistory.reduce((a, b) => a + b) / speedHistory.length);
+
 	const data = {
 		type: 'speed',
-		speed: newSpeed
+		speed: avgSpeed
 	};
 
 	send(JSON.stringify(data));
 }
 
+let lowestBattery = 100;
 async function getBattery() {
 	if (!battery) return;
 
@@ -86,8 +90,10 @@ async function getBattery() {
 	let newBattery = Math.ceil(
 		((volt * V_DIVIDER_BATTERY - MIN_BATTERY_V) / (MAX_BATTERY_V - MIN_BATTERY_V)) * 100
 	);
-	console.log('newBattery', newBattery, volt);
 	newBattery = Math.min(100, Math.max(0, newBattery));
+
+	if (newBattery < lowestBattery) lowestBattery = newBattery;
+	else newBattery = lowestBattery; // Avoid false positives
 
 	const data = {
 		type: 'battery',
